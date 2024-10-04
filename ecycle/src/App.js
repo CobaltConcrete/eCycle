@@ -10,7 +10,7 @@ const App = () => {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>Welcome to My Website</h1>
+                <h1>eCycle</h1>
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />

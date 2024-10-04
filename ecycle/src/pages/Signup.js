@@ -9,16 +9,23 @@ const Signup = () => {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const registerUser = async (userType) => {
         try {
             const response = await axios.post('http://localhost:5000/register', {
                 username,
                 password,
+                usertype: userType, // Include userType in the request
             });
             if (response.status === 201) {
-                // Successful registration, redirect to Login
-                navigate('/');
+                // Store usertype in localStorage and redirect based on usertype
+                localStorage.setItem('usertype', userType);
+
+                // Redirect user based on type
+                if (userType === 'user') {
+                    navigate('/select-waste');
+                } else {
+                    navigate('/shop-dashboard'); // Assuming shop has its own dashboard
+                }
             }
         } catch (err) {
             setError('Username already exists. Please try again.');
@@ -29,7 +36,7 @@ const Signup = () => {
         <div className="signup-container">
             <h2>Sign Up</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form onSubmit={handleSubmit}>
+            <form>
                 <input
                     type="text"
                     value={username}
@@ -44,7 +51,14 @@ const Signup = () => {
                     placeholder="Password"
                     required
                 />
-                <button type="submit">Sign Up</button>
+                <div className="user-type-container">
+                    <button type="button" onClick={() => registerUser('user')} className="user-button">
+                        Register as User
+                    </button>
+                    <button type="button" onClick={() => registerUser('shop')} className="shop-button">
+                        Register as Shop
+                    </button>
+                </div>
             </form>
         </div>
     );

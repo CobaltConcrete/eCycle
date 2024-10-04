@@ -1,8 +1,25 @@
 // SelectWaste.js
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './SelectWaste.css';
 
 const SelectWaste = () => {
+    const [usertype, setUsertype] = useState(null);
+
+    // Retrieve usertype from localStorage when component mounts
+    useEffect(() => {
+        const storedUsertype = localStorage.getItem('usertype');
+        setUsertype(storedUsertype);
+    }, []);
+
+    if (usertype == 'shop') {
+        return (
+            <div className="access-restricted">
+                <h2>Access Restricted</h2>
+                <p>You need to be registered as a user to access this page.</p>
+            </div>
+        );
+    }
+
     return (
         <div className="select-waste-container">
             <h2>Select Waste</h2>

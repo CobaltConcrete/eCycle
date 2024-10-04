@@ -1,0 +1,20 @@
+.user-type-container {
+    display: flex;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+.user-type-container button {
+    margin: 0 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
+}
+
+.user-type-container button.active {
+    background-color: #0056b3;
+    /* Darker color for active button */
+}

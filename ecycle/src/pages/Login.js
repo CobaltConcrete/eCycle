@@ -23,15 +23,22 @@ const Login = () => {
             });
 
             if (response.status === 200) {
+                const { usertype } = response.data; // Get usertype from the response
+                localStorage.setItem('usertype', usertype); // Store usertype in localStorage
+                
                 login(); // Call the login function to update the authentication state
-                navigate('/select-waste'); // Successful login, redirect to SelectWaste
+
+                // Redirect based on usertype
+                if (usertype === 'user') {
+                    navigate('/select-waste'); // User can access SelectWaste
+                } else if (usertype === 'shop') {
+                    navigate('/shop-dashboard'); // Shop users may have a different dashboard
+                }
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                // Specific error handling for unauthorized
                 setError('Invalid credentials. Please try again.');
             } else {
-                // General error handling
                 setError('An error occurred. Please try again later.');
             }
         } finally {

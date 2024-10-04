@@ -11,11 +11,12 @@ class User(db.Model):
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False)
     points = db.Column(db.BigInteger, default=0)
+    usertype = db.Column(db.String(50), nullable=False)
 
     def check_password(self, password):
         return bcrypt.check_password_hash(self.password, password)
 
     @classmethod
-    def create_user(cls, username, password):
+    def create_user(cls, username, password, usertype):
         hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
-        return cls(username=username, password=hashed_password)
+        return cls(username=username, password=hashed_password, usertype=usertype)
