@@ -1,0 +1,109 @@
+/* SelectWaste.css */
+
+.select-waste-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+}
+
+.boxes-container {
+    display: flex;
+    flex-direction: column;
+    /* Change to column for vertical alignment */
+    gap: 20px;
+    /* Add space between the boxes */
+    margin: 20px 0;
+    /* Margin above and below the boxes */
+}
+
+.waste-box {
+    width: 800px;
+    /* Width of the box */
+    height: 200px;
+    /* Height of the box (adjust as needed) */
+    color: white;
+    /* Text color */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer on hover */
+    transition: transform 0.2s;
+    /* Animation on hover */
+    background-size: cover;
+    /* Ensure the image covers the box */
+    background-position: center;
+    /* Center the background image */
+    position: relative;
+    /* Enable absolute positioning of text */
+    overflow: hidden;
+    /* Prevent overflow of background image */
+}
+
+.waste-box:before {
+    content: '';
+    /* Add a pseudo-element */
+    position: absolute;
+    /* Position it absolutely */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    /* Black overlay with 50% opacity */
+    z-index: 1;
+    /* Ensure it stays behind the text */
+}
+
+.waste-box h3 {
+    position: relative;
+    /* Positioning to ensure it stays above the overlay */
+    z-index: 2;
+    /* Ensure text stays above the overlay */
+}
+
+.waste-box:nth-child(1) {
+    background-image: url('../images/repairewaste.jpg');
+}
+
+.waste-box:nth-child(2) {
+    background-image: url('../images/disposeewaste.jpg');
+}
+
+.waste-box:nth-child(3) {
+    background-image: url('../images/generalwaste.jpeg');
+}
+
+.waste-box:hover {
+    transform: scale(1.05);
+    /* Scale up on hover */
+}
+
+.help-button {
+    margin-top: 20px;
+    /* Margin above the help button */
+    padding: 10px 15px;
+    /* Padding for the button */
+    background-color: #007bff;
+    /* Button color */
+    color: white;
+    /* Text color */
+    border: none;
+    /* No border */
+    border-radius: 5px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer on hover */
+    transition: background-color 0.3s;
+    /* Animation on hover */
+}
+
+.help-button:hover {
+    background-color: #0056b3;
+    /* Darker blue on hover */
+}

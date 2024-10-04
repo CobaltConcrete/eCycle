@@ -1,35 +1,28 @@
+// SelectWaste.js
 import React from 'react';
+import './SelectWaste.css';
 
 const SelectWaste = () => {
     return (
-        <div className="select-waste-container" style={styles.container}>
+        <div className="select-waste-container">
             <h2>Select Waste</h2>
             <p>Please select the type of waste you would like to dispose of or recycle.</p>
-            {/* Add your waste selection options here */}
-            <button style={styles.button} onClick={() => alert('Waste selected!')}>
-                Select Waste Type
+            <div className="boxes-container">
+                <div className="waste-box" onClick={() => alert('Repair E-waste selected!')}>
+                    <h3>Repair E-waste</h3>
+                </div>
+                <div className="waste-box" onClick={() => alert('Dispose E-waste selected!')}>
+                    <h3>Dispose E-waste</h3>
+                </div>
+                <div className="waste-box" onClick={() => alert('Other Waste selected!')}>
+                    <h3>Other Waste</h3>
+                </div>
+            </div>
+            <button className="help-button" onClick={() => alert('Help is on the way!')}>
+                Need help?
             </button>
         </div>
     );
-};
-
-const styles = {
-    container: {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: '#f4f4f4',
-    },
-    button: {
-        padding: '10px',
-        backgroundColor: '#5cb85c',
-        border: 'none',
-        borderRadius: '4px',
-        color: 'white',
-        cursor: 'pointer',
-    },
 };
 
 export default SelectWaste;
