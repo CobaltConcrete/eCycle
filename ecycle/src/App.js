@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import SelectWaste from './pages/SelectWaste';
 import Checklist from './pages/Checklist'; // Import the Checklist component
 import ProtectedRoute from './components/ProtectedRoute'; // Adjust the path as necessary
+import Map from './pages/Map'; // Import Map component
 
 const App = () => {
     return (
@@ -17,7 +18,7 @@ const App = () => {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/select-waste" element={<ProtectedRoute element={<SelectWaste />} />} />
                     <Route path="/checklist" element={<ProtectedRoute element={<Checklist />} />} />
-                    <Route path="/shop-dashboard" element={<ProtectedRoute />} />
+                    <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} /> {/* Updated to include Map route */}
                 </Routes>
             </header>
         </div>

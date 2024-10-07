@@ -1,0 +1,15 @@
+CREATE TABLE checklistoptiontable (
+    checklistoptionid SERIAL PRIMARY KEY,
+    checklistoptiontype VARCHAR(255) UNIQUE NOT NULL
+);
+
+INSERT INTO checklistoptiontable (checklistoptiontype) VALUES 
+('Phone, Tablets'),
+('Game Consoles'),
+('Computers, Laptops'),
+('TVs, Audios'),
+('Airconditioners'),
+('Washing Machine'),
+('Printers'),
+('Others');
+

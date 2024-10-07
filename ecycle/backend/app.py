@@ -2,6 +2,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from config import Config
 from models import db, User, ChecklistOption, UserChecklist
+import pandas as pd
+from geopy.distance import geodesic
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -58,6 +60,38 @@ def save_user_checklist():
 
     db.session.commit()
     return jsonify({'message': 'Checklist options saved successfully'}), 201
+
+
+# Load repair and disposal locations from CSV files
+repair_df = pd.read_csv('./locationCSV/repairfinal.csv')
+dispose_df = pd.read_csv('./locationCSV/ewastefinal.csv')
+
+# Route for nearby repair locations
+@app.route('/nearby-repair-locations', methods=['POST'])
+def nearby_repair_locations():
+    return get_nearby_locations(repair_df)
+
+# Route for nearby disposal locations
+@app.route('/nearby-dispose-locations', methods=['POST'])
+def nearby_dispose_locations():
+    return get_nearby_locations(dispose_df)
+
+# Helper function to calculate nearby locations
+def get_nearby_locations(df):
+    data = request.get_json()
+    user_lat = data.get('lat')
+    user_lon = data.get('lon')
+
+    if user_lat is None or user_lon is None:
+        return jsonify({'error': 'User location is required'}), 400
+
+    user_location = (user_lat, user_lon)
+    df['distance'] = df.apply(lambda row: geodesic(
+        user_location, (row['latitude'], row['longitude'])
+    ).km, axis=1)
+
+    nearby_locations = df.sort_values('distance').head(5)
+    return jsonify(nearby_locations.to_dict(orient='records')), 200
 
 if __name__ == '__main__':
     with app.app_context():
