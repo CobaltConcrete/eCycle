@@ -1,4 +1,3 @@
-// Signup.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -14,11 +13,12 @@ const Signup = () => {
             const response = await axios.post('http://localhost:5000/register', {
                 username,
                 password,
-                usertype: userType, // Include userType in the request
+                usertype: userType,
             });
             if (response.status === 201) {
-                // Store usertype in localStorage and redirect based on usertype
-                localStorage.setItem('usertype', userType);
+                const { userid } = response.data; // Get userid from the response
+                localStorage.setItem('usertype', userType); // Store usertype in localStorage
+                localStorage.setItem('userid', userid); // Store userid in localStorage
 
                 // Redirect user based on type
                 if (userType === 'user') {

@@ -4,6 +4,7 @@ import './App.css';  // Assuming you have some CSS for your app
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import SelectWaste from './pages/SelectWaste';
+import Checklist from './pages/Checklist'; // Import the Checklist component
 import ProtectedRoute from './components/ProtectedRoute'; // Adjust the path as necessary
 
 const App = () => {
@@ -15,6 +16,8 @@ const App = () => {
                     <Route path="/" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/select-waste" element={<ProtectedRoute element={<SelectWaste />} />} />
+                    <Route path="/checklist" element={<ProtectedRoute element={<Checklist />} />} />
+                    <Route path="/shop-dashboard" element={<ProtectedRoute />} />
                 </Routes>
             </header>
         </div>
@@ -22,4 +25,3 @@ const App = () => {
 };
 
 export default App;
-

@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../components/AuthContext'; // Import the useAuth hook
+import { useAuth } from '../components/AuthContext';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [loading, setLoading] = useState(false); // Add loading state
+    const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
-    const { login } = useAuth(); // Get the login function from context
+    const { login } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setLoading(true); // Set loading to true
-        setError(''); // Clear previous errors
+        setLoading(true);
+        setError('');
 
         try {
             const response = await axios.post('http://localhost:5000/login', {
@@ -23,16 +23,17 @@ const Login = () => {
             });
 
             if (response.status === 200) {
-                const { usertype } = response.data; // Get usertype from the response
+                const { userid, usertype } = response.data; // Get userid and usertype from the response
                 localStorage.setItem('usertype', usertype); // Store usertype in localStorage
-                
-                login(); // Call the login function to update the authentication state
+                localStorage.setItem('userid', userid); // Store userid in localStorage
+
+                login();
 
                 // Redirect based on usertype
                 if (usertype === 'user') {
-                    navigate('/select-waste'); // User can access SelectWaste
+                    navigate('/checklist');
                 } else if (usertype === 'shop') {
-                    navigate('/shop-dashboard'); // Shop users may have a different dashboard
+                    navigate('/checklist');
                 }
             }
         } catch (err) {
@@ -42,16 +43,13 @@ const Login = () => {
                 setError('An error occurred. Please try again later.');
             }
         } finally {
-            setLoading(false); // Set loading to false regardless of the outcome
+            setLoading(false);
         }
     };
 
-    // Navigate to Signup page
     const handleSignUp = () => {
         navigate('/signup');
     };
-
-    console.log("Rendering Login Component");
 
     return (
         <div className="login-container">
@@ -72,8 +70,8 @@ const Login = () => {
                     placeholder="Password"
                     required
                 />
-                <button type="submit" disabled={loading}> {/* Disable button while loading */}
-                    {loading ? 'Logging in...' : 'Login'} {/* Show loading text */}
+                <button type="submit" disabled={loading}>
+                    {loading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
             <p>
