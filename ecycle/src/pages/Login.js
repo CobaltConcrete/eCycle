@@ -34,6 +34,8 @@ const Login = () => {
                     navigate('/checklist');
                 } else if (usertype === 'shop') {
                     navigate('/checklist');
+                } else if (usertype === 'admin') {
+                    navigate('/adminpage');
                 }
             }
         } catch (err) {

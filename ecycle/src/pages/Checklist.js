@@ -30,6 +30,17 @@ const Checklist = () => {
         }
     };
 
+    const handleSelectAll = () => {
+        if (selectedOptions.length === checklistOptions.length) {
+            // If all are selected, deselect all
+            setSelectedOptions([]);
+        } else {
+            // Select all options
+            const allOptionIds = checklistOptions.map(option => option.checklistoptionid);
+            setSelectedOptions(allOptionIds);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userid = localStorage.getItem('userid'); // Get userid from localStorage
@@ -71,6 +82,9 @@ const Checklist = () => {
                         </label>
                     </div>
                 ))}
+                <button type="button" onClick={handleSelectAll}>
+                    {selectedOptions.length === checklistOptions.length ? 'Deselect All' : 'Select All'}
+                </button>
                 <button type="submit">Submit</button>
             </form>
         </div>

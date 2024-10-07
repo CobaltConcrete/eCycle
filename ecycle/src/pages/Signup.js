@@ -22,9 +22,11 @@ const Signup = () => {
 
                 // Redirect user based on type
                 if (userType === 'user') {
-                    navigate('/select-waste');
-                } else {
-                    navigate('/shop-dashboard'); // Assuming shop has its own dashboard
+                    navigate('/checklist');
+                } else if (userType === 'shop') {
+                    navigate('/checklist'); // Assuming shop has its own dashboard
+                } else if (userType === 'admin') {
+                    navigate('/adminpage');
                 }
             }
         } catch (err) {
