@@ -1,14 +1,18 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from config import Config
 from models import db, User, ChecklistOption, UserChecklist
 import pandas as pd
 from geopy.distance import geodesic
+from dotenv import load_dotenv
+import requests
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 CORS(app)
+load_dotenv()
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -93,32 +97,24 @@ def get_nearby_locations(df):
     nearby_locations = df.sort_values('distance').head(5)
     return jsonify(nearby_locations.to_dict(orient='records')), 200
 
-
-GOOGLE_MAPS_API_KEY = 'your_api_key_here'  # Replace with your actual Google Maps API Key
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")  # Replace with your actual Google Maps API Key
 
 @app.route('/get-coordinates', methods=['POST'])
 def get_coordinates():
-    data = request.get_json()
-    address = data.get('address')
+    address = request.json.get('address')
     if not address:
         return jsonify({'error': 'Address is required'}), 400
 
     url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={GOOGLE_MAPS_API_KEY}'
     response = requests.get(url)
-    if response.status_code == 200:
-        data = response.json()
-        if data['status'] == 'OK':
-            lat = data['results'][0]['geometry']['location']['lat']
-            lon = data['results'][0]['geometry']['location']['lng']
-            return jsonify({'lat': lat, 'lon': lon}), 200
-        else:
-            return jsonify({'error': 'No results found for the given address'}), 404
+    data = response.json()
+
+    if data['status'] == 'OK':
+        location = data['results'][0]['geometry']['location']
+        print(location)
+        return jsonify({'lat': location['lat'], 'lon': location['lng']}), 200
     else:
-        return jsonify({'error': 'Failed to connect to Google Maps API'}), 500
-
-
+        return jsonify({'error': 'Invalid address'}), 400
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()  # Create tables if not exist
     app.run(debug=True)
