@@ -93,6 +93,31 @@ def get_nearby_locations(df):
     nearby_locations = df.sort_values('distance').head(5)
     return jsonify(nearby_locations.to_dict(orient='records')), 200
 
+
+GOOGLE_MAPS_API_KEY = 'your_api_key_here'  # Replace with your actual Google Maps API Key
+
+@app.route('/get-coordinates', methods=['POST'])
+def get_coordinates():
+    data = request.get_json()
+    address = data.get('address')
+    if not address:
+        return jsonify({'error': 'Address is required'}), 400
+
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={GOOGLE_MAPS_API_KEY}'
+    response = requests.get(url)
+    if response.status_code == 200:
+        data = response.json()
+        if data['status'] == 'OK':
+            lat = data['results'][0]['geometry']['location']['lat']
+            lon = data['results'][0]['geometry']['location']['lng']
+            return jsonify({'lat': lat, 'lon': lon}), 200
+        else:
+            return jsonify({'error': 'No results found for the given address'}), 404
+    else:
+        return jsonify({'error': 'Failed to connect to Google Maps API'}), 500
+
+
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # Create tables if not exist
