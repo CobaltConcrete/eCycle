@@ -1,0 +1,6 @@
+CREATE TABLE forumtable (
+    forumid SERIAL PRIMARY KEY,
+    forumtitle VARCHAR(255) NOT NULL,
+    shopid INT,
+    FOREIGN KEY (shopid) REFERENCES usertable(userid)
+);

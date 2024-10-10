@@ -1,102 +1,154 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import L from 'leaflet';
-import redMarker from '../images/redmarker.png';
-import blueMarker from '../images/bluemarker.png';
 
 const Map = () => {
     const { type } = useParams();
-    const [locations, setLocations] = useState([]);
     const [userLocation, setUserLocation] = useState(null);
-    const [manualLocation, setManualLocation] = useState({ lat: '', lon: '' });
+    const [manualLocation, setManualLocation] = useState(null);
+    const [locations, setLocations] = useState([]);
     const [manualAddress, setManualAddress] = useState('');
     const [useCurrentLocation, setUseCurrentLocation] = useState(true);
     const [error, setError] = useState('');
+    const [transportMode, setTransportMode] = useState(window.google.maps.TravelMode.DRIVING); // Default to DRIVING
+
 
     useEffect(() => {
         if (useCurrentLocation && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    setUserLocation({ lat, lon });
-                    console.log(`Current Location: Lat: ${lat}, Lon: ${lon}`);
+                    const { latitude, longitude } = position.coords;
+                    setUserLocation({ lat: latitude, lng: longitude });
+                    loadMap(latitude, longitude);
                 },
-                () => setError('Failed to retrieve your current location')
+                (error) => {
+                    console.error("Error obtaining location", error);
+                    setError('Failed to retrieve your current location');
+                }
             );
-        } else if (!useCurrentLocation && manualAddress) {
-            fetchCoordinatesFromAddress(manualAddress);
         }
-    }, [useCurrentLocation, manualAddress]);
+    }, [useCurrentLocation]);
 
-    const fetchCoordinatesFromAddress = async (address) => {
-        try {
-            const response = await axios.post('http://localhost:5000/get-coordinates', { address });
-            const { lat, lon } = response.data;
-            setManualLocation({ lat, lon });
-            setUserLocation({ lat, lon });
-            console.log(`Fetched Coordinates: Lat: ${lat}, Lon: ${lon}`);
-        } catch (err) {
-            // setError('Failed to fetch coordinates for the given address: ' + err.message);
-        }
+    const loadMap = (lat, lng) => {
+        const map = new window.google.maps.Map(document.getElementById('map'), {
+            center: { lat, lng },
+            zoom: 13,
+        });
+
+        new window.google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: "You are here!",
+        });
+
+        // Fetch nearby locations after the map is loaded
+        fetchNearbyLocations(lat, lng);
     };
 
-    const fetchNearbyLocations = async () => {
+    const fetchNearbyLocations = async (lat, lng) => {
         try {
-            const location = useCurrentLocation ? userLocation : manualLocation;
             const url = type === 'repair' 
                 ? 'http://localhost:5000/nearby-repair-locations' 
                 : 'http://localhost:5000/nearby-dispose-locations';
-            
+
             const response = await axios.post(url, {
-                lat: location.lat,
-                lon: location.lon,
+                lat,
+                lon: lng,
             });
-            setLocations(response.data.slice(0, 5)); // Take only the first 5 locations
-            // Reset map center to user location
-            if (userLocation) {
-                console.log(`User Location: Lat: ${userLocation.lat}, Lon: ${userLocation.lon}`);
-            }
+            setLocations(response.data.slice(0, 5));
+            addMarkersToMap(response.data.slice(0, 5), { lat, lng });
         } catch (err) {
             setError('Failed to fetch nearby locations');
         }
     };
 
+    const addMarkersToMap = (locations, center) => {
+        const map = new window.google.maps.Map(document.getElementById('map'), {
+            center: center,
+            zoom: 13,
+        });
+
+        const userMarker = new window.google.maps.Marker({
+            map,
+            position: center,
+            title: "You are here!",
+            clickable: true
+        });
+
+        const infoWindow = new window.google.maps.InfoWindow();
+
+        // Create a DirectionsService and DirectionsRenderer
+        const directionsService = new window.google.maps.DirectionsService();
+        const directionsRenderer = new window.google.maps.DirectionsRenderer();
+        directionsRenderer.setMap(map);
+
+        locations.forEach((loc) => {
+            const marker = new window.google.maps.Marker({
+                map,
+                position: { lat: loc.latitude, lng: loc.longitude },
+                title: loc.Name,
+                icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
+                clickable: true
+            });
+
+            // Add click listener to each location marker
+            marker.addListener('click', () => {
+                // Fetch and display route directions
+                directionsService.route(
+                    {
+                        origin: center,
+                        destination: { lat: loc.latitude, lng: loc.longitude },
+                        travelMode: transportMode, // Use the selected transport mode here
+                        transitOptions: {
+                            routingPreference: 'LESS_WALKING'
+                        }
+                    },
+                    (result, status) => {
+                        if (status === window.google.maps.DirectionsStatus.OK) {
+                            directionsRenderer.setDirections(result);
+                        } else {
+                            console.error(`Directions request failed due to ${status}`);
+                        }
+                    }
+                );
+
+                // Set and open the info window
+                infoWindow.setContent(`
+                    <div>
+                        <h3 style="color: black;">${loc.Name}</h3>
+                        <p style="color: black;">${loc.AddressName}</p>
+                        <a href="${loc.Hyperlink}" target="_blank">Visit Website</a>
+                    </div>
+                `);
+                infoWindow.open(map, marker);
+            });
+        });
+    };
+
     const handleAddressChange = (e) => setManualAddress(e.target.value);
 
-    // Define custom icons
-    const userIcon = new L.Icon({
-        iconUrl: redMarker, // Use your imported image for user location
-        iconSize: [25, 25], // Size of the icon
-        iconAnchor: [12, 25], // Point of the icon which will correspond to marker's location
-    });
+    const handleSearch = () => {
+        if (useCurrentLocation && userLocation) {
+            fetchNearbyLocations(userLocation.lat, userLocation.lng);
+        } else {
+            fetchCoordinatesFromAddress(manualAddress);
+        }
+    };
 
-    const locationIcon = new L.Icon({
-        iconUrl: blueMarker, // Use your imported image for nearby locations
-        iconSize: [25, 25], // Size of the icon
-        iconAnchor: [12, 25], // Point of the icon which will correspond to marker's location
-    });
-
-    // Custom component to pan the map
-    const MapPan = ({ userLocation }) => {
-        const map = useMap();
-
-        useEffect(() => {
-            if (userLocation) {
-                map.setView([userLocation.lat, userLocation.lon], map.getZoom());
-            }
-        }, [userLocation, map]);
-
-        return null;
+    const fetchCoordinatesFromAddress = async (address) => {
+        try {
+            const response = await axios.post('http://localhost:5000/get-coordinates', { address });
+            const { lat, lon } = response.data;
+            setManualLocation({ lat, lng: lon });
+            loadMap(lat, lon); // Center map on manual location
+        } catch (err) {
+            setError('Failed to fetch coordinates for the given address');
+        }
     };
 
     return (
         <div>
             <h2>Find Nearest {type === 'repair' ? 'Repair' : 'Disposal'} Locations</h2>
-
             <div>
                 <label>
                     <input
@@ -127,31 +179,35 @@ const Map = () => {
                 </div>
             )}
 
-            <button onClick={fetchNearbyLocations}>Find Locations</button>
+            <button onClick={handleSearch}>Find Locations</button>
 
-            {userLocation && (
+            <div>
+                <label htmlFor="transportMode">Select Transport Mode: </label>
+                <select
+                    id="transportMode"
+                    value={transportMode}
+                    onChange={(e) => setTransportMode(e.target.value)}
+                >
+                    <option value={window.google.maps.TravelMode.DRIVING}>Driving</option>
+                    <option value={window.google.maps.TravelMode.WALKING}>Walking</option>
+                    <option value={window.google.maps.TravelMode.BICYCLING}>Bicycling</option>
+                    <option value={window.google.maps.TravelMode.TRANSIT}>Transit</option>
+                </select>
+            </div>
+
+            <div id="map" style={{ height: '400px', width: '100%' }}></div>
+
+            {locations.length > 0 && (
                 <div>
-                    <p>Lat: {userLocation.lat}, Lon: {userLocation.lon}</p>
-                    <MapContainer center={[userLocation.lat, userLocation.lon]} zoom={13} style={{ height: '400px', width: '100%' }}>
-                        <TileLayer
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        <Marker position={[userLocation.lat, userLocation.lon]} icon={userIcon}>
-                            <Popup>Your Location</Popup>
-                        </Marker>
-                        {locations.map((loc) => (
-                            <Marker key={loc.IndexName} position={[loc.latitude, loc.longitude]} icon={locationIcon}>
-                                <Popup>
-                                    <h3>{loc.Name}</h3>
-                                    <p>{loc.AddressName}</p>
-                                    <a href={loc.Hyperlink}>Visit Website</a>
-                                </Popup>
-                            </Marker>
+                    <h3>Nearby Locations:</h3>
+                    <ul>
+                        {locations.map((loc, index) => (
+                            <li key={index}>
+                                <h4>{loc.Name}</h4>
+                                <p>{loc.AddressName}</p>
+                            </li>
                         ))}
-                        {/* Include the MapPan component to handle panning */}
-                        <MapPan userLocation={userLocation} />
-                    </MapContainer>
+                    </ul>
                 </div>
             )}
 

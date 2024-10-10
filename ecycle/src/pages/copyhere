@@ -1,0 +1,147 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+
+const Map = () => {
+    const [userLocation, setUserLocation] = useState(null);
+    const [locations, setLocations] = useState([]);
+    const [manualAddress, setManualAddress] = useState('');
+    const [useCurrentLocation, setUseCurrentLocation] = useState(true);
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (useCurrentLocation && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    setUserLocation({ lat: latitude, lng: longitude });
+                    loadMap(latitude, longitude);
+                },
+                (error) => {
+                    console.error("Error obtaining location", error);
+                    setError('Failed to retrieve your current location');
+                }
+            );
+        }
+    }, [useCurrentLocation]);
+
+    const loadMap = (lat, lng) => {
+        const map = new window.google.maps.Map(document.getElementById('map'), {
+            center: { lat, lng },
+            zoom: 13,
+        });
+
+        new window.google.maps.Marker({
+            position: { lat, lng },
+            map,
+            title: "You are here!",
+        });
+    };
+
+    const fetchNearbyLocations = async () => {
+        if (!userLocation) {
+            setError('User location is not available.');
+            return;
+        }
+
+        const { lat, lng } = userLocation;
+        const service = new window.google.maps.places.PlacesService(window.google.maps.Map);
+
+        const request = {
+            location: { lat, lng },
+            radius: '500', // Search within 500 meters
+            type: useCurrentLocation ? 'repair' : 'disposal', // Change to your desired type
+        };
+
+        service.nearbySearch(request, (results, status) => {
+            if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+                setLocations(results);
+            } else {
+                setError('Failed to fetch nearby locations.');
+            }
+        });
+    };
+
+    const handleAddressChange = (e) => setManualAddress(e.target.value);
+
+    const handleSearch = () => {
+        if (useCurrentLocation) {
+            fetchNearbyLocations();
+        } else {
+            fetchCoordinatesFromAddress(manualAddress);
+        }
+    };
+
+    const fetchCoordinatesFromAddress = async (address) => {
+        try {
+            const response = await axios.post('http://localhost:5000/get-coordinates', { address });
+            const { lat, lon } = response.data;
+            setUserLocation({ lat, lng: lon });
+            loadMap(lat, lon); // Load map with new coordinates
+            fetchNearbyLocations(); // Fetch nearby locations with new coordinates
+        } catch (err) {
+            setError('Failed to fetch coordinates for the given address');
+        }
+    };
+
+    return (
+        <div>
+            <h2>Your Location</h2>
+            <div>
+                <label>
+                    <input
+                        type="radio"
+                        checked={useCurrentLocation}
+                        onChange={() => setUseCurrentLocation(true)}
+                    />
+                    Use Current Location
+                </label>
+                <label>
+                    <input
+                        type="radio"
+                        checked={!useCurrentLocation}
+                        onChange={() => setUseCurrentLocation(false)}
+                    />
+                    Enter Location Manually
+                </label>
+            </div>
+
+            {!useCurrentLocation && (
+                <div>
+                    <input
+                        type="text"
+                        placeholder="Enter address or postal code"
+                        value={manualAddress}
+                        onChange={handleAddressChange}
+                    />
+                </div>
+            )}
+
+            <button onClick={handleSearch}>Find Locations</button>
+
+            {userLocation && (
+                <div>
+                    <p>Lat: {userLocation.lat}, Lng: {userLocation.lng}</p>
+                    <div id="map" style={{ height: '400px', width: '100%' }}></div>
+                </div>
+            )}
+
+            {locations.length > 0 && (
+                <div>
+                    <h3>Nearby Locations:</h3>
+                    <ul>
+                        {locations.map((loc) => (
+                            <li key={loc.place_id}>
+                                <h4>{loc.name}</h4>
+                                <p>{loc.vicinity}</p>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
+    );
+};
+
+export default Map;

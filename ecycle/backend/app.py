@@ -116,5 +116,59 @@ def get_coordinates():
     else:
         return jsonify({'error': 'Invalid address'}), 400
 
+# @app.route('/get-directions', methods=['POST'])
+# def get_directions():
+#     data = request.get_json()
+#     user_location = data.get('user_location')
+#     destination = data.get('destination')
+
+#     if not user_location or not destination:
+#         return jsonify({'error': 'User location and destination are required'}), 400
+
+#     directions_url = f'https://maps.googleapis.com/maps/api/directions/json?origin={user_location["lat"]},{user_location["lon"]}&destination={destination["lat"]},{destination["lon"]}&key={GOOGLE_MAPS_API_KEY}'
+    
+#     response = requests.get(directions_url)
+#     directions_data = response.json()
+
+#     if directions_data['status'] == 'OK':
+#         routes = directions_data['routes'][0]
+#         steps = routes['legs'][0]['steps']
+        
+#         directions = []
+#         for step in steps:
+#             directions.append(step['html_instructions'])  # Get HTML instructions for directions
+
+#         return jsonify({'directions': directions}), 200
+#     else:
+#         return jsonify({'error': 'Unable to get directions'}), 400
+
+@app.route('/get-directions', methods=['POST'])
+def get_directions():
+    data = request.get_json()
+    user_location = data.get('user_location')
+    destination = data.get('destination')
+    mode = data.get('mode', 'DRIVING')  # Default mode is DRIVING
+
+    if not user_location or not destination:
+        return jsonify({'error': 'User location and destination are required'}), 400
+
+    directions_url = f'https://maps.googleapis.com/maps/api/directions/json?origin={user_location["lat"]},{user_location["lon"]}&destination={destination["lat"]},{destination["lon"]}&mode={mode}&key={GOOGLE_MAPS_API_KEY}'
+    
+    response = requests.get(directions_url)
+    directions_data = response.json()
+
+    if directions_data['status'] == 'OK':
+        routes = directions_data['routes'][0]
+        steps = routes['legs'][0]['steps']
+        
+        directions = []
+        for step in steps:
+            directions.append(step['html_instructions'])  # Get HTML instructions for directions
+
+        return jsonify({'directions': directions}), 200
+    else:
+        return jsonify({'error': 'Unable to get directions'}), 400
+
+
 if __name__ == '__main__':
     app.run(debug=True)
