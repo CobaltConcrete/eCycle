@@ -18,7 +18,7 @@ const App = () => {
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/select-waste" element={<ProtectedRoute element={<SelectWaste />} />} />
                     <Route path="/checklist" element={<ProtectedRoute element={<Checklist />} />} />
-                    <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} /> {/* Updated to include Map route */}
+                    <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} />
                 </Routes>
             </header>
         </div>

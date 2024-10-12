@@ -4,12 +4,13 @@ CREATE TABLE checklistoptiontable (
 );
 
 INSERT INTO checklistoptiontable (checklistoptiontype) VALUES 
+('Batteries'),
+('Lamps, Light Bulbs'),
 ('Phone, Tablets'),
 ('Game Consoles'),
 ('Computers, Laptops'),
 ('TVs, Audios'),
-('Airconditioners'),
-('Washing Machine'),
 ('Printers'),
+('Air-conditioners'),
 ('Others');
 

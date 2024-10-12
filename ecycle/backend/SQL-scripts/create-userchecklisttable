@@ -1,4 +1,4 @@
-CREATE TABLE userchecklist (
+CREATE TABLE userchecklisttable (
     userid INT NOT NULL,
     checklistoptionid INT NOT NULL,
     FOREIGN KEY (userid) REFERENCES usertable(userid) ON DELETE CASCADE,

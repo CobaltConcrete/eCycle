@@ -46,10 +46,13 @@ const Checklist = () => {
         const userid = localStorage.getItem('userid'); // Get userid from localStorage
         const usertype = localStorage.getItem('usertype'); // Get usertype from localStorage
 
+        // If no options were selected, select all options
+        let optionsToSave = selectedOptions.length > 0 ? selectedOptions : checklistOptions.map(option => option.checklistoptionid);
+
         try {
             await axios.post('http://localhost:5000/user-checklist', {
                 userid,
-                checklistoptionids: selectedOptions,
+                checklistoptionids: optionsToSave,
             });
             alert('Checklist options saved successfully!');
 

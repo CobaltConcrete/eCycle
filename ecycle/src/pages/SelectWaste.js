@@ -25,8 +25,10 @@ const SelectWaste = () => {
             navigate('/map/repair');
         } else if (type === 'dispose') {
             navigate('/map/dispose');
+        } else if (type === 'general') {
+            navigate('/map/general');
         } else {
-            alert('Other Waste selected!');
+            alert('Please select a valid waste type.');
         }
     };
 
@@ -41,8 +43,8 @@ const SelectWaste = () => {
                 <div className="waste-box" onClick={() => handleSelectWaste('dispose')}>
                     <h3>Dispose E-waste</h3>
                 </div>
-                <div className="waste-box" onClick={() => handleSelectWaste('other')}>
-                    <h3>Other Waste</h3>
+                <div className="waste-box" onClick={() => handleSelectWaste('general')}>
+                    <h3>General Waste</h3>
                 </div>
             </div>
             <button className="help-button" onClick={() => alert('Help is on the way!')}>
