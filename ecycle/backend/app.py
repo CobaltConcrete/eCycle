@@ -2,7 +2,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from config import Config
-from models import db, UserTable, ShopTable, ChecklistOptionTable, UserChecklistTable
+from models import db, UserTable, ShopTable, ChecklistOptionTable, UserChecklistTable, ForumTable, CommentTable
 import pandas as pd
 from geopy.distance import geodesic
 from dotenv import load_dotenv
@@ -254,6 +254,44 @@ def get_directions():
         return jsonify({'directions': directions}), 200
     else:
         return jsonify({'error': 'Unable to get directions'}), 400
+
+@app.route('/forums/<int:shopid>', methods=['GET'])
+def get_forums(shopid):
+    forums = ForumTable.query.filter_by(shopid=shopid).order_by(ForumTable.time.desc()).all()
+    
+    forum_list = [
+        {
+            'forumid': forum.forumid,
+            'forumtext': forum.forumtext,
+            'shopid': forum.shopid,
+            'posterid': forum.posterid,
+            'time': forum.time,
+            'postername': forum.poster.username  # Access the username from the UserTable relationship
+        } 
+        for forum in forums
+    ]
+
+    return jsonify(forum_list), 200
+
+@app.route('/comments/<int:forumid>', methods=['GET'])
+def get_comments(forumid):
+    comments = CommentTable.query.filter_by(forumid=forumid).order_by(CommentTable.time.desc()).all()
+    
+    comment_list = [
+        {
+            'commentid': comment.commentid,
+            'commenttext': comment.commenttext,
+            'forumid': comment.forumid,
+            'posterid': comment.posterid,
+            'replyid': comment.replyid,
+            'time': comment.time,
+            'postername': comment.poster.username  # Assuming postername is available in UserTable
+        }
+        for comment in comments
+    ]
+
+    return jsonify(comment_list), 200
+
 
 
 if __name__ == '__main__':

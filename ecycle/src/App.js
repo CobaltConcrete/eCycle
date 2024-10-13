@@ -1,12 +1,15 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import './App.css';  // Assuming you have some CSS for your app
+import './App.css';
+import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import SelectWaste from './pages/SelectWaste';
-import Checklist from './pages/Checklist'; // Import the Checklist component
-import ProtectedRoute from './components/ProtectedRoute'; // Adjust the path as necessary
-import Map from './pages/Map'; // Import Map component
+import Checklist from './pages/Checklist';
+import Map from './pages/Map';
+import Forums from './pages/Forums';
+import Comments from './pages/Comments';
+
 
 const App = () => {
     return (
@@ -19,6 +22,8 @@ const App = () => {
                     <Route path="/select-waste" element={<ProtectedRoute element={<SelectWaste />} />} />
                     <Route path="/checklist" element={<ProtectedRoute element={<Checklist />} />} />
                     <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} />
+                    <Route path="/forums/:shopid" element={<ProtectedRoute element={<Forums />} />} />
+                    <Route path="/comments/:forumid" element={<ProtectedRoute element={<Comments />} />} />
                 </Routes>
             </header>
         </div>

@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useAuth } from '../components/AuthContext';
 
 const Checklist = () => {
     const [checklistOptions, setChecklistOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate(); // Create a navigate instance
+    const { login } = useAuth();
 
+    login();
+    
     useEffect(() => {
         // Fetch checklist options from the backend
         const fetchChecklistOptions = async () => {

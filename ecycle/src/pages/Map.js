@@ -20,6 +20,7 @@ const Map = () => {
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [instructions, setInstructions] = useState([]);
     const userid = localStorage.getItem('userid');
+    const [selectedTransportMode, setSelectedTransportMode] = useState(transportMode);
 
     useEffect(() => {
         if (useCurrentLocation && navigator.geolocation) {
@@ -136,10 +137,14 @@ const Map = () => {
                     <div>
                         <h3 style="color: black;">${location.shopname}</h3>
                         <p style="color: black;">${location.addressname}</p>
-                        <a href="${location.Hyperlink}" target="_blank">Visit Website</a>
+                        <a href="${location.website}" target="_blank">Visit Website</a>
+                        <br />
+                        <button onclick="window.open('/forums/${location.shopid}', '_blank')">
+                            Forum
+                        </button>
                     </div>
                 `);
-                infoWindow.open(map, marker);
+                infoWindow.open(map, marker);   
             });
         });
     };
@@ -167,31 +172,36 @@ const Map = () => {
 
     const handleTransportModeChange = (mode) => {
         transportMode = mode; // Update the global transport mode variable
+        setSelectedTransportMode(mode);
 
-        if (directionsRenderer && loc) {
-            directionsRenderer.set('directions', null); // Clear previous directions
-        }
-
-        // Fetch and display route directions
-        directionsService.route(
-            {
-                origin: center,
-                destination: { lat: loc.latitude, lng: loc.longitude },
-                travelMode: transportMode, // Use the global transport mode here
-                transitOptions: {
-                    routingPreference: 'LESS_WALKING'
-                }
-            },
-            (result, status) => {
-                if (status === window.google.maps.DirectionsStatus.OK) {
-                    directionsRenderer.setDirections(result);
-                    setInstructions(result.routes[0].legs[0].steps);
-                } else {
-                    console.error(`Directions request failed due to ${status}`);
-                }
+        // Check if a location has been selected before trying to set directions
+        if (loc) {
+            if (directionsRenderer) {
+                directionsRenderer.set('directions', null); // Clear previous directions
             }
-        );
+
+            // Fetch and display route directions
+            directionsService.route(
+                {
+                    origin: center,
+                    destination: { lat: loc.latitude, lng: loc.longitude },
+                    travelMode: transportMode, // Use the global transport mode here
+                    transitOptions: {
+                        routingPreference: 'LESS_WALKING'
+                    }
+                },
+                (result, status) => {
+                    if (status === window.google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                        setInstructions(result.routes[0].legs[0].steps);
+                    } else {
+                        console.error(`Directions request failed due to ${status}`);
+                    }
+                }
+            );
+        }
     };
+
 
     return (
         <div>

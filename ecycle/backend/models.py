@@ -48,3 +48,29 @@ class UserChecklistTable(db.Model):
 
     user = db.relationship('UserTable', backref=db.backref('checklist_options', lazy=True))
     option = db.relationship('ChecklistOptionTable', backref=db.backref('users', lazy=True))
+
+class ForumTable(db.Model):
+    __tablename__ = 'forumtable'
+
+    forumid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    forumtext = db.Column(db.String(255), nullable=False)
+    shopid = db.Column(db.Integer, db.ForeignKey('shoptable.shopid'), nullable=False)
+    posterid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), nullable=False)
+    time = db.Column(db.String(50), nullable=False)
+
+    shop = db.relationship('ShopTable', backref=db.backref('forums', lazy=True))
+    poster = db.relationship('UserTable', backref=db.backref('posts', lazy=True))
+
+class CommentTable(db.Model):
+    __tablename__ = 'commenttable'
+
+    commentid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    commenttext = db.Column(db.String(255), nullable=False)
+    forumid = db.Column(db.Integer, db.ForeignKey('forumtable.forumid'), nullable=False)
+    posterid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), nullable=False)
+    replyid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid'), nullable=True)
+    time = db.Column(db.String(50), nullable=False)
+
+    forum = db.relationship('ForumTable', backref=db.backref('comments', lazy=True))
+    poster = db.relationship('UserTable', backref=db.backref('comments', lazy=True))
+    reply = db.relationship('CommentTable', remote_side=[commentid], backref='replies')

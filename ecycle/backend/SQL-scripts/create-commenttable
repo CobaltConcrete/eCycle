@@ -1,13 +1,12 @@
 CREATE TABLE commenttable (
     commentid SERIAL PRIMARY KEY,
-    commentcontent VARCHAR(255) NOT NULL,
-    userid INT NOT NULL,
+    commenttext VARCHAR(255) NOT NULL,
     forumid INT NOT NULL,
+    posterid INT NOT NULL,
     replyid INT,
     time VARCHAR(50) NOT NULL,
 
-    FOREIGN KEY (userid) REFERENCES usertable(userid),
     FOREIGN KEY (forumid) REFERENCES forumtable(forumid),
+    FOREIGN KEY (posterid) REFERENCES usertable(userid),
     FOREIGN KEY (replyid) REFERENCES commenttable(commentid)
 );
-
