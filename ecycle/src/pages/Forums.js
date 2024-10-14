@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import './Forums.css';
 
 const Forums = () => {
     const { shopid } = useParams();
@@ -25,18 +26,22 @@ const Forums = () => {
     }, [shopid]);
 
     return (
-        <div>
-            <h2>Forums for Shop {shopid}</h2>
-            {error && <p>{error}</p>}
-            <ul>
-                {forums.map((forum) => (
-                    <li key={forum.forumid}>
-                        <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <p>{forum.forumtext}</p>
-                            <small>Posted by {forum.postername} at {forum.time}</small>
-                        </Link>
-                    </li>
-                ))}
+        <div className="forums-container">
+            <h2 className="forums-title">Forums for Shop {shopid}</h2>
+            {error && <p className="error-message">{error}</p>}
+            <ul className="forums-list">
+                {forums.length > 0 ? (
+                    forums.map((forum) => (
+                        <li key={forum.forumid} className="forum-item">
+                            <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <p className="forum-text">{forum.forumtext}</p>
+                                <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
+                            </Link>
+                        </li>
+                    ))
+                ) : (
+                    <p className="no-forums">No forums yet.</p> // Message for no forums
+                )}
             </ul>
         </div>
     );

@@ -1,0 +1,34 @@
+For an e-waste recycling app, a color palette that reflects themes of sustainability, technology, and eco-friendliness would be ideal. Here’s a suggested palette with color meanings and uses:
+
+### Primary Colors:
+1. **Forest Green (#2E7D32)** 
+   - *Use for:* Primary buttons, call-to-actions, and icons related to recycling.
+   - *Why:* Represents sustainability, nature, and environmental consciousness.
+
+2. **Deep Teal (#00796B)** 
+   - *Use for:* Headers, secondary buttons, and highlighted text.
+   - *Why:* Conveys stability, reliability, and a sense of modernity, aligning with tech and recycling themes.
+
+### Secondary Colors:
+3. **Bright Lime (#A4C639)**
+   - *Use for:* Accents on icons, progress bars, and notifications.
+   - *Why:* Adds a vibrant, energetic feel to the app and draws attention to important elements.
+
+4. **Slate Gray (#37474F)**
+   - *Use for:* Backgrounds, text, and less prominent buttons.
+   - *Why:* A neutral, modern color that complements greens and makes the app look sleek and tech-oriented.
+
+5. **Ivory White (#F7F7F7)**
+   - *Use for:* Background, card surfaces, and modal dialogs.
+   - *Why:* A soft white color that brings a sense of cleanliness and simplicity, enhancing readability.
+
+### Accent Colors:
+6. **Orange (#FF7043)**
+   - *Use for:* Warnings, alerts, and to indicate error messages or important actions.
+   - *Why:* Provides contrast with greens and blues, and it’s attention-grabbing without overwhelming.
+
+7. **Sky Blue (#81D4FA)**
+   - *Use for:* Links, secondary call-to-actions, and hover effects.
+   - *Why:* Offers a refreshing and approachable feel, while complementing the green shades for an eco-tech vibe.
+
+These colors balance eco-friendly tones with modern tech aesthetics, perfect for an app focused on e-waste recycling.

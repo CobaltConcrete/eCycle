@@ -1,0 +1,98 @@
+/* Forums.css */
+
+.forums-container {
+    max-height: 80vh;
+    /* Similar height limit for scrolling */
+    overflow-y: auto;
+    /* Allow scrolling */
+    padding: 1rem;
+    /* Padding for the container */
+    max-width: 800px;
+    /* Max width to match comments */
+    margin: 0 auto;
+    /* Center the container */
+}
+
+.forums-title {
+    font-size: 2rem;
+    /* Match title size */
+    font-weight: bold;
+    /* Bold title */
+    margin-bottom: 1.5rem;
+    /* Space below title */
+    color: #2E7D32;
+    /* Forest Green */
+}
+
+.error-message {
+    color: #ff4500;
+    /* Reddit orange */
+    margin-bottom: 1rem;
+    /* Space below error message */
+}
+
+.forums-list {
+    max-height: 100%;
+    /* Fill available height */
+    overflow-y: auto;
+    /* Enable scrolling if needed */
+    border: 1px solid #ddd;
+    /* Border around the list */
+    padding: 1rem;
+    /* Inner padding */
+    border-radius: 8px;
+    /* Rounded corners */
+    background-color: #37474F;
+    /* Dark background */
+}
+
+.forum-item {
+    padding: 1rem;
+    /* Inner padding for items */
+    margin-bottom: 1rem;
+    /* Space between forum items */
+    border-left: 3px solid;
+    /* Left border for styling */
+    text-align: left;
+    /* Align text to the left */
+}
+
+.forum-text {
+    font-size: 1.5rem;
+    /* Similar text size, slightly smaller than the title */
+    color: #ffffff;
+    /* White text for visibility */
+    margin: 0;
+    /* Remove default margin */
+}
+
+.forum-meta {
+    font-size: 1rem;
+    /* Match the comment time size */
+    color: #888888;
+    /* Light gray for meta information */
+}
+
+.avatar {
+    width: 40px;
+    /* Avatar size */
+    height: 40px;
+    /* Avatar size */
+    margin-right: 1rem;
+    /* Space to the right of the avatar */
+    border-radius: 50%;
+    /* Circular avatar */
+}
+
+.reply-container {
+    padding-left: 1rem;
+    /* Indentation for replies, if needed */
+}
+
+.no-forums {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #888888;
+    /* Light gray for the no forums message */
+    margin-top: 1rem;
+}

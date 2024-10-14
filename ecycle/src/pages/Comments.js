@@ -1,44 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import './Comments.css'; // Import the CSS file
 
 const Comment = ({ comment, replies, depth = 0 }) => {
-  const getBackgroundColor = (depth) => {
-    switch (depth) {
-      case 0: return '#2D6A4F'; // Dark green for main comments
-      case 1: return '#40916C'; // Slightly lighter green for replies
-      case 2: return '#52B788'; // Lighter green for further nested replies
-      default: return '#74C69D'; // Lightest green for deeper replies
-    }
-  };
-
   return (
-    <div
-      style={{
-        backgroundColor: getBackgroundColor(depth),
-        maxHeight: depth === 0 ? '240px' : '160px',
-        overflowY: 'auto',
-        color: 'white', // Ensure text color is readable on green background
-      }}
-      className="comment-box border border-gray-300 p-4 mb-4 rounded-lg"
-    >
-      <p className={`${depth === 0 ? 'text-lg font-semibold' : 'text-base'} mb-2`}>{comment.commenttext}</p>
-      <small className="text-gray-200">Posted by {comment.postername} at {comment.time}</small>
-      {replies && replies.length > 0 && (
-        <div
-          style={{
-            maxHeight: '120px',
-            overflowY: 'auto',
-            paddingLeft: '1rem',
-            borderLeft: '2px solid #D3D3D3', // Grey border for replies
-            marginTop: '1rem',
-          }}
-          className="replies space-y-3"
-        >
-          {replies.map((reply) => (
-            <Comment key={reply.commentid} comment={reply} replies={reply.replies} depth={depth + 1} />
-          ))}
-        </div>
-      )}
+    <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: depth * 20 }}>
+      <div>
+        <p className="comment-header">
+          {comment.postername} · <span className="comment-time">{comment.time}</span>
+        </p>
+        <p className="comment-text">{comment.commenttext}</p>
+        {replies && replies.length > 0 && (
+          <div className="reply-container">
+            {replies.map((reply) => (
+              <Comment key={reply.commentid} comment={reply} replies={reply.replies} depth={depth + 1} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -47,6 +26,7 @@ const Comments = () => {
   const { forumid } = useParams();
   const [comments, setComments] = useState([]);
   const [error, setError] = useState('');
+  const [forumDetails, setForumDetails] = useState(null); // State for storing forum details
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -62,7 +42,23 @@ const Comments = () => {
         setError('Error fetching comments. Please try again later.');
       }
     };
+
+    const fetchForumDetails = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/forums/details/${forumid}`); // Assuming this endpoint exists
+        if (!response.ok) {
+          throw new Error('Error fetching forum details.');
+        }
+        const data = await response.json();
+        setForumDetails(data);
+      } catch (error) {
+        console.error('Error fetching forum details:', error);
+        setError('Error fetching forum details. Please try again later.');
+      }
+    };
+
     fetchComments();
+    fetchForumDetails();
   }, [forumid]);
 
   const organizeComments = (comments) => {
@@ -90,13 +86,22 @@ const Comments = () => {
   const organizedComments = organizeComments(comments);
 
   return (
-    <div style={{ maxHeight: '80vh', overflowY: 'auto', padding: '1rem' }} className="comments-container max-w-3xl mx-auto p-4">
-      <h2 className="text-3xl font-bold mb-6 text-gray-800">Comments for Forum {forumid}</h2>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      <div style={{ maxHeight: '100%', overflowY: 'auto', border: '1px solid #ddd', padding: '1rem' }}>
-        {organizedComments.map((comment) => (
-          <Comment key={comment.commentid} comment={comment} replies={comment.replies} />
-        ))}
+    <div className="comments-container">
+      {forumDetails && (
+        <div className="forum-details">
+          <h2 className="forum-title">{forumDetails.forumtext}</h2>
+          <p className="forum-meta">Posted by {forumDetails.postername} at {forumDetails.time}</p>
+        </div>
+      )}
+      {error && <p className="error-message">{error}</p>}
+      <div className="comments-list">
+        {organizedComments.length > 0 ? (
+          organizedComments.map((comment) => (
+            <Comment key={comment.commentid} comment={comment} replies={comment.replies} />
+          ))
+        ) : (
+          <p className="no-comments">No comments yet.</p> // Message for no comments
+        )}
       </div>
     </div>
   );

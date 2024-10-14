@@ -273,6 +273,26 @@ def get_forums(shopid):
 
     return jsonify(forum_list), 200
 
+@app.route('/forums/details/<int:forumid>', methods=['GET'])
+def get_forum_details(forumid):
+    try:
+        # Assuming ForumTable is the model corresponding to forumtable in your database
+        forum = ForumTable.query.filter_by(forumid=forumid).first()
+
+        if forum:
+            forum_details = {
+                'forumtext': forum.forumtext,
+                'posterid': forum.posterid,
+                'time': forum.time,
+                'postername': forum.poster.username
+            }
+            return jsonify(forum_details), 200
+        else:
+            return jsonify({'error': 'Forum not found'}), 404
+    except Exception as e:
+        print('Error fetching forum details:', e)
+        return jsonify({'error': 'Server error'}), 500
+    
 @app.route('/comments/<int:forumid>', methods=['GET'])
 def get_comments(forumid):
     comments = CommentTable.query.filter_by(forumid=forumid).order_by(CommentTable.time.desc()).all()
