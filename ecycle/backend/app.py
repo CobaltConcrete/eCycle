@@ -6,6 +6,7 @@ from models import db, UserTable, ShopTable, ChecklistOptionTable, UserChecklist
 import pandas as pd
 from geopy.distance import geodesic
 from dotenv import load_dotenv
+from datetime import datetime
 import requests
 
 app = Flask(__name__)
@@ -13,6 +14,27 @@ app.config.from_object(Config)
 db.init_app(app)
 CORS(app)
 load_dotenv()
+
+@app.route('/verify', methods=['POST'])
+def verify_user():
+    data = request.get_json()
+    userid = data['userid']
+    username = data['username']
+    usertype = data['usertype']
+    userhashedpassword = data['userhashedpassword']
+
+    # Query the database for a user matching all these details
+    user = UserTable.query.filter_by(
+        userid=userid,
+        username=username,
+        usertype=usertype,
+        password=userhashedpassword  # Make sure to store a hashed password in localStorage and match it
+    ).first()
+
+    if user:
+        return jsonify({'message': 'User verified', 'isValid': True}), 200
+    else:
+        return jsonify({'message': 'User not verified', 'isValid': False}), 401
 
 @app.route('/register', methods=['POST'])
 def register():
@@ -39,7 +61,7 @@ def login():
     user = UserTable.query.filter_by(username=username).first()
 
     if user and user.check_password(password):
-        return jsonify({'message': 'Login successful', 'usertype': user.usertype, 'userid': user.userid}), 200
+        return jsonify({'message': 'Login successful', 'usertype': user.usertype, 'userid': user.userid, 'userpassword': user.password}), 200
     else:
         return jsonify({'error': 'Invalid username or password'}), 401
 
@@ -293,6 +315,52 @@ def get_forum_details(forumid):
         print('Error fetching forum details:', e)
         return jsonify({'error': 'Server error'}), 500
     
+@app.route('/forums/add', methods=['POST'])
+def add_forum():
+    data = request.get_json()
+    forumtext = data['forumtext']
+    shopid = data['shopid']
+    posterid = data['posterid']
+    time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+    new_forum = ForumTable(forumtext=forumtext, shopid=shopid, posterid=posterid, time=time)
+    db.session.add(new_forum)
+    db.session.commit()
+
+    return jsonify({'message': 'Forum added successfully'}), 201
+
+@app.route('/forums/edit/<int:forumid>', methods=['PUT'])
+def edit_forum(forumid):
+    data = request.get_json()
+    new_forumtext = data['forumtext']
+
+    # Find the forum entry by ID
+    forum = ForumTable.query.get(forumid)
+    
+    if not forum:
+        return jsonify({'error': 'Forum not found'}), 404
+
+    # Update the forum text
+    forum.forumtext = new_forumtext
+    db.session.commit()
+    
+    return jsonify({'message': 'Forum updated successfully'}), 200
+
+@app.route('/forums/delete/<int:forumid>', methods=['DELETE'])
+def delete_forum(forumid):
+    # Find the forum entry by ID
+    forum = ForumTable.query.get(forumid)
+    
+    if not forum:
+        return jsonify({'error': 'Forum not found'}), 404
+
+    # Delete the forum entry
+    db.session.delete(forum)
+    db.session.commit()
+    
+    return jsonify({'message': 'Forum deleted successfully'}), 200
+
+
 @app.route('/comments/<int:forumid>', methods=['GET'])
 def get_comments(forumid):
     comments = CommentTable.query.filter_by(forumid=forumid).order_by(CommentTable.time.desc()).all()
@@ -312,7 +380,59 @@ def get_comments(forumid):
 
     return jsonify(comment_list), 200
 
+@app.route('/comments/add', methods=['POST'])
+def add_comment():
+    data = request.get_json()
+    forumid = data['forumid']
+    commenttext = data['commenttext']
+    posterid = data['posterid']
+    time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
+    new_comment = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time)
+    db.session.add(new_comment)
+    db.session.commit()
+
+    return jsonify({'message': 'Comment added successfully'}), 201
+
+@app.route('/comments/reply/<int:commentid>', methods=['POST'])
+def reply_to_comment(commentid):
+    data = request.json
+    forumid = data['forumid']
+    commenttext = data['commenttext']
+    posterid = data['posterid']
+    time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
+    # Logic to save the reply in the database, e.g.:
+    new_reply = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time, replyid=commentid)
+    db.session.add(new_reply)
+    db.session.commit()
+
+    return jsonify({'message': 'Reply added successfully'}), 201
+
+@app.route('/comments/edit/<int:commentid>', methods=['PUT'])
+def edit_comment(commentid):
+    data = request.get_json()
+    new_commenttext = data['commenttext']
+
+    comment = CommentTable.query.get(commentid)
+    if not comment:
+        return jsonify({'error': 'Comment not found'}), 404
+
+    comment.commenttext = new_commenttext
+    db.session.commit()
+
+    return jsonify({'message': 'Comment updated successfully'}), 200
+
+@app.route('/comments/delete/<int:commentid>', methods=['DELETE'])
+def delete_comment(commentid):
+    comment = CommentTable.query.get(commentid)
+    if not comment:
+        return jsonify({'error': 'Comment not found'}), 404
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return jsonify({'message': 'Comment deleted successfully'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

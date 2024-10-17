@@ -23,10 +23,11 @@ const Login = () => {
             });
 
             if (response.status === 200) {
-                const { userid, usertype } = response.data; // Get userid and usertype from the response
-                localStorage.setItem('usertype', usertype); // Store usertype in localStorage
-                localStorage.setItem('userid', userid); // Store userid in localStorage
-
+                const { userid, usertype, userpassword } = response.data; // Get userid and usertype from the response
+                localStorage.setItem('userid', userid);
+                localStorage.setItem('username', username);
+                localStorage.setItem('usertype', usertype);
+                localStorage.setItem('userhashedpassword', userpassword);
                 login();
 
                 // Redirect based on usertype

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 let loc = null; // Global variable for selected location
 let center = null; // Global variable for map center
@@ -19,11 +19,47 @@ const Map = () => {
     const [directionsRenderer, setDirectionsRenderer] = useState(null);
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [instructions, setInstructions] = useState([]);
-    const userid = localStorage.getItem('userid');
+    const [isVerified, setIsVerified] = useState(false);
     const [selectedTransportMode, setSelectedTransportMode] = useState(transportMode);
+    const navigate = useNavigate();
+    const userid = localStorage.getItem('userid');
 
     useEffect(() => {
-        if (useCurrentLocation && navigator.geolocation) {
+        const verifyUser = async () => {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            const usertype = localStorage.getItem('usertype');
+            const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+            if (!userid || !username || !usertype || !userhashedpassword) {
+                navigate('/'); // Redirect if any data is missing
+                return;
+            }
+
+            try {
+                const response = await axios.post('http://localhost:5000/verify', {
+                    userid,
+                    username,
+                    usertype,
+                    userhashedpassword,
+                });
+
+                if (response.data.isValid) {
+                    setIsVerified(true); // User is verified
+                } else {
+                    navigate('/'); // Redirect if verification fails
+                }
+            } catch (error) {
+                console.error('Verification failed:', error);
+                navigate('/'); // Redirect on any error
+            }
+        };
+
+        verifyUser();
+    }, [navigate]);
+
+    useEffect(() => {
+        if (isVerified && useCurrentLocation && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
@@ -36,7 +72,7 @@ const Map = () => {
                 }
             );
         }
-    }, [useCurrentLocation]);
+    }, [isVerified, useCurrentLocation]);
 
     const loadMap = (lat, lng) => {
         center = { lat, lng }; // Update the global center variable

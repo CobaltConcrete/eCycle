@@ -1,15 +1,51 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import './SelectWaste.css';
 
 const SelectWaste = () => {
     const [usertype, setUsertype] = useState(null);
+    const [isVerified, setIsVerified] = useState(false);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const storedUsertype = localStorage.getItem('usertype');
-        setUsertype(storedUsertype);
-    }, []);
+        useEffect(() => {
+        const verifyUser = async () => {
+            const userid = localStorage.getItem('userid');
+            const username = localStorage.getItem('username');
+            const usertype = localStorage.getItem('usertype');
+            const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+            if (!userid || !username || !usertype || !userhashedpassword) {
+                navigate('/');
+                return;
+            }
+
+            try {
+                const response = await axios.post('http://localhost:5000/verify', {
+                    userid,
+                    username,
+                    usertype,
+                    userhashedpassword,
+                });
+
+                if (response.data.isValid) {
+                    setUsertype(usertype);
+                    setIsVerified(true); // User is verified
+                } else {
+                    navigate('/'); // Redirect if verification fails
+                }
+            } catch (error) {
+                console.error('Verification failed:', error);
+                navigate('/'); // Redirect on any error
+            }
+        };
+
+        verifyUser();
+    }, [navigate]);
+
+    if (!isVerified) {
+        return <p>Loading...</p>; // Or a loading spinner
+    }
 
     if (usertype === 'shop') {
         return (
