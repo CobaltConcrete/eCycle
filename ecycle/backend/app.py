@@ -36,6 +36,31 @@ def verify_user():
     else:
         return jsonify({'message': 'User not verified', 'isValid': False}), 401
 
+@app.route('/verify-shop', methods=['POST'])
+def verify_shop():
+    data = request.get_json()
+    userid = data['userid']
+    username = data['username']
+    usertype = data['usertype']
+    userhashedpassword = data['userhashedpassword']
+
+    # Check if the user exists in the database
+    user = UserTable.query.filter_by(
+        userid=userid,
+        username=username,
+        usertype=usertype,
+        password=userhashedpassword  # Make sure to store a hashed password in localStorage and match it
+    ).first()
+    
+    if user:
+            # Check if the usertype is 'shop'
+            if user.usertype == "shop":
+                return jsonify({'isValid': True, 'usertype': user.usertype}), 200
+            else:
+                return jsonify({'isValid': False, 'message': 'User is not a shop.'}), 403
+        
+    return jsonify({'isValid': False, 'message': 'Invalid credentials.'}), 401
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -51,6 +76,72 @@ def register():
     db.session.commit()
 
     return jsonify({'message': 'User registered successfully'}), 201
+
+@app.route('/get-usertype/<int:shopid>', methods=['GET'])
+def get_user_type(shopid):
+    user = UserTable.query.filter_by(userid=shopid).first()
+    if user:
+        return jsonify({'usertype': user.usertype}), 200
+    return jsonify({'message': 'User not found'}), 404
+
+@app.route('/get-shop-details/<int:shopid>', methods=['GET'])
+def get_shop(shopid):
+    shop = ShopTable.query.get(shopid)
+    if shop:
+        return jsonify({
+            'shopname': shop.shopname,
+            'latitiude': shop.latitude,
+            'longtitude': shop.longtitude,
+            'addressname': shop.addressname,
+            'website': shop.website,
+            'actiontype': shop.actiontype
+        }), 200
+    return jsonify({'message': 'Shop not found'}), 404
+
+@app.route('/add-shop', methods=['POST'])
+def signup_shop():
+    data = request.get_json()
+    shopid = data.get('userid')  # Assuming `userid` is being passed to associate the shop
+    shopname = data['shopname']
+    addressname = data['addressname']
+    website = data.get('website')
+    actiontype = data['actiontype']
+    latitude = data.get('latitude')
+    longtitude = data.get('longtitude')
+
+    # Check if latitude and longitude are provided
+    if latitude is None or longtitude is None:
+        return jsonify({'error': 'Invalid address; unable to get coordinates.'}), 400
+
+    # Check if shop with the given shopid already exists
+    existing_shop = ShopTable.query.filter_by(shopid=shopid).first()
+
+    if existing_shop:
+        # Update existing shop record
+        existing_shop.shopname = shopname
+        existing_shop.addressname = addressname
+        existing_shop.website = website
+        existing_shop.actiontype = actiontype
+        existing_shop.latitude = latitude
+        existing_shop.longtitude = longtitude
+
+        db.session.commit()
+        return jsonify({'message': 'Shop information updated successfully!'}), 200
+    else:
+        # Create a new shop record
+        new_shop = ShopTable(
+            shopid=shopid,  # Associate with the user ID as the primary key
+            shopname=shopname,
+            addressname=addressname,
+            website=website,
+            actiontype=actiontype,
+            latitude=latitude,
+            longtitude=longtitude
+        )
+        
+        db.session.add(new_shop)
+        db.session.commit()
+        return jsonify({'message': 'Shop registered successfully!'}), 201
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -86,72 +177,6 @@ def save_user_checklist():
 
     db.session.commit()
     return jsonify({'message': 'Checklist options saved successfully'}), 201
-
-# # Load repair and disposal locations from CSV files
-# repair_df = pd.read_csv('./locationCSV/repair/repair.csv')
-# dispose_df = pd.read_csv('./locationCSV/ewaste/ewaste.csv')
-
-# # Route for nearby repair locations
-# @app.route('/nearby-repair-locations', methods=['POST'])
-# def nearby_repair_locations():
-#     return get_nearby_locations(repair_df)
-
-# # Route for nearby disposal locations
-# @app.route('/nearby-dispose-locations', methods=['POST'])
-# def nearby_dispose_locations():
-#     return get_nearby_locations(dispose_df)
-
-# # Helper function to calculate nearby locations
-# def get_nearby_locations(df):
-#     data = request.get_json()
-#     user_lat = data.get('lat')
-#     user_lon = data.get('lon')
-
-#     if user_lat is None or user_lon is None:
-#         return jsonify({'error': 'User location is required'}), 400
-
-#     user_location = (user_lat, user_lon)
-#     df['distance'] = df.apply(lambda row: geodesic(
-#         user_location, (row['latitude'], row['longitude'])
-#     ).km, axis=1)
-
-#     nearby_locations = df.sort_values('distance').head(5)
-#     return jsonify(nearby_locations.to_dict(orient='records')), 200
-
-# @app.route('/nearby-locations', methods=['POST'])
-# def get_nearby_locations():
-#     data = request.get_json()
-#     user_lat = data.get('lat')
-#     user_lon = data.get('lon')
-#     action_type = data.get('actiontype')
-
-#     if not user_lat or not user_lon or not action_type:
-#         return jsonify({'error': 'Latitude, longitude, and action type are required'}), 400
-
-#     # Query shops with the specified action type
-#     shops = ShopTable.query.filter_by(actiontype=action_type).all()
-
-#     # Calculate distance from user location and sort by distance
-#     user_location = (user_lat, user_lon)
-#     shop_list = []
-    
-#     for shop in shops:
-#         shop_location = (shop.latitude, shop.longtitude)
-#         distance = geodesic(user_location, shop_location).km
-#         shop_list.append({
-#             'shopid': shop.shopid,
-#             'shopname': shop.shopname,
-#             'latitude': shop.latitude,
-#             'longitude': shop.longtitude,
-#             'addressname': shop.addressname,
-#             'website': shop.website,
-#             'distance': distance
-#         })
-
-#     # Sort shops by distance and return top 5
-#     nearby_shops = sorted(shop_list, key=lambda x: x['distance'])[:5]
-    
-#     return jsonify(nearby_shops), 200
 
 @app.route('/nearby-locations', methods=['POST'])
 def get_nearby_locations():
@@ -321,7 +346,7 @@ def add_forum():
     forumtext = data['forumtext']
     shopid = data['shopid']
     posterid = data['posterid']
-    time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     new_forum = ForumTable(forumtext=forumtext, shopid=shopid, posterid=posterid, time=time)
     db.session.add(new_forum)
@@ -386,7 +411,7 @@ def add_comment():
     forumid = data['forumid']
     commenttext = data['commenttext']
     posterid = data['posterid']
-    time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     new_comment = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time)
     db.session.add(new_comment)

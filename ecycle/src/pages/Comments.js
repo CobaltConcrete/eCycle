@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Comments.css';
 
 const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(comment.commenttext);
-  const [isReplying, setIsReplying] = useState(false); // State to control reply visibility
-  const [replyText, setReplyText] = useState(''); // State for reply text
+  const [isReplying, setIsReplying] = useState(false);
+  const [replyText, setReplyText] = useState('');
 
   const userid = localStorage.getItem('userid');
 
@@ -17,9 +17,9 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
   };
 
   const handleReply = () => {
-    onReply(comment.commentid, replyText); // Call the reply handler
-    setReplyText(''); // Clear reply text after submission
-    setIsReplying(false); // Hide the reply input
+    onReply(comment.commentid, replyText);
+    setReplyText('');
+    setIsReplying(false);
   };
 
   return (
@@ -44,7 +44,6 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
           </div>
         )}
         
-        {/* Reply Button and Reply Input */}
         <div className="reply-container">
           <button onClick={() => setIsReplying(!isReplying)}>Reply</button>
           {isReplying && (
@@ -59,7 +58,6 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
           )}
         </div>
 
-        {/* Display Replies */}
         {replies && replies.length > 0 && (
           <div className="reply-list">
             {replies.map((reply) => (
@@ -78,11 +76,49 @@ const Comments = () => {
   const [error, setError] = useState('');
   const [forumDetails, setForumDetails] = useState(null);
   const [newComment, setNewComment] = useState('');
+  const [isVerified, setIsVerified] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchComments();
-    fetchForumDetails();
-  }, [forumid]);
+    const verifyUser = async () => {
+      const userid = localStorage.getItem('userid');
+      const username = localStorage.getItem('username');
+      const usertype = localStorage.getItem('usertype');
+      const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+      if (!userid || !username || !usertype || !userhashedpassword) {
+        navigate('/');
+        return;
+      }
+
+      try {
+        const response = await axios.post('http://localhost:5000/verify', {
+          userid,
+          username,
+          usertype,
+          userhashedpassword,
+        });
+
+        if (response.data.isValid) {
+          setIsVerified(true);
+        } else {
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Verification failed:', error);
+        navigate('/');
+      }
+    };
+
+    verifyUser();
+  }, [navigate]);
+
+  useEffect(() => {
+    if (isVerified) {
+      fetchComments();
+      fetchForumDetails();
+    }
+  }, [isVerified, forumid]);
 
   const fetchComments = async () => {
     try {
@@ -108,55 +144,99 @@ const Comments = () => {
     }
   };
 
-  const handleAddComment = async () => {
+  const verifyAndExecute = async (action) => {
     const userid = localStorage.getItem('userid');
+    const username = localStorage.getItem('username');
+    const usertype = localStorage.getItem('usertype');
+    const userhashedpassword = localStorage.getItem('userhashedpassword');
+
     try {
-      await axios.post(`http://localhost:5000/comments/add`, {
-        forumid,
-        commenttext: newComment,
-        posterid: userid,
+      const response = await axios.post('http://localhost:5000/verify', {
+        userid,
+        username,
+        usertype,
+        userhashedpassword,
       });
-      setNewComment('');
-      fetchComments();
+
+      if (response.data.isValid) {
+        await action();
+      } else {
+        setError('User verification failed. Please try again.');
+        navigate('/');
+      }
     } catch (error) {
-      console.error('Error adding comment:', error);
-      setError('Error adding comment. Please try again later.');
+      console.error('Verification failed:', error);
+      setError('Error verifying user. Please try again later.');
     }
+  };
+
+  const handleAddComment = async () => {
+    if (!newComment.trim()) {
+      setError('Comment text cannot be empty.');
+      return;
+    }
+
+    await verifyAndExecute(async () => {
+      try {
+        const userid = localStorage.getItem('userid');
+        await axios.post(`http://localhost:5000/comments/add`, {
+          forumid,
+          commenttext: newComment,
+          posterid: userid,
+        });
+        setNewComment('');
+        fetchComments();
+      } catch (error) {
+        console.error('Error adding comment:', error);
+        setError('Error adding comment. Please try again later.');
+      }
+    });
   };
 
   const handleEditComment = async (commentid, newText) => {
-    try {
-      await axios.put(`http://localhost:5000/comments/edit/${commentid}`, { commenttext: newText });
-      fetchComments();
-    } catch (error) {
-      console.error('Error editing comment:', error);
-      setError('Error editing comment. Please try again later.');
-    }
+    await verifyAndExecute(async () => {
+      try {
+        await axios.put(`http://localhost:5000/comments/edit/${commentid}`, { commenttext: newText });
+        fetchComments();
+      } catch (error) {
+        console.error('Error editing comment:', error);
+        setError('Error editing comment. Please try again later.');
+      }
+    });
   };
 
   const handleDeleteComment = async (commentid) => {
-    try {
-      await axios.delete(`http://localhost:5000/comments/delete/${commentid}`);
-      fetchComments();
-    } catch (error) {
-      console.error('Error deleting comment:', error);
-      setError('Error deleting comment. Please try again later.');
-    }
+    await verifyAndExecute(async () => {
+      try {
+        await axios.delete(`http://localhost:5000/comments/delete/${commentid}`);
+        fetchComments();
+      } catch (error) {
+        console.error('Error deleting comment:', error);
+        setError('Error deleting comment. Please try again later.');
+      }
+    });
   };
 
   const handleReplyComment = async (commentid, replyText) => {
-    const userid = localStorage.getItem('userid');
-    try {
-      await axios.post(`http://localhost:5000/comments/reply/${commentid}`, {
-        forumid,
-		commenttext: replyText,
-        posterid: userid,
-      });
-      fetchComments(); // Refresh comments to include the new reply
-    } catch (error) {
-      console.error('Error replying to comment:', error);
-      setError('Error replying to comment. Please try again later.');
+    if (!replyText.trim()) {
+      setError('Reply text cannot be empty.');
+      return;
     }
+
+    await verifyAndExecute(async () => {
+      const userid = localStorage.getItem('userid');
+      try {
+        await axios.post(`http://localhost:5000/comments/reply/${commentid}`, {
+          forumid,
+          commenttext: replyText,
+          posterid: userid,
+        });
+        fetchComments();
+      } catch (error) {
+        console.error('Error replying to comment:', error);
+        setError('Error replying to comment. Please try again later.');
+      }
+    });
   };
 
   const organizeComments = (comments) => {
@@ -195,7 +275,7 @@ const Comments = () => {
         <textarea
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add your comment here..."
+          placeholder="Write a comment..."
         />
         <button onClick={handleAddComment}>Add Comment</button>
       </div>
@@ -206,7 +286,7 @@ const Comments = () => {
             <Comment key={comment.commentid} comment={comment} replies={comment.replies} onEdit={handleEditComment} onDelete={handleDeleteComment} onReply={handleReplyComment} />
           ))
         ) : (
-          <p className="no-comments">No comments yet.</p>
+          <p>No comments available.</p>
         )}
       </div>
     </div>

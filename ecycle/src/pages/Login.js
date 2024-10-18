@@ -34,7 +34,8 @@ const Login = () => {
                 if (usertype === 'user') {
                     navigate('/checklist');
                 } else if (usertype === 'shop') {
-                    navigate('/checklist');
+                    localStorage.setItem('pathFromButton', `/forums/${userid}`);
+                    navigate(`/forums/${userid}`);
                 } else if (usertype === 'admin') {
                     navigate('/adminpage');
                 }

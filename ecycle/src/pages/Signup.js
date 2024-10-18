@@ -24,7 +24,7 @@ const Signup = () => {
                 if (userType === 'user') {
                     navigate('/checklist');
                 } else if (userType === 'shop') {
-                    navigate('/checklist'); // Assuming shop has its own dashboard
+                    navigate('/');
                 } else if (userType === 'admin') {
                     navigate('/adminpage');
                 }

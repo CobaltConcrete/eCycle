@@ -13,11 +13,11 @@ const Forums = () => {
     const [editMode, setEditMode] = useState({ status: false, forumid: null, forumtext: '' });
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid'); // Get the user ID
+    const usertype = localStorage.getItem('usertype'); // Get the usertype
 
     useEffect(() => {
         const verifyUser = async () => {
             const username = localStorage.getItem('username');
-            const usertype = localStorage.getItem('usertype');
             const userhashedpassword = localStorage.getItem('userhashedpassword');
 
             if (!userid || !username || !usertype || !userhashedpassword) {
@@ -66,6 +66,30 @@ const Forums = () => {
         }
     };
 
+    const verifyAndExecute = async (action) => {
+        const username = localStorage.getItem('username');
+        const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+        try {
+            const response = await axios.post('http://localhost:5000/verify', {
+                userid,
+                username,
+                usertype,
+                userhashedpassword,
+            });
+
+            if (response.data.isValid) {
+                await action(); // Execute the action (add, edit, delete)
+            } else {
+                setError('User verification failed. Please try again.');
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Verification failed:', error);
+            setError('Error verifying user. Please try again later.');
+        }
+    };
+
     const handleAddForum = async () => {
         if (!newForumText.trim()) {
             setError('Forum text cannot be empty.');
@@ -73,61 +97,67 @@ const Forums = () => {
         }
 
         setLoading(true);
-        try {
-            const response = await fetch(`http://localhost:5000/forums/add`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    forumtext: newForumText,
-                    shopid,
-                    posterid: userid,
-                    time: new Date().toLocaleString(),
-                })
-            });
+        await verifyAndExecute(async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/forums/add`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        forumtext: newForumText,
+                        shopid,
+                        posterid: userid,
+                        time: new Date().toLocaleString(),
+                    })
+                });
 
-            if (!response.ok) throw new Error('Error adding new forum.');
-            setNewForumText('');
-            fetchForums();
-        } catch (error) {
-            console.error('Error adding new forum:', error);
-            setError('Error adding new forum. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
+                if (!response.ok) throw new Error('Error adding new forum.');
+                setNewForumText('');
+                fetchForums();
+            } catch (error) {
+                console.error('Error adding new forum:', error);
+                setError('Error adding new forum. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        });
     };
 
     const handleEditForum = async (forumid) => {
         setLoading(true);
-        try {
-            const response = await fetch(`http://localhost:5000/forums/edit/${forumid}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ forumtext: editMode.forumtext }),
-            });
+        await verifyAndExecute(async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/forums/edit/${forumid}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ forumtext: editMode.forumtext }),
+                });
 
-            if (!response.ok) throw new Error('Error editing forum.');
-            setEditMode({ status: false, forumid: null, forumtext: '' });
-            fetchForums();
-        } catch (error) {
-            console.error('Error editing forum:', error);
-            setError('Error editing forum. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
+                if (!response.ok) throw new Error('Error editing forum.');
+                setEditMode({ status: false, forumid: null, forumtext: '' });
+                fetchForums();
+            } catch (error) {
+                console.error('Error editing forum:', error);
+                setError('Error editing forum. Please try again later.');
+            } finally {
+                setLoading(false);
+            }
+        });
     };
 
     const handleDeleteForum = async (forumid) => {
-        try {
-            const response = await fetch(`http://localhost:5000/forums/delete/${forumid}`, {
-                method: 'DELETE',
-            });
+        await verifyAndExecute(async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/forums/delete/${forumid}`, {
+                    method: 'DELETE',
+                });
 
-            if (!response.ok) throw new Error('Error deleting forum.');
-            fetchForums();
-        } catch (error) {
-            console.error('Error deleting forum:', error);
-            setError('Error deleting forum. Please try again later.');
-        }
+                if (!response.ok) throw new Error('Error deleting forum.');
+                fetchForums();
+            } catch (error) {
+                console.error('Error deleting forum:', error);
+                setError('Error deleting forum. Please try again later.');
+            }
+        });
     };
 
     return (
@@ -189,6 +219,13 @@ const Forums = () => {
                             <p className="no-forums">No forums yet.</p>
                         )}
                     </ul>
+
+                    {/* Conditional rendering of "Update shop details" button */}
+                    {userid === shopid && usertype === 'shop' && (
+                        <button onClick={() => navigate('/signup-shop')} className="update-shop-details-button">
+                            Update Shop Details
+                        </button>
+                    )}
                 </>
             ) : (
                 <p>Verifying user...</p>

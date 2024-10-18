@@ -4,6 +4,7 @@ import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import SignupShop from './pages/SignupShop';
 import SelectWaste from './pages/SelectWaste';
 import Checklist from './pages/Checklist';
 import Map from './pages/Map';
@@ -19,6 +20,7 @@ const App = () => {
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/signup-shop" element={<SignupShop />} />
                     <Route path="/select-waste" element={<ProtectedRoute element={<SelectWaste />} />} />
                     <Route path="/checklist" element={<ProtectedRoute element={<Checklist />} />} />
                     <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} />

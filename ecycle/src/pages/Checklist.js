@@ -10,10 +10,40 @@ const Checklist = () => {
     const navigate = useNavigate(); // Create a navigate instance
     const { login } = useAuth();
 
-    login();
-    
+    const verifyUser = async () => {
+        const userid = localStorage.getItem('userid');
+        const username = localStorage.getItem('username');
+        const usertype = localStorage.getItem('usertype');
+        const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+        if (!userid || !username || !usertype || !userhashedpassword) {
+            navigate('/');
+            return;
+        }
+
+        try {
+            const response = await axios.post('http://localhost:5000/verify', {
+                userid,
+                username,
+                usertype,
+                userhashedpassword,
+            });
+
+            if (!response.data.isValid) {
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Verification failed:', error);
+            navigate('/');
+        }
+    };
+
     useEffect(() => {
-        // Fetch checklist options from the backend
+        verifyUser();
+    }, []);
+
+    useEffect(() => {
+        // Fetch checklist options from the backend only after user verification
         const fetchChecklistOptions = async () => {
             try {
                 const response = await axios.get('http://localhost:5000/checklist-options');
