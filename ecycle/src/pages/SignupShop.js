@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import './SignupShop.css'; // Adjust the path as needed
 
 const SignupShop = () => {
     const [shopname, setShopname] = useState('');
     const [addressname, setAddressname] = useState('');
     const [website, setWebsite] = useState('');
-    const [actiontype, setActiontype] = useState('');
+    const [actiontype, setActiontype] = useState(''); // This will be the shop type
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -126,7 +127,7 @@ const SignupShop = () => {
                 shopname,
                 addressname: currentLocationUsed ? locationName : addressname, // Use the current location name if needed
                 website,
-                actiontype,
+                actiontype, // This will hold the selected shop type
                 latitude: lat,
                 longtitude: lon,
             };
@@ -163,6 +164,7 @@ const SignupShop = () => {
                             type="text"
                             value={shopname}
                             onChange={(e) => setShopname(e.target.value)}
+                            placeholder="Enter your shop name" // Placeholder text added
                             required
                         />
                     </label>
@@ -174,6 +176,7 @@ const SignupShop = () => {
                             type="text"
                             value={addressname}
                             onChange={(e) => setAddressname(e.target.value)}
+                            placeholder="Enter your shop address" // Placeholder text added
                             required
                         />
                     </label>
@@ -185,18 +188,23 @@ const SignupShop = () => {
                             type="text"
                             value={website}
                             onChange={(e) => setWebsite(e.target.value)}
+                            placeholder="Enter your website (optional)" // Placeholder text added
                         />
                     </label>
                 </div>
                 <div>
                     <label>
-                        Shop Type:
-                        <input
-                            type="text"
+                        Waste Service Type:
+                        <select
                             value={actiontype}
                             onChange={(e) => setActiontype(e.target.value)}
                             required
-                        />
+                        >
+                            <option value="" disabled>Select Waste Service Type</option>
+                            <option value="repair">Repair</option>
+                            <option value="dispose">Dispose</option>
+                            <option value="general">General</option>
+                        </select>
                     </label>
                 </div>
                 <button type="submit" disabled={loading}>

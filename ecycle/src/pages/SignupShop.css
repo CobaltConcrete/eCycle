@@ -1,0 +1,30 @@
+.signup-shop-container {
+    padding: 20px;
+    /* Optional: adds padding around the entire container */
+}
+
+.signup-shop-container label {
+    display: block;
+    /* Makes the label take the full width */
+    margin-bottom: 8px;
+    /* Space below the label */
+}
+
+.signup-shop-container input,
+.signup-shop-container select {
+    margin-left: 20px;
+    /* Add space to the left of input/select boxes */
+    padding: 8px;
+    /* Optional: adds padding inside the input fields */
+    width: 100%;
+    /* Optional: makes input fields take the full width */
+    box-sizing: border-box;
+    /* Ensures padding is included in width */
+}
+
+.signup-shop-container button {
+    margin-top: 15px;
+    /* Space above the button */
+    padding: 10px 15px;
+    /* Add padding inside the button */
+}

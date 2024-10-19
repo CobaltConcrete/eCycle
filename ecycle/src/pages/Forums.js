@@ -208,7 +208,18 @@ const Forums = () => {
                     </h2>
                     <div className="shop-details">
                         <p>Address: {shopDetails.addressname}</p>
-                        <p>Website: <a href={shopDetails.website} target="_blank" rel="noopener noreferrer">{shopDetails.website}</a></p>
+                        <p>
+                            Website: <span style={{ marginRight: '1px' }}></span>
+                            <a 
+                                href={shopDetails && shopDetails.website ? 
+                                    (shopDetails.website.startsWith('http') ? shopDetails.website : `http://${shopDetails.website}`) 
+                                    : '#'} // Fallback to a placeholder if shopDetails is undefined
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                            >
+                                {shopDetails && shopDetails.website ? shopDetails.website : 'N/A'}
+                            </a>
+                        </p>
                         <p>Owner: {username}</p>
                     </div>
 

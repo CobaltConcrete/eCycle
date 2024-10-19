@@ -15,3 +15,29 @@
     margin-top: 10px;
     /* Adjust this value as needed */
 }
+
+.radio-label {
+    margin-right: 20px;
+    margin-left: 20px;
+    /* Adjust the margin as needed */
+}
+
+.instructions-container {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 30px;
+    margin-top: 20px;
+    border-radius: 8px;
+    text-align: justify;
+}
+
+.instructions-container ol {
+    padding-left: 60px;
+    /* Add space to the left for numbers */
+}
+
+.instructions-container li {
+    margin-bottom: 10px;
+    /* Space between list items */
+}

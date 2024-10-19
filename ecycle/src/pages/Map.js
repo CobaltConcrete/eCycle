@@ -249,7 +249,7 @@ const Map = () => {
         <div>
             <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
             <div>
-                <label>
+                <label className="radio-label">
                     <input
                         type="radio"
                         checked={useCurrentLocation}
@@ -257,7 +257,7 @@ const Map = () => {
                     />
                     Use Current Location
                 </label>
-                <label>
+                <label className="radio-label">
                     <input
                         type="radio"
                         checked={!useCurrentLocation}
@@ -298,21 +298,13 @@ const Map = () => {
 
             <div>
                 {instructions.length > 0 && (
-                    <div style={{ 
-                        maxHeight: '600px', 
-                        overflowY: 'auto', 
-                        border: '1px solid #ccc', 
-                        padding: '30px', 
-                        marginTop: '20px', 
-                        borderRadius: '8px', 
-                        textAlign: 'justify'
-                    }}>
+                    <div className="instructions-container">
                         <h3>Directions Instructions:</h3>
-                        <ul>
+                        <ol>
                             {instructions.map((step, index) => (
                                 <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
                             ))}
-                        </ul>
+                        </ol>
                     </div>
                 )}
             </div>
