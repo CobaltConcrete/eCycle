@@ -420,12 +420,14 @@ def delete_forum(forumid):
     if not forum:
         return jsonify({'error': 'Forum not found'}), 404
 
+    # Delete associated comments
+    CommentTable.query.filter_by(forumid=forumid).delete()
+
     # Delete the forum entry
     db.session.delete(forum)
     db.session.commit()
     
     return jsonify({'message': 'Forum deleted successfully'}), 200
-
 
 @app.route('/comments/<int:forumid>', methods=['GET'])
 def get_comments(forumid):
@@ -438,8 +440,10 @@ def get_comments(forumid):
             'forumid': comment.forumid,
             'posterid': comment.posterid,
             'replyid': comment.replyid,
+            'encodedimage': comment.encodedimage,
             'time': comment.time,
-            'postername': comment.poster.username  # Assuming postername is available in UserTable
+            'deleted': comment.deleted,
+            'postername': comment.poster.username 
         }
         for comment in comments
     ]
@@ -452,24 +456,32 @@ def add_comment():
     forumid = data['forumid']
     commenttext = data['commenttext']
     posterid = data['posterid']
+    encodedimage = data.get('encodedimage')  # Get the encoded image
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
-    new_comment = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time)
+    new_comment = CommentTable(
+        forumid=forumid,
+        commenttext=commenttext,
+        posterid=posterid,
+        time=time,
+        encodedimage=encodedimage  # Store the encoded image
+    )
     db.session.add(new_comment)
     db.session.commit()
 
     return jsonify({'message': 'Comment added successfully'}), 201
 
 @app.route('/comments/reply/<int:commentid>', methods=['POST'])
-def reply_to_comment(commentid):
+def reply_comment(commentid):
     data = request.json
     forumid = data['forumid']
     commenttext = data['commenttext']
     posterid = data['posterid']
+    encodedimage = data.get('encodedimage')
     time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     # Logic to save the reply in the database, e.g.:
-    new_reply = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time, replyid=commentid)
+    new_reply = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time, replyid=commentid, encodedimage=encodedimage)
     db.session.add(new_reply)
     db.session.commit()
 
@@ -489,16 +501,30 @@ def edit_comment(commentid):
 
     return jsonify({'message': 'Comment updated successfully'}), 200
 
-@app.route('/comments/delete/<int:commentid>', methods=['DELETE'])
+# @app.route('/comments/delete/<int:commentid>', methods=['DELETE'])
+# def delete_comment(commentid):
+#     comment = CommentTable.query.get(commentid)
+#     if not comment:
+#         return jsonify({'error': 'Comment not found'}), 404
+
+#     db.session.delete(comment)
+#     db.session.commit()
+
+#     return jsonify({'message': 'Comment deleted successfully'}), 200
+
+@app.route('/comments/delete/<int:commentid>', methods=['PUT'])
 def delete_comment(commentid):
     comment = CommentTable.query.get(commentid)
     if not comment:
         return jsonify({'error': 'Comment not found'}), 404
 
-    db.session.delete(comment)
+    # Instead of deleting, mark the comment as deleted
+    comment.commenttext = '[deleted]'
+    comment.deleted = True
     db.session.commit()
 
-    return jsonify({'message': 'Comment deleted successfully'}), 200
+    return jsonify({'message': 'Comment marked as deleted successfully'}), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)

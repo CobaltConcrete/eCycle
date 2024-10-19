@@ -7,5 +7,5 @@ CREATE TABLE shoptable (
     website VARCHAR(255),
     actiontype VARCHAR(255) NOT NULL,
     PRIMARY KEY (shopid),
-    FOREIGN KEY (shopid) REFERENCES usertable(userid)
+    FOREIGN KEY (shopid) REFERENCES usertable(userid) ON DELETE CASCADE
 );

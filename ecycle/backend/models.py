@@ -69,7 +69,9 @@ class CommentTable(db.Model):
     forumid = db.Column(db.Integer, db.ForeignKey('forumtable.forumid'), nullable=False)
     posterid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), nullable=False)
     replyid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid'), nullable=True)
+    encodedimage = db.Column(db.Text, nullable=True)  # Change to Text
     time = db.Column(db.String(50), nullable=False)
+    deleted = db.Column(db.Boolean, nullable=False, default=False)
 
     forum = db.relationship('ForumTable', backref=db.backref('comments', lazy=True))
     poster = db.relationship('UserTable', backref=db.backref('comments', lazy=True))

@@ -4,9 +4,19 @@ CREATE TABLE commenttable (
     forumid INT NOT NULL,
     posterid INT NOT NULL,
     replyid INT,
+    encodedimage TEXT,
     time VARCHAR(50) NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
 
-    FOREIGN KEY (forumid) REFERENCES forumtable(forumid),
-    FOREIGN KEY (posterid) REFERENCES usertable(userid),
-    FOREIGN KEY (replyid) REFERENCES commenttable(commentid)
+    FOREIGN KEY (forumid) REFERENCES forumtable(forumid) ON DELETE CASCADE,
+    FOREIGN KEY (posterid) REFERENCES usertable(userid) ON DELETE CASCADE,
+    FOREIGN KEY (replyid) REFERENCES commenttable(commentid) ON DELETE CASCADE
 );
+
+
+ALTER TABLE commenttable
+DROP CONSTRAINT commenttable_forumid_fkey;
+
+ALTER TABLE commenttable
+ADD CONSTRAINT commenttable_replyid_fkey
+FOREIGN KEY (replyid) REFERENCES commenttable(commentid) ON DELETE CASCADE;

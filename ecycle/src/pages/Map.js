@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
+import './Map.css'
 
 let loc = null; // Global variable for selected location
 let center = null; // Global variable for map center
@@ -172,15 +173,19 @@ const Map = () => {
                 );
 
                 infoWindow.setContent(`
-                    <div>
-                        <h3 style="color: black;">${location.shopname}</h3>
-                        <p style="color: black;">${location.addressname}</p>
-                        <a href="${location.website}" target="_blank">Visit Website</a>
-                        <br />
-                        <button onclick="window.open('/forums/${location.shopid}', '_blank')">
-                            Forum
-                        </button>
-                    </div>
+                <div>
+                    <h3 style="color: black;">${location.shopname}</h3>
+                    <p style="color: black;">${location.addressname}</p>
+                    <a href="${location.website}" target="_blank">Visit Website</a>
+                    <br />
+                    <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" style="color: blue;">
+                        View on Google Maps
+                    </a>
+                    <br />
+                    <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
+                        Forum
+                    </button>
+                </div>
                 `);
                 infoWindow.open(map, marker);   
             });
