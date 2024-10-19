@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Forums.css';
@@ -10,10 +10,45 @@ const Forums = () => {
     const [newForumText, setNewForumText] = useState('');
     const [loading, setLoading] = useState(false);
     const [isVerified, setIsVerified] = useState(false);
+    const [shopDetails, setShopDetails] = useState({});
+    const [username, setUsername] = useState('');
     const [editMode, setEditMode] = useState({ status: false, forumid: null, forumtext: '' });
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid'); // Get the user ID
     const usertype = localStorage.getItem('usertype'); // Get the usertype
+
+    const fetchShopDetails = useCallback(async () => {
+        try {
+            const shopResponse = await fetch(`http://localhost:5000/get-shop-details/${shopid}`);
+            if (!shopResponse.ok) throw new Error('Error fetching shop details.');
+
+            const shopData = await shopResponse.json();
+            setShopDetails(shopData);
+
+            // Fetch username based on shop's userid
+            const userResponse = await fetch(`http://localhost:5000/get-username/${shopid}`); // Assuming this endpoint exists
+            if (!userResponse.ok) throw new Error('Error fetching user details.');
+
+            const userData = await userResponse.json();
+            setUsername(userData.username);
+        } catch (error) {
+            console.error('Error fetching shop or user data:', error);
+            setError('Error fetching shop or user data. Please try again later.');
+        }
+    }, [shopid]);
+
+    const fetchForums = useCallback(async () => {
+        try {
+            const response = await fetch(`http://localhost:5000/forums/${shopid}`);
+            if (!response.ok) throw new Error('Error fetching forum data.');
+
+            const data = await response.json();
+            setForums(data);
+        } catch (error) {
+            console.error('Error fetching forum data:', error);
+            setError('Error fetching forum data. Please try again later.');
+        }
+    }, [shopid]);
 
     useEffect(() => {
         const verifyUser = async () => {
@@ -45,26 +80,14 @@ const Forums = () => {
         };
 
         verifyUser();
-    }, [navigate, userid]);
+    }, [navigate, userid, usertype]);
 
     useEffect(() => {
         if (isVerified) {
+            fetchShopDetails();
             fetchForums();
         }
-    }, [isVerified, shopid]);
-
-    const fetchForums = async () => {
-        try {
-            const response = await fetch(`http://localhost:5000/forums/${shopid}`);
-            if (!response.ok) throw new Error('Error fetching forum data.');
-
-            const data = await response.json();
-            setForums(data);
-        } catch (error) {
-            console.error('Error fetching forum data:', error);
-            setError('Error fetching forum data. Please try again later.');
-        }
-    };
+    }, [isVerified, shopid, fetchForums, fetchShopDetails]);
 
     const verifyAndExecute = async (action) => {
         const username = localStorage.getItem('username');
@@ -160,11 +183,35 @@ const Forums = () => {
         });
     };
 
+    const handleRemoveShop = async () => {
+        const confirmRemoval = window.confirm('Are you sure you want to remove this shop? This action cannot be undone.');
+        if (!confirmRemoval) return;
+
+        try {
+            const response = await axios.post('http://localhost:5000/remove-shop', { shopid });
+            if (response.data.message) {
+                alert('Shop removed successfully!');
+                navigate('/'); // Redirect after removal
+            }
+        } catch (error) {
+            console.error('Error removing shop:', error);
+            setError('Failed to remove shop. Please try again later.');
+        }
+    };
+
     return (
         <div className="forums-container">
             {isVerified ? (
                 <>
-                    <h2 className="forums-title">Forums for Shop {shopid}</h2>
+                    <h2 className="forums-title">
+                        Forums for {shopDetails.actiontype} waste {shopDetails.shopname}
+                    </h2>
+                    <div className="shop-details">
+                        <p>Address: {shopDetails.addressname}</p>
+                        <p>Website: <a href={shopDetails.website} target="_blank" rel="noopener noreferrer">{shopDetails.website}</a></p>
+                        <p>Owner: {username}</p>
+                    </div>
+
                     {error && <p className="error-message">{error}</p>}
 
                     <div className="add-forum">
@@ -222,9 +269,14 @@ const Forums = () => {
 
                     {/* Conditional rendering of "Update shop details" button */}
                     {userid === shopid && usertype === 'shop' && (
-                        <button onClick={() => navigate('/signup-shop')} className="update-shop-details-button">
-                            Update Shop Details
-                        </button>
+                        <>
+                            <button onClick={() => navigate('/signup-shop')} className="update-shop-details-button">
+                                Update Shop Details
+                            </button>
+                            <button onClick={handleRemoveShop} className="remove-shop-button">
+                                Remove Shop
+                            </button>
+                        </>
                     )}
                 </>
             ) : (

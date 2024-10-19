@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -58,23 +58,24 @@ const Map = () => {
         verifyUser();
     }, [navigate]);
 
-    useEffect(() => {
-        if (isVerified && useCurrentLocation && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
-                    setUserLocation({ lat: latitude, lng: longitude });
-                    loadMap(latitude, longitude);
-                },
-                (error) => {
-                    console.error("Error obtaining location", error);
-                    setError('Failed to retrieve your current location');
-                }
-            );
-        }
-    }, [isVerified, useCurrentLocation]);
+    const fetchNearbyLocations = useCallback(async (lat, lng) => {
+        try {
+            const url = 'http://localhost:5000/nearby-locations'; // Use the unified endpoint
 
-    const loadMap = (lat, lng) => {
+            const response = await axios.post(url, {
+                lat,
+                lon: lng,
+                actiontype: type,  // Include the action type in the request body
+                userid: userid
+            });
+            setLocations(response.data.slice(0, 5));
+            addMarkersToMap(response.data.slice(0, 5));
+        } catch (err) {
+            setError('Failed to fetch nearby locations');
+        }
+    }, [type, userid]); // Include type and userid in the dependency array
+
+    const loadMap = useCallback((lat, lng) => {
         center = { lat, lng }; // Update the global center variable
         const map = new window.google.maps.Map(document.getElementById('map'), {
             center,
@@ -90,24 +91,25 @@ const Map = () => {
 
         // Fetch nearby locations after the map is loaded
         fetchNearbyLocations(lat, lng);
-    };
+    }, [fetchNearbyLocations]); // Add fetchNearbyLocations to the dependency array
 
-    const fetchNearbyLocations = async (lat, lng) => {
-        try {
-            const url = 'http://localhost:5000/nearby-locations'; // Use the unified endpoint
-
-            const response = await axios.post(url, {
-                lat,
-                lon: lng,
-                actiontype: type,  // Include the action type in the request body
-                userid: userid
-            });
-            setLocations(response.data.slice(0, 5));
-            addMarkersToMap(response.data.slice(0, 5));
-        } catch (err) {
-            setError('Failed to fetch nearby locations');
+    useEffect(() => {
+        if (isVerified && useCurrentLocation && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    let { latitude, longitude } = position.coords;
+                    latitude += 0.00153
+                    longitude += -0.0041175
+                    setUserLocation({ lat: latitude, lng: longitude });
+                    loadMap(latitude, longitude);
+                },
+                (error) => {
+                    console.error("Error obtaining location", error);
+                    setError('Failed to retrieve your current location');
+                }
+            );
         }
-    };
+    }, [isVerified, useCurrentLocation, loadMap]);
 
     const addMarkersToMap = (locations) => {
         // Ensure map is centered on the user's current location
@@ -237,7 +239,6 @@ const Map = () => {
             );
         }
     };
-
 
     return (
         <div>

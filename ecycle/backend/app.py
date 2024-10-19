@@ -77,15 +77,22 @@ def register():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
-@app.route('/get-usertype/<int:shopid>', methods=['GET'])
-def get_user_type(shopid):
-    user = UserTable.query.filter_by(userid=shopid).first()
+@app.route('/get-username/<int:userid>', methods=['GET'])
+def get_username(userid):
+    user = UserTable.query.filter_by(userid=userid).first()
+    if user:
+        return jsonify({'username': user.username}), 200
+    return jsonify({'message': 'User not found'}), 404
+
+@app.route('/get-usertype/<int:userid>', methods=['GET'])
+def get_usertype(userid):
+    user = UserTable.query.filter_by(userid=userid).first()
     if user:
         return jsonify({'usertype': user.usertype}), 200
     return jsonify({'message': 'User not found'}), 404
 
 @app.route('/get-shop-details/<int:shopid>', methods=['GET'])
-def get_shop(shopid):
+def get_shop_details(shopid):
     shop = ShopTable.query.get(shopid)
     if shop:
         return jsonify({
@@ -142,6 +149,27 @@ def signup_shop():
         db.session.add(new_shop)
         db.session.commit()
         return jsonify({'message': 'Shop registered successfully!'}), 201
+
+@app.route('/remove-shop', methods=['POST'])
+def remove_shop():
+    data = request.get_json()
+    shopid = data.get('shopid')  # Assuming 'shopId' is passed from the frontend
+
+    if not shopid:
+        return jsonify({'error': 'Shop ID is required.'}), 400
+
+    # Find the shop by shopid
+    shop_to_delete = ShopTable.query.filter_by(shopid=shopid).first()
+
+    if not shop_to_delete:
+        return jsonify({'error': 'Shop not found.'}), 404
+
+    # Delete the shop record
+    db.session.delete(shop_to_delete)
+    db.session.commit()
+
+    return jsonify({'message': 'Shop removed successfully!'}), 200
+
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -232,6 +260,26 @@ def get_nearby_locations():
 
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 
+@app.route('/get-current-coordinates', methods=['POST'])
+def get_current_coordinates():
+    try:
+        # Use the Google Maps Geolocation API
+        url = f'https://www.googleapis.com/geolocation/v1/geolocate?key={GOOGLE_MAPS_API_KEY}'
+        
+        # Send a POST request to the Geolocation API
+        response = requests.post(url)
+        data = response.json()
+
+        # Check if the request was successful
+        if 'location' in data:
+            lat = data['location']['lat']
+            lon = data['location']['lng']
+            return jsonify({'lat': lat, 'lon': lon}), 200
+        else:
+            return jsonify({'error': 'Unable to retrieve current coordinates'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/get-coordinates', methods=['POST'])
 def get_coordinates():
     address = request.json.get('address')
@@ -249,31 +297,24 @@ def get_coordinates():
     else:
         return jsonify({'error': 'Invalid address'}), 400
 
-# @app.route('/get-directions', methods=['POST'])
-# def get_directions():
-#     data = request.get_json()
-#     user_location = data.get('user_location')
-#     destination = data.get('destination')
+@app.route('/get-location-name', methods=['POST'])
+def get_location_name():
+    data = request.json
+    lat = data.get('lat')
+    lon = data.get('lon')
 
-#     if not user_location or not destination:
-#         return jsonify({'error': 'User location and destination are required'}), 400
+    if not lat or not lon:
+        return jsonify({'error': 'Latitude and longitude are required'}), 400
 
-#     directions_url = f'https://maps.googleapis.com/maps/api/directions/json?origin={user_location["lat"]},{user_location["lon"]}&destination={destination["lat"]},{destination["lon"]}&key={GOOGLE_MAPS_API_KEY}'
-    
-#     response = requests.get(directions_url)
-#     directions_data = response.json()
+    url = f'https://maps.googleapis.com/maps/api/geocode/json?latlng={lat},{lon}&key={GOOGLE_MAPS_API_KEY}'
+    response = requests.get(url)
+    data = response.json()
 
-#     if directions_data['status'] == 'OK':
-#         routes = directions_data['routes'][0]
-#         steps = routes['legs'][0]['steps']
-        
-#         directions = []
-#         for step in steps:
-#             directions.append(step['html_instructions'])  # Get HTML instructions for directions
-
-#         return jsonify({'directions': directions}), 200
-#     else:
-#         return jsonify({'error': 'Unable to get directions'}), 400
+    if data['status'] == 'OK':
+        location_name = data['results'][0]['formatted_address']
+        return jsonify({'locationName': location_name}), 200
+    else:
+        return jsonify({'error': 'Unable to retrieve location name'}), 400
 
 @app.route('/get-directions', methods=['POST'])
 def get_directions():
