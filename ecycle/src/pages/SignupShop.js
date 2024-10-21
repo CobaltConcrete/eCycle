@@ -164,7 +164,7 @@ const SignupShop = () => {
                             type="text"
                             value={shopname}
                             onChange={(e) => setShopname(e.target.value)}
-                            placeholder="Enter your shop name" // Placeholder text added
+                            placeholder="Enter your shop name"
                             required
                         />
                     </label>
@@ -176,7 +176,7 @@ const SignupShop = () => {
                             type="text"
                             value={addressname}
                             onChange={(e) => setAddressname(e.target.value)}
-                            placeholder="Enter your shop address" // Placeholder text added
+                            placeholder="Enter your shop address"
                             required
                         />
                     </label>
@@ -188,7 +188,7 @@ const SignupShop = () => {
                             type="text"
                             value={website}
                             onChange={(e) => setWebsite(e.target.value)}
-                            placeholder="Enter your website (optional)" // Placeholder text added
+                            placeholder="Enter your website (optional)"
                         />
                     </label>
                 </div>

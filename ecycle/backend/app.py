@@ -257,8 +257,7 @@ def get_nearby_locations():
     
     return jsonify(nearby_shops), 200
 
-
-GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+GOOGLE_MAPS_API_KEY = os.getenv("REACT_APP_GOOGLE_MAPS_API_KEY")
 
 @app.route('/get-current-coordinates', methods=['POST'])
 def get_current_coordinates():

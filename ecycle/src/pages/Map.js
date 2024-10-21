@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
-import './Map.css'
+import './Map.css';
 
 let loc = null; // Global variable for selected location
 let center = null; // Global variable for map center
 let directionsService = null; // Global variable for DirectionsService
-let transportMode = window.google.maps.TravelMode.DRIVING; // Global variable for transport mode
+let transportMode = window.google?.maps?.TravelMode?.DRIVING || 'DRIVING'; // Default transport mode
 
 const Map = () => {
     const { type } = useParams();
@@ -24,6 +24,22 @@ const Map = () => {
     const [selectedTransportMode, setSelectedTransportMode] = useState(transportMode);
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
+
+    // Function to load Google Maps script dynamically
+    const loadGoogleMapsScript = (callback) => {
+        const existingScript = document.getElementById('googleMaps');
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}&libraries=places`;
+            script.id = 'googleMaps';
+            document.body.appendChild(script);
+            script.onload = () => {
+                if (callback) callback();
+            };
+        } else {
+            if (callback) callback();
+        }
+    };
 
     useEffect(() => {
         const verifyUser = async () => {
@@ -78,6 +94,7 @@ const Map = () => {
 
     const loadMap = useCallback((lat, lng) => {
         center = { lat, lng }; // Update the global center variable
+
         const map = new window.google.maps.Map(document.getElementById('map'), {
             center,
             zoom: 13,
@@ -96,30 +113,29 @@ const Map = () => {
 
     useEffect(() => {
         if (isVerified && useCurrentLocation && navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    let { latitude, longitude } = position.coords;
-                    latitude += 0.00153
-                    longitude += -0.0041175
-                    setUserLocation({ lat: latitude, lng: longitude });
-                    loadMap(latitude, longitude);
-                },
-                (error) => {
-                    console.error("Error obtaining location", error);
-                    setError('Failed to retrieve your current location');
-                }
-            );
+            loadGoogleMapsScript(() => {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        let { latitude, longitude } = position.coords;
+                        setUserLocation({ lat: latitude, lng: longitude });
+                        loadMap(latitude, longitude);
+                    },
+                    (error) => {
+                        console.error("Error obtaining location", error);
+                        setError('Failed to retrieve your current location');
+                    }
+                );
+            });
         }
     }, [isVerified, useCurrentLocation, loadMap]);
 
     const addMarkersToMap = (locations) => {
-        // Ensure map is centered on the user's current location
         const map = new window.google.maps.Map(document.getElementById('map'), {
             center,
             zoom: 13,
         });
 
-        const userMarker = new window.google.maps.Marker({
+        new window.google.maps.Marker({
             map,
             position: center,
             title: "You are here!",
@@ -128,7 +144,6 @@ const Map = () => {
 
         const infoWindow = new window.google.maps.InfoWindow();
         
-        // Initialize DirectionsService if not already initialized
         if (!directionsService) {
             directionsService = new window.google.maps.DirectionsService();
         }
@@ -152,12 +167,11 @@ const Map = () => {
                     directionsRenderer.set('directions', null); // Clear previous directions
                 }
 
-                // Fetch and display route directions
                 directionsService.route(
                     {
                         origin: center,
                         destination: { lat: loc.latitude, lng: loc.longitude },
-                        travelMode: transportMode, // Use the global transport mode here
+                        travelMode: transportMode, 
                         transitOptions: {
                             routingPreference: 'LESS_WALKING'
                         }
@@ -173,19 +187,21 @@ const Map = () => {
                 );
 
                 infoWindow.setContent(`
-                <div>
-                    <h3 style="color: black;">${location.shopname}</h3>
-                    <p style="color: black;">${location.addressname}</p>
-                    <a href="${location.website}" target="_blank">Visit Website</a>
-                    <br />
-                    <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" style="color: blue;">
-                        View on Google Maps
-                    </a>
-                    <br />
-                    <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
-                        Forum
-                    </button>
-                </div>
+                    <div class="location-info">
+                        <h3 class="shop-name">${location.shopname}</h3>
+                        <p class="shop-address">${location.addressname}</p>
+                        <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
+                        <br />
+                        <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
+                            View on Google Maps
+                        </a>
+                        <br />
+                        <div class="forum-button-container">
+                            <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
+                                Visit Forum
+                            </button>
+                        </div>
+                    </div>
                 `);
                 infoWindow.open(map, marker);   
             });
@@ -217,18 +233,16 @@ const Map = () => {
         transportMode = mode; // Update the global transport mode variable
         setSelectedTransportMode(mode);
 
-        // Check if a location has been selected before trying to set directions
         if (loc) {
             if (directionsRenderer) {
                 directionsRenderer.set('directions', null); // Clear previous directions
             }
 
-            // Fetch and display route directions
             directionsService.route(
                 {
                     origin: center,
                     destination: { lat: loc.latitude, lng: loc.longitude },
-                    travelMode: transportMode, // Use the global transport mode here
+                    travelMode: transportMode, 
                     transitOptions: {
                         routingPreference: 'LESS_WALKING'
                     }
@@ -246,71 +260,76 @@ const Map = () => {
     };
 
     return (
-        <div>
-            <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
-            <div>
-                <label className="radio-label">
-                    <input
-                        type="radio"
-                        checked={useCurrentLocation}
-                        onChange={() => setUseCurrentLocation(true)}
-                    />
-                    Use Current Location
-                </label>
-                <label className="radio-label">
-                    <input
-                        type="radio"
-                        checked={!useCurrentLocation}
-                        onChange={() => setUseCurrentLocation(false)}
-                    />
-                    Enter Location Manually
-                </label>
+<div>
+    <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
+    <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <a className="nav-item" role="presentation">
+            <a
+                className={`nav-link ${useCurrentLocation ? 'active' : ''}`}
+                onClick={() => setUseCurrentLocation(true)}
+                href="#"
+            >
+                Use Current Location
+            </a>
+        </a>
+        <a className="nav-item" role="presentation">
+            <a
+                className={`nav-link ${!useCurrentLocation ? 'active' : ''}`}
+                onClick={() => setUseCurrentLocation(false)}
+                href="#"
+            >
+                Enter Location Manually
+            </a>
+        </a>
+    </ul>
+
+    <div className="input-container" style={{ height: !useCurrentLocation ? '60px' : '0' }}>
+        {!useCurrentLocation && (
+            <input
+                type="text"
+                placeholder="Enter address or postal code"
+                value={manualAddress}
+                onChange={handleAddressChange}
+                className="location-input"
+            />
+        )}
+    </div>
+
+    <button className="find-locations-btn" onClick={handleSearch}>Find Locations</button>
+
+    <div className="transport-mode-container">
+        <label htmlFor="transportMode">Select Transport Mode: </label>
+        <select
+            id="transportMode"
+            value={transportMode}
+            onChange={(e) => handleTransportModeChange(e.target.value)}
+            className="transport-mode-select"
+        >
+            <option value={window.google?.maps?.TravelMode?.DRIVING}>Driving</option>
+            <option value={window.google?.maps?.TravelMode?.WALKING}>Walking</option>
+            <option value={window.google?.maps?.TravelMode?.BICYCLING}>Bicycling</option>
+            <option value={window.google?.maps?.TravelMode?.TRANSIT}>Transit</option>
+        </select>
+    </div>
+
+    <div id="map" style={{ height: '400px', width: '100%' }}></div>
+
+    <div>
+        {instructions.length > 0 && (
+            <div className="instructions-container">
+                <h3>Directions Instructions:</h3>
+                <ol>
+                    {instructions.map((step, index) => (
+                        <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
+                    ))}
+                </ol>
             </div>
+        )}
+    </div>
 
-            {!useCurrentLocation && (
-                <div>
-                    <input
-                        type="text"
-                        placeholder="Enter address or postal code"
-                        value={manualAddress}
-                        onChange={handleAddressChange}
-                    />
-                </div>
-            )}
+    {error && <p style={{ color: 'red' }}>{error}</p>}
+</div>
 
-            <button onClick={handleSearch}>Find Locations</button>
-
-            <div>
-                <label htmlFor="transportMode">Select Transport Mode: </label>
-                <select
-                    id="transportMode"
-                    value={transportMode}
-                    onChange={(e) => handleTransportModeChange(e.target.value)}
-                >
-                    <option value={window.google.maps.TravelMode.DRIVING}>Driving</option>
-                    <option value={window.google.maps.TravelMode.WALKING}>Walking</option>
-                    <option value={window.google.maps.TravelMode.BICYCLING}>Bicycling</option>
-                    <option value={window.google.maps.TravelMode.TRANSIT}>Transit</option>
-                </select>
-            </div>
-
-            <div id="map" style={{ height: '400px', width: '100%' }}></div>
-
-            <div>
-                {instructions.length > 0 && (
-                    <div className="instructions-container">
-                        <h3>Directions Instructions:</h3>
-                        <ol>
-                            {instructions.map((step, index) => (
-                                <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
-                            ))}
-                        </ol>
-                    </div>
-                )}
-            </div>
-
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-        </div>
     );
 };
 

@@ -1,4 +1,4 @@
-.signup-container {
+.login-container {
     border: 1px solid #4caf50;
     /* Border color */
     border-radius: 5px;
@@ -10,19 +10,20 @@
     background-color: #f9f9f9;
     /* Light background color */
     width: 500px;
+    height: 350px;
     /* Fixed width for the container */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     /* Subtle shadow */
 }
 
-.signup-container h2 {
+.login-container h2 {
     text-align: center;
     /* Center the heading */
     color: #4caf50;
     /* Heading color */
 }
 
-.signup-container input {
+.login-container input {
     width: 50%;
     /* Full width */
     padding: 10px;
@@ -37,24 +38,17 @@
     /* Smooth border transition */
 }
 
-.signup-container input:focus {
+.login-container input:focus {
     border-color: #4caf50;
     /* Change border color on focus */
     outline: none;
     /* Remove default outline */
 }
 
-.user-type-container {
-    display: flex;
-    /* Flexbox for horizontal alignment */
-    justify-content: center;
-    /* Align items to the start with minimal space */
-    margin-top: 20px;
-    /* Space above the buttons */
-}
-
-.user-type-container button {
-    padding: 10px 20px;
+.login-container button[type="submit"] {
+    width: 50%;
+    /* Full width */
+    padding: 10px;
     /* Padding inside the button */
     border: none;
     /* Remove border */
@@ -68,36 +62,38 @@
     /* Pointer cursor on hover */
     transition: background-color 0.3s;
     /* Smooth transition */
-    margin-right: 10px;
-    /* Add a small margin to the right of each button */
 }
 
-.user-type-container button:last-child {
-    margin-right: 0;
-    /* Remove margin for the last button */
-}
-
-.user-type-container button:hover {
+.login-container button[type="submit"]:hover {
     background-color: #388e3c;
     /* Darker background on hover */
 }
 
-.back-to-login-button {
-    margin-top: 20px;
-    /* Space above the button */
+.signup-prompt {
+    font-size: 0.5em;
+    /* Adjust the size as needed */
+    color: #555;
+    /* Optional: Change text color */
+    text-align: center;
+    /* Center the text */
+}
+
+.signup-prompt button {
+    margin-left: 5px;
+    /* Space between prompt text and button */
     background-color: transparent;
-    /* Transparent background */
+    /* Transparent background for the sign-up button */
     color: #007bff;
-    /* Text color */
+    /* Text color for the sign-up button */
     border: none;
-    /* Remove border */
+    /* Remove default border */
     cursor: pointer;
     /* Pointer cursor on hover */
     text-decoration: underline;
-    /* Underline for the button */
+    /* Underline for sign-up button */
 }
 
-.back-to-login-button:hover {
+.signup-prompt button:hover {
     color: #0056b3;
     /* Change color on hover */
 }

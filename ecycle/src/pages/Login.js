@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
+import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -78,7 +79,7 @@ const Login = () => {
                     {loading ? 'Logging in...' : 'Login'}
                 </button>
             </form>
-            <p>
+            <p className="signup-prompt">
                 Don't have an account? 
                 <button onClick={handleSignUp} style={{ marginLeft: '5px' }}>
                     Sign Up

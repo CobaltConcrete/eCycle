@@ -107,3 +107,26 @@
     background-color: #0056b3;
     /* Darker blue on hover */
 }
+
+.checklist-button {
+    margin-top: 20px;
+    /* Margin above the help button */
+    padding: 10px 15px;
+    /* Padding for the button */
+    background-color: #4caf50;
+    /* Button color */
+    color: white;
+    /* Text color */
+    border: none;
+    /* No border */
+    border-radius: 5px;
+    /* Rounded corners */
+    cursor: pointer;
+    /* Pointer on hover */
+    transition: background-color 0.3s;
+    /* Animation on hover */
+}
+
+.checklist-button:hover {
+    background-color: #388e3c;
+}
