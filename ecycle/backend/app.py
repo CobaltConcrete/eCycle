@@ -153,23 +153,26 @@ def signup_shop():
 @app.route('/remove-shop', methods=['POST'])
 def remove_shop():
     data = request.get_json()
-    shopid = data.get('shopid')  # Assuming 'shopId' is passed from the frontend
+    shopid = data.get('shopid')  # Assuming 'shopid' is passed from the frontend
 
     if not shopid:
         return jsonify({'error': 'Shop ID is required.'}), 400
 
-    # Find the shop by shopid
     shop_to_delete = ShopTable.query.filter_by(shopid=shopid).first()
 
     if not shop_to_delete:
         return jsonify({'error': 'Shop not found.'}), 404
 
-    # Delete the shop record
+    forums_to_delete = ForumTable.query.filter_by(shopid=shopid).all()  # Fetch all forums with the given shopid
+    for forum in forums_to_delete:
+        CommentTable.query.filter_by(forumid=forum.forumid).delete()
+        db.session.delete(forum)
+
     db.session.delete(shop_to_delete)
+
     db.session.commit()
 
-    return jsonify({'message': 'Shop removed successfully!'}), 200
-
+    return jsonify({'message': 'Shop and its associated forums removed successfully!'}), 200
 
 @app.route('/login', methods=['POST'])
 def login():

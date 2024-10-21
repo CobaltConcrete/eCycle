@@ -15,9 +15,3 @@ VALUES
     ('What are the repair costs for phones?', 712, 3, '2024-10-13 10:15:00'),
     ('Does this shop provide warranty?', 712, 4, '2024-10-13 11:30:00'),
     ('Great service, highly recommended!', 712, 5, '2024-10-13 12:45:00');
-
-
-ALTER TABLE forumtable
-ADD CONSTRAINT commenttable_posterid_fkey
-FOREIGN KEY (posterid) REFERENCES usertable(userid) ON DELETE CASCADE;
-
