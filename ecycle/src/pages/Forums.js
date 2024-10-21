@@ -201,98 +201,105 @@ const Forums = () => {
 
     return (
         <div className="forums-container">
-            {isVerified ? (
+        {isVerified ? (
+            <>
+            <h2 className="forums-title">
+                Forums for {shopDetails.actiontype} waste {shopDetails.shopname}
+            </h2>
+            <div className="shop-details">
+                <p>Address: {shopDetails.addressname}</p>
+                <p>
+                Website: <span style={{ marginRight: '1px' }}></span>
+                <a 
+                    href={shopDetails && shopDetails.website ? 
+                    (shopDetails.website.startsWith('http') ? shopDetails.website : `http://${shopDetails.website}`) 
+                    : '#'}
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                >
+                    {shopDetails && shopDetails.website ? shopDetails.website : 'N/A'}
+                </a>
+                </p>
+                <p>Owner: {username}</p>
+            </div>
+
+            {userid === shopid && usertype === 'shop' && (
                 <>
-                    <h2 className="forums-title">
-                        Forums for {shopDetails.actiontype} waste {shopDetails.shopname}
-                    </h2>
-                    <div className="shop-details">
-                        <p>Address: {shopDetails.addressname}</p>
-                        <p>
-                            Website: <span style={{ marginRight: '1px' }}></span>
-                            <a 
-                                href={shopDetails && shopDetails.website ? 
-                                    (shopDetails.website.startsWith('http') ? shopDetails.website : `http://${shopDetails.website}`) 
-                                    : '#'} // Fallback to a placeholder if shopDetails is undefined
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                            >
-                                {shopDetails && shopDetails.website ? shopDetails.website : 'N/A'}
-                            </a>
-                        </p>
-                        <p>Owner: {username}</p>
-                    </div>
+                    {/* New Checklist Button */}
+                    <button onClick={() => navigate('/checklist')} className="btn checklist-button">
+                        Update Checklist
+                    </button>
+                    {/* Update Shop Details Button */}
+                    <button onClick={() => navigate('/signup-shop')} className="btn update-shop-details-button">
+                        Update Shop Details
+                    </button>
+                    {/* Remove Shop Button */}
+                    <button onClick={handleRemoveShop} className="btn remove-shop-button">
+                        Remove Shop
+                    </button>
+                </>
+            )}
 
-                    {error && <p className="error-message">{error}</p>}
+            {error && <p className="error-message">{error}</p>}
 
-                    <div className="add-forum">
-                        <textarea
-                            value={newForumText}
-                            onChange={(e) => setNewForumText(e.target.value)}
-                            placeholder="Enter your forum text here"
-                            className="forum-input"
-                        ></textarea>
-                        <button onClick={handleAddForum} disabled={loading} className="add-forum-button">
-                            {loading ? 'Submitting...' : 'Add Forum'}
-                        </button>
-                    </div>
+            <div className="add-forum">
+                <textarea
+                value={newForumText}
+                onChange={(e) => setNewForumText(e.target.value)}
+                placeholder="Write a forum..."
+                className="forum-input"
+                ></textarea>
+                <button onClick={handleAddForum} disabled={loading} className="btn add-forum-button">
+                {loading ? 'Submitting...' : 'Submit Forum'}
+                </button>
+            </div>
 
-                    <ul className="forums-list">
-                        {forums.length > 0 ? (
-                            forums.map((forum) => (
-                                <li key={forum.forumid} className="forum-item">
-                                    {editMode.status && editMode.forumid === forum.forumid ? (
-                                        <>
-                                            <textarea
-                                                value={editMode.forumtext}
-                                                onChange={(e) => setEditMode({ ...editMode, forumtext: e.target.value })}
-                                                className="forum-edit-input"
-                                            />
-                                            <button onClick={() => handleEditForum(forum.forumid)} disabled={loading}>
-                                                Save
-                                            </button>
-                                            <button onClick={() => setEditMode({ status: false, forumid: null, forumtext: '' })}>
-                                                Cancel
-                                            </button>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                                <p className="forum-text">{forum.forumtext}</p>
-                                                <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
-                                            </Link>
-                                            {forum.posterid === parseInt(userid) && (
-                                                <div className="forum-actions">
-                                                    <button onClick={() => setEditMode({ status: true, forumid: forum.forumid, forumtext: forum.forumtext })}>
-                                                        Edit
-                                                    </button>
-                                                    <button onClick={() => handleDeleteForum(forum.forumid)}>Delete</button>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </li>
-                            ))
-                        ) : (
-                            <p className="no-forums">No forums yet.</p>
-                        )}
-                    </ul>
-
-                    {/* Conditional rendering of "Update shop details" button */}
-                    {userid === shopid && usertype === 'shop' && (
+            <ul className={`forums-list ${forums.length === 0 ? 'no-forums-bg' : ''}`}>
+                {forums.length > 0 ? (
+                forums.map((forum) => (
+                    <li key={forum.forumid} className="forum-item">
+                    {editMode.status && editMode.forumid === forum.forumid ? (
                         <>
-                            <button onClick={() => navigate('/signup-shop')} className="update-shop-details-button">
-                                Update Shop Details
+                        <textarea
+                            value={editMode.forumtext}
+                            onChange={(e) => setEditMode({ ...editMode, forumtext: e.target.value })}
+                            className="forum-edit-input"
+                        />
+                        <button onClick={() => handleEditForum(forum.forumid)} disabled={loading} className="btn save-button">
+                            Save
+                        </button>
+                        <button onClick={() => setEditMode({ status: false, forumid: null, forumtext: '' })} className="btn cancel-button">
+                            Cancel
+                        </button>
+                        </>
+                    ) : (
+                        <>
+                        <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                            <p className="forum-text">{forum.forumtext}</p>
+                            <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
+                        </Link>
+                        {forum.posterid === parseInt(userid) && (
+                            <div className="forum-actions">
+                            <button onClick={() => setEditMode({ status: true, forumid: forum.forumid, forumtext: forum.forumtext })} className="btn edit-button">
+                                Edit
                             </button>
-                            <button onClick={handleRemoveShop} className="remove-shop-button">
-                                Remove Shop
+                            <button onClick={() => handleDeleteForum(forum.forumid)} className="btn delete-button">
+                                Delete
                             </button>
+                            </div>
+                        )}
                         </>
                     )}
-                </>
-            ) : (
-                <p>Verifying user...</p>
-            )}
+                    </li>
+                ))
+                ) : (
+                <p className="no-forums">No forums yet.</p>
+                )}
+            </ul>
+            </>
+        ) : (
+            <p>Verifying user...</p>
+        )}
         </div>
     );
 };
