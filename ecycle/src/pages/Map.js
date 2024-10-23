@@ -316,7 +316,7 @@ const Map = () => {
 
     <div>
         {instructions.length > 0 && (
-            <div className="instructions-container">
+            <div className="instructions-container" style={{ fontSize: '0.8em' }}>
                 <h3>Directions Instructions:</h3>
                 <ol>
                     {instructions.map((step, index) => (

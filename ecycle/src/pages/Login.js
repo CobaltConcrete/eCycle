@@ -38,7 +38,7 @@ const Login = () => {
                     localStorage.setItem('pathFromButton', `/forums/${userid}`);
                     navigate(`/forums/${userid}`);
                 } else if (usertype === 'admin') {
-                    navigate('/adminpage');
+                    navigate('/select-waste');
                 }
             }
         } catch (err) {

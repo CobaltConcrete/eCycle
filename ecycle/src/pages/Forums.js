@@ -278,16 +278,18 @@ const Forums = () => {
                             <p className="forum-text">{forum.forumtext}</p>
                             <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
                         </Link>
-                        {forum.posterid === parseInt(userid) && (
                             <div className="forum-actions">
-                            <button onClick={() => setEditMode({ status: true, forumid: forum.forumid, forumtext: forum.forumtext })} className="btn edit-button">
-                                Edit
-                            </button>
-                            <button onClick={() => handleDeleteForum(forum.forumid)} className="btn delete-button">
-                                Delete
-                            </button>
+                                {forum.posterid === parseInt(userid) && (
+                                    <button onClick={() => setEditMode({ status: true, forumid: forum.forumid, forumtext: forum.forumtext })} className="btn edit-button">
+                                        Edit
+                                    </button>
+                                )}
+                                {(forum.posterid === parseInt(userid) || usertype === 'admin') && (
+                                    <button onClick={() => handleDeleteForum(forum.forumid)} className="btn delete-button">
+                                        Delete
+                                    </button>
+                                )}
                             </div>
-                        )}
                         </>
                     )}
                     </li>

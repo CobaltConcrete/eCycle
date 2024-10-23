@@ -12,6 +12,7 @@ import requests
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
+# CORS(app, resources={r"/*": {"origins": "https://ecycle-2024.web.app"}})
 CORS(app)
 load_dotenv()
 
@@ -28,7 +29,7 @@ def verify_user():
         userid=userid,
         username=username,
         usertype=usertype,
-        password=userhashedpassword  # Make sure to store a hashed password in localStorage and match it
+        password=userhashedpassword
     ).first()
 
     if user:
@@ -529,4 +530,4 @@ def delete_comment(commentid):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

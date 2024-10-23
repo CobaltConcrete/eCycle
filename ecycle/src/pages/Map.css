@@ -221,8 +221,14 @@
 }
 
 .instructions-container ol {
-    padding-left: 60px;
+    padding-left: 20px;
+    font-size: 0.8em;
     /* Add space to the left for numbers */
+}
+
+.instructions-container h3 {
+    font-size: 0.9em;
+    /* Adjust this value as needed for the h3 */
 }
 
 .instructions-container li {

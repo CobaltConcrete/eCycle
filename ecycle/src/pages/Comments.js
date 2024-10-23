@@ -11,6 +11,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
     const [imageFile, setImageFile] = useState(null); // New state for image file
 
     const userid = localStorage.getItem('userid');
+    const usertype = localStorage.getItem('usertype');
 
     const handleEdit = () => {
         onEdit(comment.commentid, editText);
@@ -75,14 +76,19 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
                     </div>
                 )}
 
-
                 <div className="comment-actions">
+                    {/* Admin can edit only their own comment */}
                     {parseInt(userid) === comment.posterid && (
                         <>
                             <button onClick={() => setIsEditing(true)} className="btn edit-button">Edit</button>
-                            <button onClick={() => onDelete(comment.commentid)} className="btn delete-button">Delete</button>
                         </>
                     )}
+
+                    {/* Admin can delete anyone's comment */}
+                    {(usertype === 'admin' || parseInt(userid) === comment.posterid) && (
+                        <button onClick={() => onDelete(comment.commentid)} className="btn delete-button">Delete</button>
+                    )}
+                    
                     <button onClick={() => setIsReplying(!isReplying)} className="btn reply-button">Reply</button>
                 </div>
 
