@@ -19,17 +19,11 @@ const Forums = () => {
 
     const fetchShopDetails = useCallback(async () => {
         try {
-            const shopResponse = await fetch(`http://${process.env.REACT_APP_localhost}:5000/get-shop-details/${shopid}`);
-            if (!shopResponse.ok) throw new Error('Error fetching shop details.');
+            const shopResponse = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/get-shop-details/${shopid}`);
+            setShopDetails(shopResponse.data);
 
-            const shopData = await shopResponse.json();
-            setShopDetails(shopData);
-
-            const userResponse = await fetch(`http://${process.env.REACT_APP_localhost}:5000/get-username/${shopid}`);
-            if (!userResponse.ok) throw new Error('Error fetching user details.');
-
-            const userData = await userResponse.json();
-            setUsername(userData.username);
+            const userResponse = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/get-username/${shopid}`);
+            setUsername(userResponse.data.username);
         } catch (error) {
             console.error('Error fetching shop or user data:', error);
             setError('Error fetching shop or user data. Please try again later.');
@@ -38,11 +32,8 @@ const Forums = () => {
 
     const fetchForums = useCallback(async () => {
         try {
-            const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/${shopid}`);
-            if (!response.ok) throw new Error('Error fetching forum data.');
-
-            const data = await response.json();
-            setForums(data);
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/forums/${shopid}`);
+            setForums(response.data);
         } catch (error) {
             console.error('Error fetching forum data:', error);
             setError('Error fetching forum data. Please try again later.');
@@ -121,18 +112,16 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/add`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        forumtext: newForumText,
-                        shopid,
-                        posterid: userid,
-                        time: new Date().toLocaleString(),
-                    })
+                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/forums/add`, {
+                    forumtext: newForumText,
+                    shopid,
+                    posterid: userid,
+                    time: new Date().toLocaleString(),
+                }, {
+                    headers: { 'Content-Type': 'application/json' }
                 });
 
-                if (!response.ok) throw new Error('Error adding new forum.');
+                if (response.status !== 201) throw new Error('Error adding new forum.');
                 setNewForumText('');
                 fetchForums();
             } catch (error) {
@@ -148,13 +137,11 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/edit/${forumid}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ forumtext: editMode.forumtext }),
+                const response = await axios.put(`http://${process.env.REACT_APP_localhost}:5000/forums/edit/${forumid}`, {
+                    forumtext: editMode.forumtext,
                 });
 
-                if (!response.ok) throw new Error('Error editing forum.');
+                if (response.status !== 200) throw new Error('Error editing forum.');
                 setEditMode({ status: false, forumid: null, forumtext: '' });
                 fetchForums();
             } catch (error) {
@@ -169,11 +156,9 @@ const Forums = () => {
     const handleDeleteForum = async (forumid) => {
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/delete/${forumid}`, {
-                    method: 'DELETE',
-                });
+                const response = await axios.delete(`http://${process.env.REACT_APP_localhost}:5000/forums/delete/${forumid}`);
 
-                if (!response.ok) throw new Error('Error deleting forum.');
+                if (response.status !== 200) throw new Error('Error deleting forum.');
                 fetchForums();
             } catch (error) {
                 console.error('Error deleting forum:', error);

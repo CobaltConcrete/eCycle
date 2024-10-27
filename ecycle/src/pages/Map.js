@@ -77,9 +77,7 @@ const Map = () => {
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
-            const url = `http://${process.env.REACT_APP_localhost}:5000/nearby-locations`;
-
-            const response = await axios.post(url, {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/nearby-locations`, {
                 lat,
                 lon: lng,
                 actiontype: type,
