@@ -54,7 +54,7 @@ const Map = () => {
             }
 
             try {
-                const response = await axios.post('http://localhost:5000/verify', {
+                const response = await axios.post('http://192.168.18.72:5000/verify', {
                     userid,
                     username,
                     usertype,
@@ -77,7 +77,7 @@ const Map = () => {
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
-            const url = 'http://localhost:5000/nearby-locations'; // Use the unified endpoint
+            const url = 'http://192.168.18.72:5000/nearby-locations'; // Use the unified endpoint
 
             const response = await axios.post(url, {
                 lat,
@@ -111,20 +111,48 @@ const Map = () => {
         fetchNearbyLocations(lat, lng);
     }, [fetchNearbyLocations]); // Add fetchNearbyLocations to the dependency array
 
+    // useEffect(() => {
+    //     if (isVerified && useCurrentLocation && navigator.geolocation) {
+    //         loadGoogleMapsScript(() => {
+    //             navigator.geolocation.getCurrentPosition(
+    //                 (position) => {
+    //                     let { latitude, longitude } = position.coords;
+    //                     setUserLocation({ lat: latitude, lng: longitude });
+    //                     loadMap(latitude, longitude);
+    //                 },
+    //                 (error) => {
+    //                     console.error("Error obtaining location", error);
+    //                     setError('Failed to retrieve your current location');
+    //                 }
+    //             );
+    //         });
+    //     }
+    // }, [isVerified, useCurrentLocation, loadMap]);
+
     useEffect(() => {
-        if (isVerified && useCurrentLocation && navigator.geolocation) {
+        if (isVerified && useCurrentLocation) {
             loadGoogleMapsScript(() => {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        let { latitude, longitude } = position.coords;
-                        setUserLocation({ lat: latitude, lng: longitude });
-                        loadMap(latitude, longitude);
-                    },
-                    (error) => {
-                        console.error("Error obtaining location", error);
-                        setError('Failed to retrieve your current location');
-                    }
-                );
+                const apiKey = 'YOUR_API_KEY';
+                const url = `https://www.googleapis.com/geolocation/v1/geolocate?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+
+                fetch(url, {
+                    method: 'POST'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Failed to retrieve location");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const { lat, lng } = data.location;
+                        setUserLocation({ lat, lng });
+                        loadMap(lat, lng);
+                    })
+                    .catch(error => {
+                        console.error("Error obtaining location via Google API", error);
+                        setError('Failed to retrieve your current location: ' + error.message);
+                    });
             });
         }
     }, [isVerified, useCurrentLocation, loadMap]);
@@ -220,7 +248,7 @@ const Map = () => {
 
     const fetchCoordinatesFromAddress = async (address) => {
         try {
-            const response = await axios.post('http://localhost:5000/get-coordinates', { address });
+            const response = await axios.post('http://192.168.18.72:5000/get-coordinates', { address });
             const { lat, lon } = response.data;
             setManualLocation({ lat, lng: lon });
             loadMap(lat, lon); // Center map on manual location

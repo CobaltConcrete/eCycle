@@ -21,7 +21,7 @@ const SelectWaste = () => {
             }
 
             try {
-                const response = await axios.post('http://localhost:5000/verify', {
+                const response = await axios.post('http://192.168.18.72:5000/verify', {
                     userid,
                     username,
                     usertype,

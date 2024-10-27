@@ -23,7 +23,7 @@ const Checklist = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/verify', {
+            const response = await axios.post('http://192.168.18.72:5000/verify', {
                 userid,
                 username,
                 usertype,
@@ -47,7 +47,7 @@ const Checklist = () => {
         // Fetch checklist options from the backend only after user verification
         const fetchChecklistOptions = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/checklist-options');
+                const response = await axios.get('http://192.168.18.72:5000/checklist-options');
                 setChecklistOptions(response.data);
             } catch (err) {
                 setError('Error fetching checklist options. Please try again later.');
@@ -81,7 +81,7 @@ const Checklist = () => {
         const userid = localStorage.getItem('userid'); // Get userid from localStorage
 
         try {
-            await axios.post('http://localhost:5000/user-checklist', {
+            await axios.post('http://192.168.18.72:5000/user-checklist', {
                 userid,
                 checklistoptionids: selectedOptions,
             });

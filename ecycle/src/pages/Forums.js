@@ -19,14 +19,14 @@ const Forums = () => {
 
     const fetchShopDetails = useCallback(async () => {
         try {
-            const shopResponse = await fetch(`http://localhost:5000/get-shop-details/${shopid}`);
+            const shopResponse = await fetch(`http://192.168.18.72:5000/get-shop-details/${shopid}`);
             if (!shopResponse.ok) throw new Error('Error fetching shop details.');
 
             const shopData = await shopResponse.json();
             setShopDetails(shopData);
 
             // Fetch username based on shop's userid
-            const userResponse = await fetch(`http://localhost:5000/get-username/${shopid}`); // Assuming this endpoint exists
+            const userResponse = await fetch(`http://192.168.18.72:5000/get-username/${shopid}`); // Assuming this endpoint exists
             if (!userResponse.ok) throw new Error('Error fetching user details.');
 
             const userData = await userResponse.json();
@@ -39,7 +39,7 @@ const Forums = () => {
 
     const fetchForums = useCallback(async () => {
         try {
-            const response = await fetch(`http://localhost:5000/forums/${shopid}`);
+            const response = await fetch(`http://192.168.18.72:5000/forums/${shopid}`);
             if (!response.ok) throw new Error('Error fetching forum data.');
 
             const data = await response.json();
@@ -61,7 +61,7 @@ const Forums = () => {
             }
 
             try {
-                const response = await axios.post('http://localhost:5000/verify', {
+                const response = await axios.post('http://192.168.18.72:5000/verify', {
                     userid,
                     username,
                     usertype,
@@ -94,7 +94,7 @@ const Forums = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         try {
-            const response = await axios.post('http://localhost:5000/verify', {
+            const response = await axios.post('http://192.168.18.72:5000/verify', {
                 userid,
                 username,
                 usertype,
@@ -122,7 +122,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://localhost:5000/forums/add`, {
+                const response = await fetch(`http://192.168.18.72:5000/forums/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -149,7 +149,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://localhost:5000/forums/edit/${forumid}`, {
+                const response = await fetch(`http://192.168.18.72:5000/forums/edit/${forumid}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ forumtext: editMode.forumtext }),
@@ -170,7 +170,7 @@ const Forums = () => {
     const handleDeleteForum = async (forumid) => {
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://localhost:5000/forums/delete/${forumid}`, {
+                const response = await fetch(`http://192.168.18.72:5000/forums/delete/${forumid}`, {
                     method: 'DELETE',
                 });
 
@@ -188,7 +188,7 @@ const Forums = () => {
         if (!confirmRemoval) return;
 
         try {
-            const response = await axios.post('http://localhost:5000/remove-shop', { shopid });
+            const response = await axios.post('http://192.168.18.72:5000/remove-shop', { shopid });
             if (response.data.message) {
                 alert('Shop removed successfully!');
                 navigate('/'); // Redirect after removal

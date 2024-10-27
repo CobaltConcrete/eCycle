@@ -13,7 +13,7 @@ const Signup = () => {
 
     const registerUser = async (usertype) => {
         try {
-            const response = await axios.post('http://localhost:5000/register', {
+            const response = await axios.post('http://192.168.18.72:5000/register', {
                 username,
                 password,
                 usertype,

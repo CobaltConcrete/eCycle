@@ -25,7 +25,7 @@ const SignupShop = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:5000/verify-shop', {
+            const response = await axios.post('http://192.168.18.72:5000/verify-shop', {
                 userid,
                 username,
                 usertype,
@@ -47,7 +47,7 @@ const SignupShop = () => {
 
     const getLocationName = async (lat, lon) => {
         try {
-            const response = await axios.post('http://localhost:5000/get-location-name', {
+            const response = await axios.post('http://192.168.18.72:5000/get-location-name', {
                 lat,
                 lon,
             });
@@ -71,7 +71,7 @@ const SignupShop = () => {
 
             // First try to get coordinates from the entered address
             try {
-                const coordsResponse = await axios.post('http://localhost:5000/get-coordinates', { address: addressname });
+                const coordsResponse = await axios.post('http://192.168.18.72:5000/get-coordinates', { address: addressname });
                 // Destructure lat and lon from response
                 ({ lat, lon } = coordsResponse.data); 
 
@@ -132,7 +132,7 @@ const SignupShop = () => {
                 longtitude: lon,
             };
 
-            await axios.post('http://localhost:5000/add-shop', shopData);
+            await axios.post('http://192.168.18.72:5000/add-shop', shopData);
 
             // Show alert if current location was used
             if (currentLocationUsed) {
