@@ -1,5 +1,3 @@
-/* Checklist.css */
-
 .checklist-container {
     max-width: 600px;
     margin: 0 auto;
@@ -12,7 +10,7 @@
 }
 
 .switch-input {
-    display: none; /* Hide the default checkbox */
+    display: none;
 }
 
 .switch-label {
@@ -50,15 +48,14 @@
     transition: all 0.3s ease;
 }
 
-.switch-input:checked + .switch-label:before {
-    background-color: #4caf50; /* Color when checked */
+.switch-input:checked+.switch-label:before {
+    background-color: #4caf50;
 }
 
-.switch-input:checked + .switch-label:after {
-    left: 25px; /* Move the toggle switch when checked */
+.switch-input:checked+.switch-label:after {
+    left: 25px;
 }
 
-/* Button styles */
 .btn {
     margin-top: 20px;
     padding: 10px 15px;
@@ -70,19 +67,19 @@
 }
 
 .select-all-btn {
-    background-color: #4caf50; /* Color for Select All button */
-    margin-right: 10px; /* Space between buttons */
+    background-color: #4caf50;
+    margin-right: 10px;
 }
 
 .submit-btn {
-    background-color: #007bff; /* Color for Submit button */
-    margin-left: 10px; /* Space between buttons */
+    background-color: #007bff;
+    margin-left: 10px;
 }
 
 .submit-btn:hover {
-    background-color: #0056b3; /* Darker blue on hover for Submit button */
+    background-color: #0056b3;
 }
 
 .select-all-btn:hover {
-    background-color: #388e3c; /* Darker green on hover for Select All button */
+    background-color: #388e3c;
 }

@@ -1,99 +1,65 @@
 .login-container {
     border: 1px solid #4caf50;
-    /* Border color */
     border-radius: 5px;
-    /* Rounded corners */
     padding: 50px;
-    /* Padding inside the box */
     margin: 20px auto;
-    /* Center the box with margin */
     background-color: #f9f9f9;
-    /* Light background color */
-    width: 500px;
-    height: 350px;
-    /* Fixed width for the container */
+    width: 80%;
+    max-width: 500px;
+    height: auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow */
+    box-sizing: border-box;
 }
 
 .login-container h2 {
     text-align: center;
-    /* Center the heading */
     color: #4caf50;
-    /* Heading color */
 }
 
 .login-container input {
-    width: 50%;
-    /* Full width */
+    width: 100%;
     padding: 10px;
-    /* Padding inside the input */
     border: 1px solid #ccc;
-    /* Light border */
     border-radius: 5px;
-    /* Rounded corners */
     margin: 10px 0;
-    /* Space between inputs */
     transition: border-color 0.3s;
-    /* Smooth border transition */
 }
 
 .login-container input:focus {
     border-color: #4caf50;
-    /* Change border color on focus */
     outline: none;
-    /* Remove default outline */
 }
 
 .login-container button[type="submit"] {
-    width: 50%;
-    /* Full width */
+    width: 100%;
     padding: 10px;
-    /* Padding inside the button */
     border: none;
-    /* Remove border */
     border-radius: 5px;
-    /* Rounded corners */
     background-color: #4caf50;
-    /* Button background color */
     color: white;
-    /* Button text color */
     cursor: pointer;
-    /* Pointer cursor on hover */
     transition: background-color 0.3s;
-    /* Smooth transition */
 }
 
 .login-container button[type="submit"]:hover {
     background-color: #388e3c;
-    /* Darker background on hover */
 }
 
 .signup-prompt {
-    font-size: 0.5em;
-    /* Adjust the size as needed */
+    font-size: 0.9rem;
     color: #555;
-    /* Optional: Change text color */
     text-align: center;
-    /* Center the text */
 }
 
 .signup-prompt button {
     margin-left: 5px;
-    /* Space between prompt text and button */
     background-color: transparent;
-    /* Transparent background for the sign-up button */
     color: #007bff;
-    /* Text color for the sign-up button */
     border: none;
-    /* Remove default border */
     cursor: pointer;
-    /* Pointer cursor on hover */
     text-decoration: underline;
-    /* Underline for sign-up button */
 }
 
 .signup-prompt button:hover {
     color: #0056b3;
-    /* Change color on hover */
 }

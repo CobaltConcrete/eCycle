@@ -10,26 +10,18 @@
     font-weight: bold;
     margin-bottom: 1.5rem;
     color: #2E7D32;
-    /* Forest Green */
 }
 
 .error-message {
     color: #ff4500;
-    /* Reddit orange */
     margin-bottom: 1rem;
 }
 
 .comments-scrollable {
     max-height: 700px;
-    /* Set your desired height */
     overflow-y: auto;
-    /* Enable vertical scrolling */
-    /* border: 1px solid #ccc; */
-    /* Optional: Add a border for better visibility */
     padding: 10px;
-    /* Optional: Add some padding */
     margin-top: 10px;
-    /* Optional: Space between new comment area and comments */
 }
 
 .comments-list {
@@ -39,12 +31,10 @@
     padding: 1rem;
     border-radius: 8px;
     background-color: #7bda7e;
-    /* Light green background to match forums */
 }
 
 .comments-list.no-comments-bg {
     background-color: #888888;
-    /* Red background color for no forums */
 }
 
 .no-comments {
@@ -57,39 +47,28 @@
 .comment-box {
     padding: 1rem;
     margin-top: 1rem;
-    /* margin-bottom: 1rem; */
     border-left: 3px solid;
     text-align: left;
-    /* Align text to the left */
 }
 
 .comment-box.even {
     background-color: #63c566;
-    /* Even depth background */
     color: #ffffff;
-    /* White text for even depth */
     border-color: #AAAAAA;
-    /* White border for main comments */
     border-radius: 10px;
 }
 
 .comment-box.odd {
     background-color: #7bda7e;
-    /* Odd depth background */
     color: #000000;
-    /* White text for odd depth */
     border-color: #AAAAAA;
-    /* Grey border for replies */
     border-radius: 10px;
 }
 
 .comment-box .comment-text.deleted {
     color: #ffffff;
-    /* Keep text color white */
     opacity: 0.7;
-    /* Apply some opacity to indicate it’s deleted */
     font-style: italic;
-    /* Italicize deleted text for emphasis */
 }
 
 .avatar {
@@ -97,72 +76,54 @@
     height: 40px;
     margin-right: 1rem;
     border-radius: 50%;
-    /* Circular avatar */
 }
 
 .comment-header {
     font-size: 1rem;
     font-weight: bold;
     color: inherit;
-    /* Inherit color */
     text-align: left;
-    /* Align header text to the left */
 }
 
 .comment-time {
     color: rgba(0, 0, 0, 0.4);
-    /* Light gray for time */
 }
 
 .comment-text {
     margin-top: 0.5rem;
     font-size: 1rem;
     text-align: left;
-    /* Align comment text to the left */
 }
 
 .reply-container {
     padding-left: 1rem;
-    /* Indent replies */
 }
 
 .new-comment textarea:focus,
 .reply-container textarea:focus {
     border-color: #4caf50;
-    /* Change border color on focus */
     outline: none;
-    /* Remove default outline */
 }
 
 .comment-input,
 .reply-input,
 .edit-input {
     width: 70%;
-    /* Full width */
     padding: 10px;
-    /* Padding inside the input */
     border: 1px solid #ccc;
-    /* Light border */
     border-radius: 5px;
-    /* Rounded corners */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow */
     font-size: 16px;
-    /* Font size */
     transition: border-color 0.3s;
-    /* Smooth border transition */
 }
 
 .comment-input:focus,
 .reply-input:focus,
 .edit-input:focus {
     border-color: #4caf50;
-    /* Change border color on focus */
     outline: none;
-    /* Remove default outline */
 }
 
-/* Button styles for comments */
 .btn {
     padding: 10px 15px;
     border: none;
@@ -178,50 +139,40 @@
 
 .add-comment-button {
     background-color: #007bff;
-    /* Primary blue */
 }
 
 .add-comment-button:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
 }
 
 .save-button {
     background-color: #4caf50;
-    /* Green for save */
 }
 
 .save-button:hover {
     background-color: #388e3c;
-    /* Darker green on hover */
 }
 
 .reply-button {
     background-color: #007bff;
-    /* Primary blue for reply */
 }
 
 .reply-button:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
 }
 
 .edit-button {
     background-color: #ff9800;
-    /* Orange for edit */
 }
 
 .edit-button:hover {
     background-color: #f57c00;
-    /* Darker orange on hover */
 }
 
 .delete-button {
     background-color: #f44336;
-    /* Red for delete */
 }
 
 .delete-button:hover {
     background-color: #c62828;
-    /* Darker red on hover */
 }

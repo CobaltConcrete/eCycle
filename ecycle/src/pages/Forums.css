@@ -20,27 +20,18 @@
 
 .forum-input {
     width: 70%;
-    /* Full width */
     padding: 10px;
-    /* Padding inside the input */
     border: 1px solid #ccc;
-    /* Light border */
     border-radius: 5px;
-    /* Rounded corners */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow */
     font-size: 16px;
-    /* Font size */
     transition: border-color 0.3s;
-    /* Smooth border transition */
     margin-top: 20px;
 }
 
 .forum-input:focus {
     border-color: #4caf50;
-    /* Change border color on focus */
     outline: none;
-    /* Remove default outline */
 }
 
 .forums-list {
@@ -54,7 +45,6 @@
 
 .forums-list.no-forums-bg {
     background-color: #888888;
-    /* Red background color for no forums */
 }
 
 .no-forums {
@@ -117,7 +107,6 @@
     padding-left: 1rem;
 }
 
-/* Button styles */
 .btn {
     padding: 10px 15px;
     border: none;
@@ -127,87 +116,70 @@
     transition: background-color 0.3s;
     margin-top: 10px;
     margin-bottom: 10px;
-    margin-left:5px;
+    margin-left: 5px;
     margin-right: 5px;
-    /* Add spacing for buttons */
 }
 
 .add-forum-button {
     background-color: #007bff;
-    /* Primary blue */
 }
 
 .add-forum-button:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
 }
 
 .save-button {
     background-color: #4caf50;
-    /* Green for save */
 }
 
 .save-button:hover {
     background-color: #388e3c;
-    /* Darker green on hover */
 }
 
 .cancel-button {
     background-color: #f44336;
-    /* Red for cancel */
 }
 
 .cancel-button:hover {
     background-color: #c62828;
-    /* Darker red on hover */
 }
 
 .edit-button {
     background-color: #ff9800;
-    /* Orange for edit */
 }
 
 .edit-button:hover {
     background-color: #f57c00;
-    /* Darker orange on hover */
 }
 
 .delete-button {
     background-color: #f44336;
-    /* Red for delete */
 }
 
 .delete-button:hover {
     background-color: #c62828;
-    /* Darker red on hover */
 }
 
 .checklist-button {
     background-color: #4caf50;
-    /* Primary blue */
 }
 
 .checklist-button:hover {
     background-color: #388e3c;
-    /* Darker blue on hover */
 }
 
 .update-shop-details-button {
     background-color: #007bff;
-    /* Primary blue */
 }
 
 .update-shop-details-button:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
 }
 
 .remove-shop-button {
     background-color: #f44336;
-    /* Red for remove */
 }
 
 .remove-shop-button:hover {
     background-color: #c62828;
-    /* Darker red on hover */
 }

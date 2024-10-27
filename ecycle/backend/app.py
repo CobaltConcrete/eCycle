@@ -24,7 +24,6 @@ def verify_user():
     usertype = data['usertype']
     userhashedpassword = data['userhashedpassword']
 
-    # Query the database for a user matching all these details
     user = UserTable.query.filter_by(
         userid=userid,
         username=username,
@@ -50,11 +49,10 @@ def verify_shop():
         userid=userid,
         username=username,
         usertype=usertype,
-        password=userhashedpassword  # Make sure to store a hashed password in localStorage and match it
+        password=userhashedpassword
     ).first()
     
     if user:
-            # Check if the usertype is 'shop'
             if user.usertype == "shop":
                 return jsonify({'isValid': True, 'usertype': user.usertype}), 200
             else:
@@ -109,7 +107,7 @@ def get_shop_details(shopid):
 @app.route('/add-shop', methods=['POST'])
 def signup_shop():
     data = request.get_json()
-    shopid = data.get('userid')  # Assuming `userid` is being passed to associate the shop
+    shopid = data.get('userid')
     shopname = data['shopname']
     addressname = data['addressname']
     website = data.get('website')
@@ -138,7 +136,7 @@ def signup_shop():
     else:
         # Create a new shop record
         new_shop = ShopTable(
-            shopid=shopid,  # Associate with the user ID as the primary key
+            shopid=shopid,
             shopname=shopname,
             addressname=addressname,
             website=website,
@@ -154,7 +152,7 @@ def signup_shop():
 @app.route('/remove-shop', methods=['POST'])
 def remove_shop():
     data = request.get_json()
-    shopid = data.get('shopid')  # Assuming 'shopid' is passed from the frontend
+    shopid = data.get('shopid')
 
     if not shopid:
         return jsonify({'error': 'Shop ID is required.'}), 400
@@ -164,7 +162,7 @@ def remove_shop():
     if not shop_to_delete:
         return jsonify({'error': 'Shop not found.'}), 404
 
-    forums_to_delete = ForumTable.query.filter_by(shopid=shopid).all()  # Fetch all forums with the given shopid
+    forums_to_delete = ForumTable.query.filter_by(shopid=shopid).all()
     for forum in forums_to_delete:
         CommentTable.query.filter_by(forumid=forum.forumid).delete()
         db.session.delete(forum)
@@ -199,10 +197,8 @@ def save_user_checklist():
     userid = data['userid']
     checklistoptionids = data['checklistoptionids']
 
-    # Delete existing options for this user
     UserChecklistTable.query.filter_by(userid=userid).delete()
 
-    # Add new options
     for checklistoptionid in checklistoptionids:
         user_checklist = UserChecklistTable(userid=userid, checklistoptionid=checklistoptionid)
         db.session.add(user_checklist)
@@ -216,7 +212,7 @@ def get_nearby_locations():
     user_lat = data.get('lat')
     user_lon = data.get('lon')
     action_type = data.get('actiontype')
-    user_id = data.get('userid')  # Assuming you also send userid in the request
+    user_id = data.get('userid')
 
     if not user_lat or not user_lon or not action_type or not user_id:
         return jsonify({'error': 'Latitude, longitude, action type, and user ID are required'}), 400
@@ -228,18 +224,15 @@ def get_nearby_locations():
     # Query shops with the specified action type
     shops = ShopTable.query.filter_by(actiontype=action_type).all()
 
-    # Filter shops to keep only those that have all the checklist option IDs
     valid_shops = []
     for shop in shops:
         # Query to get checklist option IDs for the current shop
         shop_checklist_options = UserChecklistTable.query.filter_by(userid=shop.shopid).all()
         shop_option_ids = {option.checklistoptionid for option in shop_checklist_options}
         
-        # Check if shop_option_ids contains all checklist_option_ids
         if checklist_option_ids.issubset(shop_option_ids):
             valid_shops.append(shop)
 
-    # Calculate distance from user location and sort by distance
     user_location = (user_lat, user_lon)
     shop_list = []
     
@@ -266,14 +259,11 @@ GOOGLE_MAPS_API_KEY = os.getenv("REACT_APP_GOOGLE_MAPS_API_KEY")
 @app.route('/get-current-coordinates', methods=['POST'])
 def get_current_coordinates():
     try:
-        # Use the Google Maps Geolocation API
         url = f'https://www.googleapis.com/geolocation/v1/geolocate?key={GOOGLE_MAPS_API_KEY}'
         
-        # Send a POST request to the Geolocation API
         response = requests.post(url)
         data = response.json()
 
-        # Check if the request was successful
         if 'location' in data:
             lat = data['location']['lat']
             lon = data['location']['lng']
@@ -324,7 +314,7 @@ def get_directions():
     data = request.get_json()
     user_location = data.get('user_location')
     destination = data.get('destination')
-    mode = data.get('mode', 'DRIVING')  # Default mode is DRIVING
+    mode = data.get('mode', 'DRIVING')
 
     if not user_location or not destination:
         return jsonify({'error': 'User location and destination are required'}), 400
@@ -340,7 +330,7 @@ def get_directions():
         
         directions = []
         for step in steps:
-            directions.append(step['html_instructions'])  # Get HTML instructions for directions
+            directions.append(step['html_instructions'])
 
         return jsonify({'directions': directions}), 200
     else:
@@ -357,7 +347,7 @@ def get_forums(shopid):
             'shopid': forum.shopid,
             'posterid': forum.posterid,
             'time': forum.time,
-            'postername': forum.poster.username  # Access the username from the UserTable relationship
+            'postername': forum.poster.username
         } 
         for forum in forums
     ]
@@ -367,7 +357,6 @@ def get_forums(shopid):
 @app.route('/forums/details/<int:forumid>', methods=['GET'])
 def get_forum_details(forumid):
     try:
-        # Assuming ForumTable is the model corresponding to forumtable in your database
         forum = ForumTable.query.filter_by(forumid=forumid).first()
 
         if forum:
@@ -403,13 +392,11 @@ def edit_forum(forumid):
     data = request.get_json()
     new_forumtext = data['forumtext']
 
-    # Find the forum entry by ID
     forum = ForumTable.query.get(forumid)
     
     if not forum:
         return jsonify({'error': 'Forum not found'}), 404
 
-    # Update the forum text
     forum.forumtext = new_forumtext
     db.session.commit()
     
@@ -417,16 +404,13 @@ def edit_forum(forumid):
 
 @app.route('/forums/delete/<int:forumid>', methods=['DELETE'])
 def delete_forum(forumid):
-    # Find the forum entry by ID
     forum = ForumTable.query.get(forumid)
     
     if not forum:
         return jsonify({'error': 'Forum not found'}), 404
 
-    # Delete associated comments
     CommentTable.query.filter_by(forumid=forumid).delete()
 
-    # Delete the forum entry
     db.session.delete(forum)
     db.session.commit()
     
@@ -459,7 +443,7 @@ def add_comment():
     forumid = data['forumid']
     commenttext = data['commenttext']
     posterid = data['posterid']
-    encodedimage = data.get('encodedimage')  # Get the encoded image
+    encodedimage = data.get('encodedimage')
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     new_comment = CommentTable(
@@ -467,7 +451,7 @@ def add_comment():
         commenttext=commenttext,
         posterid=posterid,
         time=time,
-        encodedimage=encodedimage  # Store the encoded image
+        encodedimage=encodedimage
     )
     db.session.add(new_comment)
     db.session.commit()
@@ -483,7 +467,6 @@ def reply_comment(commentid):
     encodedimage = data.get('encodedimage')
     time = data.get('time', datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    # Logic to save the reply in the database, e.g.:
     new_reply = CommentTable(forumid=forumid, commenttext=commenttext, posterid=posterid, time=time, replyid=commentid, encodedimage=encodedimage)
     db.session.add(new_reply)
     db.session.commit()
@@ -504,24 +487,12 @@ def edit_comment(commentid):
 
     return jsonify({'message': 'Comment updated successfully'}), 200
 
-# @app.route('/comments/delete/<int:commentid>', methods=['DELETE'])
-# def delete_comment(commentid):
-#     comment = CommentTable.query.get(commentid)
-#     if not comment:
-#         return jsonify({'error': 'Comment not found'}), 404
-
-#     db.session.delete(comment)
-#     db.session.commit()
-
-#     return jsonify({'message': 'Comment deleted successfully'}), 200
-
 @app.route('/comments/delete/<int:commentid>', methods=['PUT'])
 def delete_comment(commentid):
     comment = CommentTable.query.get(commentid)
     if not comment:
         return jsonify({'error': 'Comment not found'}), 404
 
-    # Instead of deleting, mark the comment as deleted
     comment.commenttext = '[deleted]'
     comment.deleted = True
     db.session.commit()

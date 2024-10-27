@@ -16,7 +16,9 @@ const App = () => {
     return (
         <div className="App">
             <header className="App-header">
-                <h1>eCycle</h1>
+                <div className="title-container">
+                    <h1>eCycle</h1>
+                </div>
                 <Routes>
                     <Route path="/" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />

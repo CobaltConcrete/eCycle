@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './SignupShop.css'; // Adjust the path as needed
+import './SignupShop.css';
 
 const SignupShop = () => {
     const [shopname, setShopname] = useState('');
     const [addressname, setAddressname] = useState('');
     const [website, setWebsite] = useState('');
-    const [actiontype, setActiontype] = useState(''); // This will be the shop type
+    const [actiontype, setActiontype] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
@@ -20,12 +20,12 @@ const SignupShop = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         if (!userid || !username || !usertype || !userhashedpassword) {
-            navigate('/'); // Redirect to login page
+            navigate('/');
             return;
         }
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/verify-shop', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify-shop`, {
                 userid,
                 username,
                 usertype,
@@ -47,14 +47,14 @@ const SignupShop = () => {
 
     const getLocationName = async (lat, lon) => {
         try {
-            const response = await axios.post('http://192.168.18.72:5000/get-location-name', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/get-location-name`, {
                 lat,
                 lon,
             });
             return response.data.locationName;
         } catch (error) {
             console.error('Error fetching location name:', error);
-            return null; // Return null if there is an error
+            return null;
         }
     };
 
@@ -63,53 +63,49 @@ const SignupShop = () => {
         setError('');
         setLoading(true);
 
-        const userid = localStorage.getItem('userid'); // Retrieve userid from local storage
-        let currentLocationUsed = false; // Use this flag instead of state
+        const userid = localStorage.getItem('userid');
+        let currentLocationUsed = false;
 
         try {
             let lat, lon;
 
-            // First try to get coordinates from the entered address
             try {
-                const coordsResponse = await axios.post('http://192.168.18.72:5000/get-coordinates', { address: addressname });
-                // Destructure lat and lon from response
+                const coordsResponse = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/get-coordinates`, { address: addressname });
                 ({ lat, lon } = coordsResponse.data); 
 
             } catch (addressError) {
-                // If address lookup fails, fallback to geolocation
-                console.warn('Address lookup failed. Attempting to get user\'s current location...');
-                currentLocationUsed = true; // Set this flag when geolocation is used
+                console.warn('Address lookup failed. Attempting to get user\'s current location via Google API...');
+                currentLocationUsed = true;
 
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        async (position) => {
-                            lat = position.coords.latitude;
-                            lon = position.coords.longitude;
+                const url = `https://www.googleapis.com/geolocation/v1/geolocate?key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`;
+                try {
+                    const response = await fetch(url, { method: 'POST' });
+                    
+                    if (!response.ok) {
+                        throw new Error("Failed to retrieve location via Google API");
+                    }
+                    
+                    const data = await response.json();
+                    lat = data.location.lat;
+                    lon = data.location.lng;
 
-                            // Apply manual calibration using the calculated offsets
-                            lat += 0.00153;
-                            lon -= 0.0041175; 
+                    lat += 0.00153;
+                    lon -= 0.0041175;
 
-                            resolve();
-                        },
-                        (geoError) => {
-                            // If geolocation fails or permission is denied, show error
-                            setError('Address is invalid and location permission was denied. Shop registration failed.');
-                            setLoading(false);
-                            reject(geoError);
-                        }
-                    );
-                });
+                } catch (geoError) {
+                    console.error("Error obtaining location via Google API", geoError);
+                    setError('Address is invalid and location retrieval via Google API failed. Shop registration failed.');
+                    setLoading(false);
+                    return;
+                }
             }
 
-            // If no lat/lon is found, terminate
             if (!lat || !lon) {
                 setError('Unable to retrieve location. Shop registration failed.');
                 setLoading(false);
                 return;
             }
 
-            // If current location was used, get the location name
             let locationName = '';
             if (currentLocationUsed) {
                 locationName = await getLocationName(lat, lon);
@@ -118,23 +114,21 @@ const SignupShop = () => {
                     setLoading(false);
                     return;
                 }
-                setAddressname(locationName); // Use setAddressname to update state
+                setAddressname(locationName);
             }
 
-            // Create shopData after updating addressname
             const shopData = {
                 userid,
                 shopname,
-                addressname: currentLocationUsed ? locationName : addressname, // Use the current location name if needed
+                addressname: currentLocationUsed ? locationName : addressname,
                 website,
-                actiontype, // This will hold the selected shop type
+                actiontype,
                 latitude: lat,
                 longtitude: lon,
             };
 
-            await axios.post('http://192.168.18.72:5000/add-shop', shopData);
+            await axios.post(`http://${process.env.REACT_APP_localhost}:5000/add-shop`, shopData);
 
-            // Show alert if current location was used
             if (currentLocationUsed) {
                 alert('Your current location has been used because the address you entered could not be located.');
             }
@@ -150,6 +144,11 @@ const SignupShop = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleBack = () => {
+        const userid = localStorage.getItem('userid');
+        navigate(`/forums/${userid}`);
     };
 
     return (
@@ -207,10 +206,13 @@ const SignupShop = () => {
                         </select>
                     </label>
                 </div>
-                <button type="submit" disabled={loading}>
+                <button type="submit" disabled={loading} className="register-button">
                     {loading ? 'Registering...' : 'Register Shop'}
                 </button>
             </form>
+            <button type="button" onClick={handleBack} className="back-button">
+                Back to Forums
+            </button>
         </div>
     );
 };

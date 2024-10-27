@@ -1,58 +1,50 @@
 .directions-box {
     border: 1px solid #031eed;
-    /* Border color */
     border-radius: 5px;
-    /* Rounded corners */
     padding: 15px;
-    /* Padding inside the box */
     margin: 20px 0;
-    /* Space around the box */
     background-color: #77e63b;
-    /* Light background color */
 }
 
 .nav-pills .nav-link {
     border-radius: 0.5rem;
-    /* Rounded edges */
     margin-right: 10px;
-    /* Space between pills */
     color: #4caf50;
-    /* Default text color */
     cursor: pointer;
-    /* Cursor change on hover */
     padding: 10px 15px;
-    /* Padding for better clickability */
     text-decoration: none;
-    /* Remove underline */
     border: 5px solid #fff;
-    /* Set a white border by default */
     transition: border-color 0.3s;
-    /* Smooth transition for border color */
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.nav-pills .nav-item {
+    display: inline-block;
 }
 
 .nav-pills .nav-link.active {
     background-color: #4caf50;
-    /* Active background color */
     color: white;
-    /* Active text color */
     border: 5px solid #4caf50;
-    /* Active border color */
 }
 
 .nav-pills .nav-link:hover {
     border-color: #4caf50;
-    /* Change border color to green on hover */
     background-color: white;
-    /* Background color on hover */
     color: #4caf50;
-    /* Text color on hover */
 }
 
 .nav-pills .nav-link.active:hover {
     background-color: #388e3c;
-    /* Background color on hover for active state */
     color: white;
-    /* Text color on hover for active state */
+}
+
+.nav-pills {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
 .instructions-container {
@@ -67,171 +59,117 @@
 
 .find-locations-btn {
     background-color: #007bff;
-    /* Button background color */
     color: white;
-    /* Text color */
     border: none;
-    /* Remove default border */
     padding: 10px 20px;
-    /* Padding for the button */
     border-radius: 5px;
-    /* Rounded corners */
     cursor: pointer;
-    /* Pointer cursor on hover */
     transition: background-color 0.3s, transform 0.2s;
-    /* Smooth transition */
 }
 
 .find-locations-btn:hover {
     background-color: #0056b3;
-    /* Darker blue on hover */
     transform: translateY(-2px);
-    /* Slight lift effect on hover */
 }
 
 .input-container {
     height: 60px;
-    /* Fixed height for input container */
     transition: height 0.3s ease;
-    /* Smooth transition for height change */
     overflow: hidden;
-    /* Hide overflow when the height changes */
 }
 
 .location-input {
     width: 70%;
-    /* Full width */
     padding: 10px;
-    /* Padding inside the input */
     border: 1px solid #ccc;
-    /* Light border */
     border-radius: 5px;
-    /* Rounded corners */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    /* Subtle shadow */
     font-size: 16px;
-    /* Font size */
     transition: border-color 0.3s;
-    /* Smooth border transition */
 }
 
 .location-input:focus {
     border-color: #4caf50;
-    /* Green border on focus */
     outline: none;
-    /* Remove default outline */
 }
 
 .transport-mode-container {
     margin: 20px 0;
-    /* Space above and below the container */
     display: flex;
-    /* Use flexbox for alignment */
     justify-content: center;
-    /* Center items horizontally */
     align-items: center;
-    /* Center items vertically */
 }
 
 .transport-mode-container label {
     margin-right: 10px;
-    /* Space between label and select */
     color: #333;
-    /* Label color */
 }
 
 .transport-mode-select {
     padding: 10px;
-    /* Padding inside the select box */
     border-radius: 5px;
-    /* Rounded corners */
     border: 2px solid #ccc;
-    /* Border color */
     cursor: pointer;
-    /* Pointer cursor on hover */
     transition: border-color 0.3s;
-    /* Smooth transition for border color */
 }
 
 .transport-mode-select:focus {
     border-color: #007bff;
-    /* Change border color on focus */
     outline: none;
-    /* Remove default outline */
 }
 
 .location-info {
     text-align: left;
-    /* Left align all text inside the container */
     margin: 15px 0;
-    /* Margin above and below the location info */
 }
 
 .shop-name {
     color: black;
-    /* Shop name color */
 }
 
 .shop-address {
     color: black;
-    /* Address color */
 }
 
 .website-link,
 .maps-link {
     color: blue;
-    /* Link color */
     text-decoration: none;
-    /* Remove underline */
 }
 
 .website-link:hover,
 .maps-link:hover {
     text-decoration: underline;
-    /* Underline on hover */
 }
 
 .forum-button-container {
     text-align: center;
-    /* Center the button */
     margin-top: 10px;
-    /* Space above the button */
 }
 
 .forum-button {
     padding: 10px 15px;
-    /* Padding inside the button */
     border: none;
-    /* Remove border */
     border-radius: 5px;
-    /* Rounded corners */
     background-color: #4caf50;
-    /* Button background color */
     color: white;
-    /* Button text color */
     cursor: pointer;
-    /* Pointer cursor on hover */
     transition: background-color 0.3s;
-    /* Smooth transition */
 }
 
 .forum-button:hover {
     background-color: #388e3c;
-    /* Darker background on hover */
 }
 
 .instructions-container ol {
     padding-left: 20px;
     font-size: 0.8em;
-    /* Add space to the left for numbers */
 }
 
 .instructions-container h3 {
     font-size: 0.9em;
-    /* Adjust this value as needed for the h3 */
 }
 
 .instructions-container li {
     margin-bottom: 10px;
-    /* Space between list items */
 }

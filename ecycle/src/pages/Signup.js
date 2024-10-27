@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../components/AuthContext';
-import './Signup.css'; // Import the custom CSS
+import './Signup.css';
 
 const Signup = () => {
     const [username, setUsername] = useState('');
@@ -13,7 +13,7 @@ const Signup = () => {
 
     const registerUser = async (usertype) => {
         try {
-            const response = await axios.post('http://192.168.18.72:5000/register', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/register`, {
                 username,
                 password,
                 usertype,
@@ -27,13 +27,10 @@ const Signup = () => {
                 localStorage.setItem('usertype', usertype);
                 login();
                 
-                // Show success message
                 alert('Registration successful! Redirecting to login page.');
                 
-                // Redirect to login page after popup
                 navigate('/');
             } else {
-                // Show error popup if response status is not 200 or 201
                 alert('Registration failed! Please try again.');
             }
         } catch (err) {
@@ -43,7 +40,7 @@ const Signup = () => {
     };
 
     const handleBackToLogin = () => {
-        navigate('/'); // Redirect to login page
+        navigate('/');
     };
 
     return (

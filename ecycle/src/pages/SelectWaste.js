@@ -21,7 +21,7 @@ const SelectWaste = () => {
             }
 
             try {
-                const response = await axios.post('http://192.168.18.72:5000/verify', {
+                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                     userid,
                     username,
                     usertype,
@@ -30,13 +30,13 @@ const SelectWaste = () => {
 
                 if (response.data.isValid) {
                     setUsertype(usertype);
-                    setIsVerified(true); // User is verified
+                    setIsVerified(true);
                 } else {
-                    navigate('/'); // Redirect if verification fails
+                    navigate('/');
                 }
             } catch (error) {
                 console.error('Verification failed:', error);
-                navigate('/'); // Redirect on any error
+                navigate('/');
             }
         };
 
@@ -44,7 +44,7 @@ const SelectWaste = () => {
     }, [navigate]);
 
     if (!isVerified) {
-        return <p>Loading...</p>; // Or a loading spinner
+        return <p>Loading...</p>;
     }
 
     if (usertype === 'shop') {

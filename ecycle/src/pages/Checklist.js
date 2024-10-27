@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
-import './Checklist.css'; // Import custom CSS for styling
+import './Checklist.css';
 
 const Checklist = () => {
     const [checklistOptions, setChecklistOptions] = useState([]);
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [error, setError] = useState('');
-    const navigate = useNavigate(); // Create a navigate instance
+    const navigate = useNavigate();
     const { login } = useAuth();
-    const [usertype, setUsertype] = useState(localStorage.getItem('usertype')); // Fetch usertype from local storage
+    const [usertype, setUsertype] = useState(localStorage.getItem('usertype'));
 
     const verifyUser = async () => {
         const userid = localStorage.getItem('userid');
@@ -23,7 +23,7 @@ const Checklist = () => {
         }
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/verify', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                 userid,
                 username,
                 usertype,
@@ -44,10 +44,9 @@ const Checklist = () => {
     }, []);
 
     useEffect(() => {
-        // Fetch checklist options from the backend only after user verification
         const fetchChecklistOptions = async () => {
             try {
-                const response = await axios.get('http://192.168.18.72:5000/checklist-options');
+                const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/checklist-options`);
                 setChecklistOptions(response.data);
             } catch (err) {
                 setError('Error fetching checklist options. Please try again later.');
@@ -67,10 +66,8 @@ const Checklist = () => {
 
     const handleSelectAll = () => {
         if (selectedOptions.length === checklistOptions.length) {
-            // If all are selected, deselect all
             setSelectedOptions([]);
         } else {
-            // Select all options
             const allOptionIds = checklistOptions.map(option => option.checklistoptionid);
             setSelectedOptions(allOptionIds);
         }
@@ -78,19 +75,18 @@ const Checklist = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const userid = localStorage.getItem('userid'); // Get userid from localStorage
+        const userid = localStorage.getItem('userid');
 
         try {
-            await axios.post('http://192.168.18.72:5000/user-checklist', {
+            await axios.post(`http://${process.env.REACT_APP_localhost}:5000/user-checklist`, {
                 userid,
                 checklistoptionids: selectedOptions,
             });
 
-            // Redirect based on usertype
             if (usertype === 'user') {
-                navigate('/select-waste'); // Redirect to /select-waste
+                navigate('/select-waste');
             } else if (usertype === 'shop') {
-                navigate(`/forums/${userid}`); // Redirect to /shop-dashboard
+                navigate(`/forums/${userid}`);
             }
         } catch (err) {
             setError('Error saving checklist options. Please try again later.');
@@ -108,7 +104,7 @@ const Checklist = () => {
                     <div key={option.checklistoptionid} className="switch-container">
                         <input
                             type="checkbox"
-                            id={`optionSwitch${option.checklistoptionid}`} // Unique ID for each switch
+                            id={`optionSwitch${option.checklistoptionid}`}
                             checked={selectedOptions.includes(option.checklistoptionid)}
                             onChange={() => handleCheckboxChange(option.checklistoptionid)}
                             className="switch-input"

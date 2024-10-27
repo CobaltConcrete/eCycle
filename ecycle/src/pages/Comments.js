@@ -8,7 +8,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
     const [editText, setEditText] = useState(comment.commenttext);
     const [isReplying, setIsReplying] = useState(false);
     const [replyText, setReplyText] = useState('');
-    const [imageFile, setImageFile] = useState(null); // New state for image file
+    const [imageFile, setImageFile] = useState(null);
 
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
@@ -19,13 +19,12 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
     };
 
     const handleReply = () => {
-        onReply(comment.commentid, replyText, imageFile); // Pass image file to onReply
+        onReply(comment.commentid, replyText, imageFile);
         setReplyText('');
         setIsReplying(false);
-        setImageFile(null); // Clear the image file after submitting
+        setImageFile(null);
     };
 
-    // Check if the comment is deleted
     if (comment.deleted) {
         return (
             <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: depth * 20 }}>
@@ -147,7 +146,7 @@ const Comments = () => {
     const [forumDetails, setForumDetails] = useState(null);
     const [newComment, setNewComment] = useState('');
     const [isVerified, setIsVerified] = useState(false);
-    const [imageFile, setImageFile] = useState(null); // New state for new comment image
+    const [imageFile, setImageFile] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -163,7 +162,7 @@ const Comments = () => {
             }
 
             try {
-                const response = await axios.post('http://192.168.18.72:5000/verify', {
+                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                     userid,
                     username,
                     usertype,
@@ -193,10 +192,8 @@ const Comments = () => {
 
     const fetchComments = async () => {
         try {
-            const response = await fetch(`http://192.168.18.72:5000/comments/${forumid}`);
-            if (!response.ok) throw new Error('Error fetching comments.');
-            const data = await response.json();
-            setComments(data);
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/comments/${forumid}`);
+            setComments(response.data);
         } catch (error) {
             console.error('Error fetching comments:', error);
             setError('Error fetching comments. Please try again later.');
@@ -205,10 +202,8 @@ const Comments = () => {
 
     const fetchForumDetails = async () => {
         try {
-            const response = await fetch(`http://192.168.18.72:5000/forums/details/${forumid}`);
-            if (!response.ok) throw new Error('Error fetching forum details.');
-            const data = await response.json();
-            setForumDetails(data);
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/forums/details/${forumid}`);
+            setForumDetails(response.data);
         } catch (error) {
             console.error('Error fetching forum details:', error);
             setError('Error fetching forum details. Please try again later.');
@@ -222,7 +217,7 @@ const Comments = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/verify', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                 userid,
                 username,
                 usertype,
@@ -249,19 +244,19 @@ const Comments = () => {
 
         const reader = new FileReader();
         reader.onloadend = async () => {
-            const encodedImage = reader.result.split(',')[1]; // Get the base64 string
+            const encodedImage = reader.result.split(',')[1];
 
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://192.168.18.72:5000/comments/add`, {
+                    await axios.post(`http://${process.env.REACT_APP_localhost}:5000/comments/add`, {
                         forumid,
                         commenttext: newComment,
                         posterid: userid,
-                        encodedimage: encodedImage, // Include encoded image
+                        encodedimage: encodedImage,
                     });
                     setNewComment('');
-                    setImageFile(null); // Clear image after adding comment
+                    setImageFile(null);
                     fetchComments();
                 } catch (error) {
                     console.error('Error adding comment:', error);
@@ -271,18 +266,18 @@ const Comments = () => {
         };
 
         if (imageFile) {
-            reader.readAsDataURL(imageFile); // Read the file
+            reader.readAsDataURL(imageFile);
         } else {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://192.168.18.72:5000/comments/add`, {
+                    await axios.post(`http://${process.env.REACT_APP_localhost}:5000/comments/add`, {
                         forumid,
                         commenttext: newComment,
                         posterid: userid,
                     });
                     setNewComment('');
-                    setImageFile(null); // Clear image after adding comment
+                    setImageFile(null);
                     fetchComments();
                 } catch (error) {
                     console.error('Error adding comment:', error);
@@ -295,7 +290,7 @@ const Comments = () => {
     const handleEditComment = async (commentid, newText) => {
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`http://192.168.18.72:5000/comments/edit/${commentid}`, { commenttext: newText });
+                await axios.put(`http://${process.env.REACT_APP_localhost}:5000/comments/edit/${commentid}`, { commenttext: newText });
                 fetchComments();
             } catch (error) {
                 console.error('Error editing comment:', error);
@@ -307,7 +302,7 @@ const Comments = () => {
     const handleDeleteComment = async (commentid) => {
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`http://192.168.18.72:5000/comments/delete/${commentid}`);
+                await axios.put(`http://${process.env.REACT_APP_localhost}:5000/comments/delete/${commentid}`);
                 fetchComments();
             } catch (error) {
                 console.error('Error deleting comment:', error);
@@ -324,16 +319,15 @@ const Comments = () => {
 
         const reader = new FileReader();
         reader.onloadend = async () => {
-            const encodedImage = reader.result.split(',')[1]; // Get the base64 string
-
+            const encodedImage = reader.result.split(',')[1];
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://192.168.18.72:5000/comments/reply/${commentid}`, {
+                    await axios.post(`http://${process.env.REACT_APP_localhost}:5000/comments/reply/${commentid}`, {
                         forumid,
                         commenttext: replyText,
                         posterid: userid,
-                        encodedimage: encodedImage, // Include encoded image
+                        encodedimage: encodedImage,
                     });
                     fetchComments();
                 } catch (error) {
@@ -344,12 +338,12 @@ const Comments = () => {
         };
 
         if (replyImage) {
-            reader.readAsDataURL(replyImage); // Read the file
+            reader.readAsDataURL(replyImage);
         } else {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://192.168.18.72:5000/comments/reply/${commentid}`, {
+                    await axios.post(`http://${process.env.REACT_APP_localhost}:5000/comments/reply/${commentid}`, {
                         forumid,
                         commenttext: replyText,
                         posterid: userid,

@@ -14,19 +14,18 @@ const Forums = () => {
     const [username, setUsername] = useState('');
     const [editMode, setEditMode] = useState({ status: false, forumid: null, forumtext: '' });
     const navigate = useNavigate();
-    const userid = localStorage.getItem('userid'); // Get the user ID
-    const usertype = localStorage.getItem('usertype'); // Get the usertype
+    const userid = localStorage.getItem('userid');
+    const usertype = localStorage.getItem('usertype');
 
     const fetchShopDetails = useCallback(async () => {
         try {
-            const shopResponse = await fetch(`http://192.168.18.72:5000/get-shop-details/${shopid}`);
+            const shopResponse = await fetch(`http://${process.env.REACT_APP_localhost}:5000/get-shop-details/${shopid}`);
             if (!shopResponse.ok) throw new Error('Error fetching shop details.');
 
             const shopData = await shopResponse.json();
             setShopDetails(shopData);
 
-            // Fetch username based on shop's userid
-            const userResponse = await fetch(`http://192.168.18.72:5000/get-username/${shopid}`); // Assuming this endpoint exists
+            const userResponse = await fetch(`http://${process.env.REACT_APP_localhost}:5000/get-username/${shopid}`);
             if (!userResponse.ok) throw new Error('Error fetching user details.');
 
             const userData = await userResponse.json();
@@ -39,7 +38,7 @@ const Forums = () => {
 
     const fetchForums = useCallback(async () => {
         try {
-            const response = await fetch(`http://192.168.18.72:5000/forums/${shopid}`);
+            const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/${shopid}`);
             if (!response.ok) throw new Error('Error fetching forum data.');
 
             const data = await response.json();
@@ -61,7 +60,7 @@ const Forums = () => {
             }
 
             try {
-                const response = await axios.post('http://192.168.18.72:5000/verify', {
+                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                     userid,
                     username,
                     usertype,
@@ -94,7 +93,7 @@ const Forums = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/verify', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                 userid,
                 username,
                 usertype,
@@ -102,7 +101,7 @@ const Forums = () => {
             });
 
             if (response.data.isValid) {
-                await action(); // Execute the action (add, edit, delete)
+                await action();
             } else {
                 setError('User verification failed. Please try again.');
                 navigate('/');
@@ -122,7 +121,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://192.168.18.72:5000/forums/add`, {
+                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -149,7 +148,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://192.168.18.72:5000/forums/edit/${forumid}`, {
+                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/edit/${forumid}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ forumtext: editMode.forumtext }),
@@ -170,7 +169,7 @@ const Forums = () => {
     const handleDeleteForum = async (forumid) => {
         await verifyAndExecute(async () => {
             try {
-                const response = await fetch(`http://192.168.18.72:5000/forums/delete/${forumid}`, {
+                const response = await fetch(`http://${process.env.REACT_APP_localhost}:5000/forums/delete/${forumid}`, {
                     method: 'DELETE',
                 });
 
@@ -188,10 +187,10 @@ const Forums = () => {
         if (!confirmRemoval) return;
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/remove-shop', { shopid });
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/remove-shop`, { shopid });
             if (response.data.message) {
                 alert('Shop removed successfully!');
-                navigate('/'); // Redirect after removal
+                navigate('/');
             }
         } catch (error) {
             console.error('Error removing shop:', error);
@@ -224,20 +223,17 @@ const Forums = () => {
             </div>
 
             {userid === shopid && usertype === 'shop' && (
-                <>
-                    {/* New Checklist Button */}
+                <div className="shop-buttons-container">
                     <button onClick={() => navigate('/checklist')} className="btn checklist-button">
                         Update Checklist
                     </button>
-                    {/* Update Shop Details Button */}
                     <button onClick={() => navigate('/signup-shop')} className="btn update-shop-details-button">
                         Update Shop Details
                     </button>
-                    {/* Remove Shop Button */}
                     <button onClick={handleRemoveShop} className="btn remove-shop-button">
                         Remove Shop
                     </button>
-                </>
+                </div>
             )}
 
             {error && <p className="error-message">{error}</p>}

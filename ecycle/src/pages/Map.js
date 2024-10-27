@@ -3,10 +3,10 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Map.css';
 
-let loc = null; // Global variable for selected location
-let center = null; // Global variable for map center
-let directionsService = null; // Global variable for DirectionsService
-let transportMode = window.google?.maps?.TravelMode?.DRIVING || 'DRIVING'; // Default transport mode
+let loc = null;
+let center = null;
+let directionsService = null;
+let transportMode = window.google?.maps?.TravelMode?.DRIVING || 'DRIVING';
 
 const Map = () => {
     const { type } = useParams();
@@ -49,12 +49,12 @@ const Map = () => {
             const userhashedpassword = localStorage.getItem('userhashedpassword');
 
             if (!userid || !username || !usertype || !userhashedpassword) {
-                navigate('/'); // Redirect if any data is missing
+                navigate('/');
                 return;
             }
 
             try {
-                const response = await axios.post('http://192.168.18.72:5000/verify', {
+                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
                     userid,
                     username,
                     usertype,
@@ -62,13 +62,13 @@ const Map = () => {
                 });
 
                 if (response.data.isValid) {
-                    setIsVerified(true); // User is verified
+                    setIsVerified(true);
                 } else {
-                    navigate('/'); // Redirect if verification fails
+                    navigate('/');
                 }
             } catch (error) {
                 console.error('Verification failed:', error);
-                navigate('/'); // Redirect on any error
+                navigate('/');
             }
         };
 
@@ -77,12 +77,12 @@ const Map = () => {
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
-            const url = 'http://192.168.18.72:5000/nearby-locations'; // Use the unified endpoint
+            const url = `http://${process.env.REACT_APP_localhost}:5000/nearby-locations`;
 
             const response = await axios.post(url, {
                 lat,
                 lon: lng,
-                actiontype: type,  // Include the action type in the request body
+                actiontype: type,
                 userid: userid
             });
             setLocations(response.data.slice(0, 5));
@@ -90,10 +90,10 @@ const Map = () => {
         } catch (err) {
             setError('Failed to fetch nearby locations');
         }
-    }, [type, userid]); // Include type and userid in the dependency array
+    }, [type, userid]);
 
     const loadMap = useCallback((lat, lng) => {
-        center = { lat, lng }; // Update the global center variable
+        center = { lat, lng };
 
         const map = new window.google.maps.Map(document.getElementById('map'), {
             center,
@@ -107,9 +107,8 @@ const Map = () => {
             title: "You are here!",
         });
 
-        // Fetch nearby locations after the map is loaded
         fetchNearbyLocations(lat, lng);
-    }, [fetchNearbyLocations]); // Add fetchNearbyLocations to the dependency array
+    }, [fetchNearbyLocations]);
 
     // useEffect(() => {
     //     if (isVerified && useCurrentLocation && navigator.geolocation) {
@@ -189,10 +188,10 @@ const Map = () => {
             });
 
             marker.addListener('click', () => {
-                loc = location; // Update the global loc variable
+                loc = location;
 
                 if (directionsRenderer) {
-                    directionsRenderer.set('directions', null); // Clear previous directions
+                    directionsRenderer.set('directions', null);
                 }
 
                 directionsService.route(
@@ -248,22 +247,22 @@ const Map = () => {
 
     const fetchCoordinatesFromAddress = async (address) => {
         try {
-            const response = await axios.post('http://192.168.18.72:5000/get-coordinates', { address });
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/get-coordinates`, { address });
             const { lat, lon } = response.data;
             setManualLocation({ lat, lng: lon });
-            loadMap(lat, lon); // Center map on manual location
+            loadMap(lat, lon);
         } catch (err) {
             setError('Failed to fetch coordinates for the given address');
         }
     };
 
     const handleTransportModeChange = (mode) => {
-        transportMode = mode; // Update the global transport mode variable
+        transportMode = mode;
         setSelectedTransportMode(mode);
 
         if (loc) {
             if (directionsRenderer) {
-                directionsRenderer.set('directions', null); // Clear previous directions
+                directionsRenderer.set('directions', null);
             }
 
             directionsService.route(
@@ -288,76 +287,75 @@ const Map = () => {
     };
 
     return (
-<div>
-    <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
-    <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
-        <a className="nav-item" role="presentation">
-            <a
-                className={`nav-link ${useCurrentLocation ? 'active' : ''}`}
-                onClick={() => setUseCurrentLocation(true)}
-                href="#"
-            >
-                Use Current Location
-            </a>
-        </a>
-        <a className="nav-item" role="presentation">
-            <a
-                className={`nav-link ${!useCurrentLocation ? 'active' : ''}`}
-                onClick={() => setUseCurrentLocation(false)}
-                href="#"
-            >
-                Enter Location Manually
-            </a>
-        </a>
-    </ul>
+        <div>
+            <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
+            <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                <a className="nav-item" role="presentation">
+                    <a
+                        className={`nav-link ${useCurrentLocation ? 'active' : ''}`}
+                        onClick={() => setUseCurrentLocation(true)}
+                        href="#"
+                    >
+                        Use Current Location
+                    </a>
+                </a>
+                <a className="nav-item" role="presentation">
+                    <a
+                        className={`nav-link ${!useCurrentLocation ? 'active' : ''}`}
+                        onClick={() => setUseCurrentLocation(false)}
+                        href="#"
+                    >
+                        Enter Location Manually
+                    </a>
+                </a>
+            </ul>
 
-    <div className="input-container" style={{ height: !useCurrentLocation ? '60px' : '0' }}>
-        {!useCurrentLocation && (
-            <input
-                type="text"
-                placeholder="Enter address or postal code"
-                value={manualAddress}
-                onChange={handleAddressChange}
-                className="location-input"
-            />
-        )}
-    </div>
-
-    <button className="find-locations-btn" onClick={handleSearch}>Find Locations</button>
-
-    <div className="transport-mode-container">
-        <label htmlFor="transportMode">Select Transport Mode: </label>
-        <select
-            id="transportMode"
-            value={transportMode}
-            onChange={(e) => handleTransportModeChange(e.target.value)}
-            className="transport-mode-select"
-        >
-            <option value={window.google?.maps?.TravelMode?.DRIVING}>Driving</option>
-            <option value={window.google?.maps?.TravelMode?.WALKING}>Walking</option>
-            <option value={window.google?.maps?.TravelMode?.BICYCLING}>Bicycling</option>
-            <option value={window.google?.maps?.TravelMode?.TRANSIT}>Transit</option>
-        </select>
-    </div>
-
-    <div id="map" style={{ height: '400px', width: '100%' }}></div>
-
-    <div>
-        {instructions.length > 0 && (
-            <div className="instructions-container" style={{ fontSize: '0.8em' }}>
-                <h3>Directions Instructions:</h3>
-                <ol>
-                    {instructions.map((step, index) => (
-                        <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
-                    ))}
-                </ol>
+            <div className="input-container" style={{ height: !useCurrentLocation ? '60px' : '0' }}>
+                {!useCurrentLocation && (
+                    <input
+                        type="text"
+                        placeholder="Enter address or postal code"
+                        value={manualAddress}
+                        onChange={handleAddressChange}
+                        className="location-input"
+                    />
+                )}
             </div>
-        )}
-    </div>
 
-    {error && <p style={{ color: 'red' }}>{error}</p>}
-</div>
+            <button className="find-locations-btn" onClick={handleSearch}>Find Locations</button>
 
+            <div className="transport-mode-container">
+                <label htmlFor="transportMode">Select Transport Mode: </label>
+                <select
+                    id="transportMode"
+                    value={transportMode}
+                    onChange={(e) => handleTransportModeChange(e.target.value)}
+                    className="transport-mode-select"
+                >
+                    <option value={window.google?.maps?.TravelMode?.DRIVING}>Driving</option>
+                    <option value={window.google?.maps?.TravelMode?.WALKING}>Walking</option>
+                    <option value={window.google?.maps?.TravelMode?.BICYCLING}>Bicycling</option>
+                    <option value={window.google?.maps?.TravelMode?.TRANSIT}>Transit</option>
+                </select>
+            </div>
+
+            <div id="map" style={{ height: '400px', width: '100%' }}></div>
+
+            <div>
+                {instructions.length > 0 && (
+                    <div className="instructions-container" style={{ fontSize: '0.8em' }}>
+                        <h3>Directions Instructions:</h3>
+                        <ol>
+                            {instructions.map((step, index) => (
+                                <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
+                            ))}
+                        </ol>
+                    </div>
+                )}
+            </div>
+
+            {error && <p style={{ color: 'red' }}>{error}</p>}
+        </div>
     );
 };
 

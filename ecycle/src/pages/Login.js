@@ -18,13 +18,13 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await axios.post('http://192.168.18.72:5000/login', {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/login`, {
                 username,
                 password,
             });
 
             if (response.status === 200) {
-                const { userid, usertype, userpassword } = response.data; // Get userid and usertype from the response
+                const { userid, usertype, userpassword } = response.data;
                 localStorage.setItem('userid', userid);
                 localStorage.setItem('username', username);
                 localStorage.setItem('usertype', usertype);
