@@ -52,7 +52,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
     }
 
     return (
-        <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: depth * 20 }}>
+        <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: 0 }}>
             <div>
                 <p className="comment-header">
                     {comment.postername} · <span className="comment-time">{comment.time}</span>

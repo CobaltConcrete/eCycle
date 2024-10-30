@@ -22,7 +22,8 @@
     width: 70%;
     padding: 10px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px;
+    /* Retained for input */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     font-size: 16px;
     transition: border-color 0.3s;
@@ -39,7 +40,7 @@
     overflow-y: auto;
     border: 1px solid #ddd;
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: 10px;
     background-color: #7bda7e;
 }
 
@@ -100,7 +101,7 @@
     width: 40px;
     height: 40px;
     margin-right: 1rem;
-    border-radius: 50%;
+    border-radius: 50px;
 }
 
 .reply-container {
@@ -110,7 +111,8 @@
 .btn {
     padding: 10px 15px;
     border: none;
-    border-radius: 5px;
+    border-radius: 50px;
+    /* 50px border radius for all buttons */
     color: white;
     cursor: pointer;
     transition: background-color 0.3s;

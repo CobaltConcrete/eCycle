@@ -2,7 +2,11 @@
     max-height: 80vh;
     padding: 1rem;
     max-width: 800px;
+    /* Keep the max-width to limit size */
     margin: 0 auto;
+    /* Center the container */
+    width: 100%;
+    /* Ensure it does not exceed the max width */
 }
 
 .comments-title {
@@ -27,10 +31,13 @@
 .comments-list {
     max-height: 100%;
     overflow-y: auto;
+    /* Allow vertical scrolling */
     border: 1px solid #ddd;
     padding: 1rem;
     border-radius: 8px;
     background-color: #7bda7e;
+    overflow-x: hidden;
+    /* Hide horizontal overflow */
 }
 
 .comments-list.no-comments-bg {
@@ -49,6 +56,12 @@
     margin-top: 1rem;
     border-left: 3px solid;
     text-align: left;
+    overflow: hidden;
+    /* Prevent overflow issues */
+    max-width: 100%;
+    /* Ensure it doesn't exceed container width */
+    word-wrap: break-word;
+    /* Break long words */
 }
 
 .comment-box.even {
@@ -93,6 +106,17 @@
     margin-top: 0.5rem;
     font-size: 1rem;
     text-align: left;
+}
+
+.comment-text img {
+    max-width: 100%;
+    /* Make images responsive */
+    height: auto;
+    /* Maintain aspect ratio */
+    display: block;
+    /* Ensure images behave like block elements */
+    margin: 0 auto;
+    /* Center the image if necessary */
 }
 
 .reply-container {
@@ -175,4 +199,22 @@
 
 .delete-button:hover {
     background-color: #c62828;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 600px) {
+    .comments-container {
+        padding: 0.5rem;
+        /* Reduce padding on mobile */
+    }
+
+    .comment-box {
+        padding: 0.5rem;
+        /* Reduce padding inside comment boxes */
+    }
+
+    .comment-text {
+        font-size: 0.9rem;
+        /* Slightly reduce font size on mobile */
+    }
 }

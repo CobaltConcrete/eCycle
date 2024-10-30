@@ -3,9 +3,60 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './SelectWaste.css';
 
+const HelpModal = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <h2>E-Waste Checklist</h2>
+                <ol>
+                    <li>
+                        Is the electronic device functioning?
+                        <ul>
+                            <li>Yes: Go to <strong>Repair E-Waste</strong>.</li>
+                            <li>No: Proceed to the next question.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Is there visible damage (e.g., cracked screen, missing parts)?
+                        <ul>
+                            <li>Yes: Go to <strong>Dispose E-Waste</strong>.</li>
+                            <li>No: Proceed to the next question.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Is it a newer model with available parts?
+                        <ul>
+                            <li>Yes: Go to <strong>Repair E-Waste</strong>.</li>
+                            <li>No: Go to <strong>Dispose E-Waste</strong>.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        Is the cost of repair reasonable compared to purchasing a new one?
+                        <ul>
+                            <li>Yes: Go to <strong>Repair E-Waste</strong>.</li>
+                            <li>No: Go to <strong>Dispose E-Waste</strong>.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        If it is not an electronic device (e.g., household appliance), can it be recycled?
+                        <ul>
+                            <li>Yes: Go to <strong>General Waste</strong>.</li>
+                            <li>No: Go to <strong>Dispose E-Waste</strong>.</li>
+                        </ul>
+                    </li>
+                </ol>
+                <button className="close-button" onClick={onClose}>Close</button>
+            </div>
+        </div>
+    );
+};
+
 const SelectWaste = () => {
     const [usertype, setUsertype] = useState(null);
     const [isVerified, setIsVerified] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
 
         useEffect(() => {
@@ -83,9 +134,13 @@ const SelectWaste = () => {
                     <h3>General Waste</h3>
                 </div>
             </div>
-            <button className="help-button" onClick={() => alert('Help is on the way!')}>
-                Need help?
-            </button>
+            <div>
+                <button className="help-button" onClick={() => setIsModalOpen(true)}>
+                    Need help?
+                </button>
+
+                <HelpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+            </div>
             <button className="checklist-button" onClick={() => navigate('/checklist')}>
                 Go to Checklist
             </button>

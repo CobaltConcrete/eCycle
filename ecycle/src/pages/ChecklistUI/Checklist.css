@@ -69,6 +69,7 @@
 .select-all-btn {
     background-color: #4caf50;
     margin-right: 10px;
+    border-radius: 5px;
 }
 
 .submit-btn {

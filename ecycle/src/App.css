@@ -1,5 +1,7 @@
 .App {
   text-align: center;
+  height: 100vh;
+  /* Ensure it takes full height of the viewport */
 }
 
 .App-logo {
@@ -24,8 +26,11 @@
   color: #115d33;
   box-sizing: border-box;
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
+  /* Allow it to expand to full width */
   margin: 0 auto;
+  padding: 2rem 0;
+  /* Add padding for spacing */
 }
 
 .title-container {
@@ -37,7 +42,8 @@
   justify-content: center;
   align-items: center;
   width: 100%;
-  max-width: 300px;
+  max-width: 100%;
+  /* Allow it to expand to full width */
 }
 
 h1 {

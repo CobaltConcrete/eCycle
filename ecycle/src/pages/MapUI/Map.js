@@ -13,6 +13,7 @@ const Map = () => {
     const [userLocation, setUserLocation] = useState(null);
     const [manualLocation, setManualLocation] = useState(null);
     const [locations, setLocations] = useState([]);
+    const [activeIndex, setActiveIndex] = useState(null);
     const [manualAddress, setManualAddress] = useState('');
     const [useCurrentLocation, setUseCurrentLocation] = useState(true);
     const [error, setError] = useState('');
@@ -22,8 +23,24 @@ const Map = () => {
     const [instructions, setInstructions] = useState([]);
     const [isVerified, setIsVerified] = useState(false);
     const [selectedTransportMode, setSelectedTransportMode] = useState(transportMode);
+    const [markers, setMarkers] = useState([]);
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
+    const usertype = localStorage.getItem('usertype');
+
+//     useEffect(() => {
+//     // Reload the page once every time it's entered
+//     const handlePageShow = (event) => {
+//         if (event.persisted || performance.getEntriesByType("navigation")[0].type === "back_forward") {
+//             window.location.reload();
+//         }
+//     };
+//     window.addEventListener('pageshow', handlePageShow);
+
+//     // Cleanup event listener on unmount
+//     return () => window.removeEventListener('pageshow', handlePageShow);
+// }, []);
+
 
     // Function to load Google Maps script dynamically
     const loadGoogleMapsScript = (callback) => {
@@ -154,104 +171,90 @@ const Map = () => {
         }
     }, [isVerified, useCurrentLocation, loadMap]);
 
-    const addMarkersToMap = (locations) => {
-        const map = new window.google.maps.Map(document.getElementById('map'), {
-            center,
-            zoom: 13,
-        });
+const addMarkersToMap = (locations) => {
+    const map = new window.google.maps.Map(document.getElementById('map'), {
+        center,
+        zoom: 13,
+    });
 
-        new window.google.maps.Marker({
+    const newMarkers = [];
+
+    new window.google.maps.Marker({
+        map,
+        position: center,
+        title: "You are here!",
+        clickable: true
+    });
+
+    const infoWindow = new window.google.maps.InfoWindow();
+    
+    if (!directionsService) {
+        directionsService = new window.google.maps.DirectionsService();
+    }
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+    setDirectionsRenderer(directionsRenderer);
+
+    locations.forEach((location) => {
+        const marker = new window.google.maps.Marker({
             map,
-            position: center,
-            title: "You are here!",
+            position: { lat: location.latitude, lng: location.longitude },
+            title: location.Name,
+            icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
             clickable: true
         });
 
-        const infoWindow = new window.google.maps.InfoWindow();
-        
-        if (!directionsService) {
-            directionsService = new window.google.maps.DirectionsService();
-        }
-        const directionsRenderer = new window.google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-        setDirectionsRenderer(directionsRenderer);
+        newMarkers.push(marker); // Store marker in the array
 
-        locations.forEach((location) => {
-            const marker = new window.google.maps.Marker({
-                map,
-                position: { lat: location.latitude, lng: location.longitude },
-                title: location.Name,
-                icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
-                clickable: true
-            });
+        marker.addListener('click', () => {
+            loc = location;
 
-            marker.addListener('click', () => {
-                loc = location;
+            if (directionsRenderer) {
+                directionsRenderer.set('directions', null);
+            }
 
-                if (directionsRenderer) {
-                    directionsRenderer.set('directions', null);
-                }
-
-                directionsService.route(
-                    {
-                        origin: center,
-                        destination: { lat: loc.latitude, lng: loc.longitude },
-                        travelMode: transportMode, 
-                        transitOptions: {
-                            routingPreference: 'LESS_WALKING'
-                        }
-                    },
-                    (result, status) => {
-                        if (status === window.google.maps.DirectionsStatus.OK) {
-                            directionsRenderer.setDirections(result);
-                            setInstructions(result.routes[0].legs[0].steps);
-                        } else {
-                            console.error(`Directions request failed due to ${status}`);
-                        }
+            directionsService.route(
+                {
+                    origin: center,
+                    destination: { lat: loc.latitude, lng: loc.longitude },
+                    travelMode: transportMode, 
+                    transitOptions: {
+                        routingPreference: 'LESS_WALKING'
                     }
-                );
-                
-                // Opens forum in new tab
-                // infoWindow.setContent(`
-                //     <div class="location-info">
-                //         <h3 class="shop-name">${location.shopname}</h3>
-                //         <p class="shop-address">${location.addressname}</p>
-                //         <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
-                //         <br />
-                //         <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
-                //             View on Google Maps
-                //         </a>
-                //         <br />
-                //         <div class="forum-button-container">
-                //             <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
-                //                 Visit Forum
-                //             </button>
-                //         </div>
-                //     </div>
-                // `);
-
-                infoWindow.setContent(`
-                    <div class="location-info">
-                        <h3 class="shop-name">${location.shopname}</h3>
-                        <p class="shop-address">${location.addressname}</p>
-                        <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
-                        <br />
-                        <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
-                            View on Google Maps
-                        </a>
-                        <br />
-                        <div class="forum-button-container">
-                            <button class="forum-button" onclick="window.location.href='/forums/${location.shopid}'">
-                                Visit Forum
-                            </button>
-                        </div>
+                },
+                (result, status) => {
+                    if (status === window.google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                        setInstructions(result.routes[0].legs[0].steps);
+                    } else {
+                        console.error(`Directions request failed due to ${status}`);
+                    }
+                }
+            );
+            
+            infoWindow.setContent(`
+                <div class="location-info">
+                    <h3 class="shop-name">${location.shopname}</h3>
+                    <p class="shop-address">${location.addressname}</p>
+                    <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
+                    <br />
+                    <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
+                        View on Google Maps
+                    </a>
+                    <br />
+                    <div class="forum-button-container">
+                        <button class="forum-button" onclick="window.location.href='/forums/${location.shopid}'">
+                            Visit Forum
+                        </button>
                     </div>
-                `);
+                </div>
+            `);
 
-                infoWindow.open(map, marker);   
-            });
+            infoWindow.open(map, marker);   
         });
-    };
+    });
+    setMarkers(newMarkers);
+};
 
     const handleAddressChange = (e) => setManualAddress(e.target.value);
 
@@ -304,29 +307,43 @@ const Map = () => {
         }
     };
 
+    const handleLocationClick = (location, index) => {
+    const marker = markers[index];
+    window.google.maps.event.trigger(marker, 'click');
+};
+
+    const handleItemClick = (location, index) => {
+        setActiveIndex(index);
+        handleLocationClick(location, index);
+    };
+
+    
+
     return (
         <div>
             <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
-            <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
-                <a className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${useCurrentLocation ? 'active' : ''}`}
-                        onClick={() => setUseCurrentLocation(true)}
-                        href="#"
-                    >
-                        Use Current Location
-                    </a>
-                </a>
-                <a className="nav-item" role="presentation">
-                    <a
-                        className={`nav-link ${!useCurrentLocation ? 'active' : ''}`}
-                        onClick={() => setUseCurrentLocation(false)}
-                        href="#"
-                    >
-                        Enter Location Manually
-                    </a>
-                </a>
-            </ul>
+            <div className="pills-container">
+                <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${useCurrentLocation ? 'active' : ''}`}
+                            onClick={() => setUseCurrentLocation(true)}
+                            href="#"
+                        >
+                            Use Current Location
+                        </a>
+                    </li>
+                    <li className="nav-item" role="presentation">
+                        <a
+                            className={`nav-link ${!useCurrentLocation ? 'active' : ''}`}
+                            onClick={() => setUseCurrentLocation(false)}
+                            href="#"
+                        >
+                            Enter Location Manually
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
             <div className="input-container" style={{ height: !useCurrentLocation ? '60px' : '0' }}>
                 {!useCurrentLocation && (
@@ -372,9 +389,36 @@ const Map = () => {
                 )}
             </div>
 
-            <button className="back-button" onClick={() => navigate('/select-waste')}>
-                Back to Waste Selection
-            </button>
+        <div className="location-details">
+            <h2>Nearby Locations Details</h2>
+            <ul>
+                {locations.map((location, index) => (
+                    <li
+                        key={index}
+                        onClick={() => handleItemClick(location, index)}
+                        className={activeIndex === index ? 'active' : ''} // Add class based on active index
+                    >
+                        <h3>{location.shopname}</h3>
+                        <p>{location.addressname}</p>
+                        <a href={location.website} target="_blank" rel="noopener noreferrer">
+                            Visit Website
+                        </a>
+                    </li>
+                ))}
+            </ul>
+        </div>
+
+            {usertype === 'shop' && (
+                <button className="back-button" onClick={() => navigate(`/forums/${userid}`)}>
+                    Back to Forums
+                </button>
+            )}
+
+            {usertype !== 'shop' && (
+                <button className="back-button" onClick={() => navigate('/select-waste')}>
+                    Back to Waste Selection
+                </button>
+            )}
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>

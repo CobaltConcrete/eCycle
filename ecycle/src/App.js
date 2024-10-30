@@ -2,14 +2,14 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import SignupShop from './pages/SignupShop';
-import SelectWaste from './pages/SelectWaste';
-import Checklist from './pages/Checklist';
-import Map from './pages/Map';
-import Forums from './pages/Forums';
-import Comments from './pages/Comments';
+import Login from './pages/LoginUI/Login';
+import Signup from './pages/SignupUI/Signup';
+import SignupShop from './pages/SignupShopUI/SignupShop';
+import SelectWaste from './pages/SelectWasteUI/SelectWaste';
+import Checklist from './pages/ChecklistUI/Checklist';
+import Map from './pages/MapUI/Map';
+import Forums from './pages/ForumsUI/Forums';
+import Comments from './pages/CommentsUI/Comments';
 
 
 const App = () => {
