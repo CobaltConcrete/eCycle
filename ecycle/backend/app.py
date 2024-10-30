@@ -104,6 +104,12 @@ def get_shop_details(shopid):
         }), 200
     return jsonify({'message': 'Shop not found'}), 404
 
+@app.route('/user-checklist/<int:userid>', methods=['GET'])
+def get_user_checklist(userid):
+    user_checklist = UserChecklistTable.query.filter_by(userid=userid).all()
+    checklistoptionids = [item.checklistoptionid for item in user_checklist]
+    return jsonify(checklistoptionids), 200
+
 @app.route('/add-shop', methods=['POST'])
 def signup_shop():
     data = request.get_json()

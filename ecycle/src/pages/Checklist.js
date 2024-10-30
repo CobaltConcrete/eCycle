@@ -39,6 +39,16 @@ const Checklist = () => {
         }
     };
 
+    const fetchUserChecklist = async () => {
+        const userid = localStorage.getItem('userid');
+        try {
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/user-checklist/${userid}`);
+            setSelectedOptions(response.data); // Set saved checklist options as selected
+        } catch (err) {
+            setError('Error loading user checklist. Please try again later.');
+        }
+    };
+
     useEffect(() => {
         verifyUser();
     }, []);
@@ -54,6 +64,7 @@ const Checklist = () => {
         };
 
         fetchChecklistOptions();
+        fetchUserChecklist(); // Load user-specific selections
     }, []);
 
     const handleCheckboxChange = (optionId) => {
