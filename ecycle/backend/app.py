@@ -12,7 +12,6 @@ import requests
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
-# CORS(app, resources={r"/*": {"origins": "https://ecycle-2024.web.app"}})
 CORS(app)
 load_dotenv()
 
@@ -505,6 +504,25 @@ def delete_comment(commentid):
 
     return jsonify({'message': 'Comment marked as deleted successfully'}), 200
 
+@app.route('/get-actiontype-from-shopid/<int:shopid>', methods=['GET'])
+def get_actiontype(shopid):
+    shop = ShopTable.query.filter_by(shopid=shopid).first()
+    
+    if shop:
+        return jsonify({'actiontype': shop.actiontype}), 200
+    else:
+        return jsonify({'message': 'Shop not found'}), 404
+
+
+@app.route('/get-shopid-from-forumid/<int:forumid>', methods=['GET'])
+def get_shopid(forumid):
+    forum = ForumTable.query.filter_by(forumid=forumid).first()
+    if forum:
+        return jsonify({'shopid': forum.shopid}), 200
+    else:
+        return jsonify({'message': 'Forum not found'}), 404
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
+

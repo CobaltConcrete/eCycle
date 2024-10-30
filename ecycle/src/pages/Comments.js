@@ -381,6 +381,18 @@ const Comments = () => {
 
     const organizedComments = organizeComments(comments);
 
+    const handleBackClick = async () => {
+        try {
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/get-shopid-from-forumid/${forumid}`);
+            const shopid = response.data.shopid;
+            navigate(`/forums/${shopid}`);
+        } catch (error) {
+            console.error('Error retrieving shopid:', error);
+            setError('Error retrieving shop information. Please try again later.');
+        }
+    };
+
+
     return (
         <div className="comments-container">
             {forumDetails && (
@@ -435,6 +447,10 @@ const Comments = () => {
                     )}
                 </div>
             </div>
+            
+            <button onClick={handleBackClick} className="back-button">
+                Back to Forum
+            </button>
         </div>
     );
 };

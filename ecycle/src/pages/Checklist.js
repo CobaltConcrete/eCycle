@@ -94,7 +94,7 @@ const Checklist = () => {
                 checklistoptionids: selectedOptions,
             });
 
-            if (usertype === 'user') {
+            if (usertype === 'user' || usertype === 'admin') {
                 navigate('/select-waste');
             } else if (usertype === 'shop') {
                 navigate(`/forums/${userid}`);

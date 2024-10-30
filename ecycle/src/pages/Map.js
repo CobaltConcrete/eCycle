@@ -210,6 +210,25 @@ const Map = () => {
                         }
                     }
                 );
+                
+                // Opens forum in new tab
+                // infoWindow.setContent(`
+                //     <div class="location-info">
+                //         <h3 class="shop-name">${location.shopname}</h3>
+                //         <p class="shop-address">${location.addressname}</p>
+                //         <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
+                //         <br />
+                //         <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
+                //             View on Google Maps
+                //         </a>
+                //         <br />
+                //         <div class="forum-button-container">
+                //             <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
+                //                 Visit Forum
+                //             </button>
+                //         </div>
+                //     </div>
+                // `);
 
                 infoWindow.setContent(`
                     <div class="location-info">
@@ -222,12 +241,13 @@ const Map = () => {
                         </a>
                         <br />
                         <div class="forum-button-container">
-                            <button class="forum-button" onclick="window.open('/forums/${location.shopid}', '_blank')">
+                            <button class="forum-button" onclick="window.location.href='/forums/${location.shopid}'">
                                 Visit Forum
                             </button>
                         </div>
                     </div>
                 `);
+
                 infoWindow.open(map, marker);   
             });
         });
@@ -351,6 +371,10 @@ const Map = () => {
                     </div>
                 )}
             </div>
+
+            <button className="back-button" onClick={() => navigate('/select-waste')}>
+                Back to Waste Selection
+            </button>
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>

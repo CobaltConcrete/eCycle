@@ -13,6 +13,7 @@ const Forums = () => {
     const [shopDetails, setShopDetails] = useState({});
     const [username, setUsername] = useState('');
     const [editMode, setEditMode] = useState({ status: false, forumid: null, forumtext: '' });
+    const [actionType, setActionType] = useState('');
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
@@ -27,6 +28,16 @@ const Forums = () => {
         } catch (error) {
             console.error('Error fetching shop or user data:', error);
             setError('Error fetching shop or user data. Please try again later.');
+        }
+    }, [shopid]);
+
+    const fetchActionType = useCallback(async () => {
+        try {
+            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/get-actiontype/${shopid}`);
+            setActionType(response.data.actiontype);
+        } catch (error) {
+            console.error('Error fetching action type:', error);
+            setError('Error fetching action type. Please try again later.');
         }
     }, [shopid]);
 
@@ -283,6 +294,9 @@ const Forums = () => {
         ) : (
             <p>Verifying user...</p>
         )}
+            <button onClick={() => navigate(`/map/${shopDetails.actiontype}`)} className="btn back-button">
+                Back to Map
+            </button>
         </div>
     );
 };

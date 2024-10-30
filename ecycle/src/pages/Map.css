@@ -173,3 +173,24 @@
 .instructions-container li {
     margin-bottom: 10px;
 }
+
+.back-button {
+    background-color: #f44336;
+    /* Red background for a clear back action */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-bottom: 20px;
+    /* Adds spacing between back button and other elements */
+}
+
+.back-button:hover {
+    background-color: #d32f2f;
+    /* Darker red on hover */
+    transform: translateY(-2px);
+    /* Slight lift effect on hover */
+}
