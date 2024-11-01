@@ -1,0 +1,7 @@
+CREATE TABLE userhistorytable (
+    userid INT NOT NULL,
+    shopid INT NOT NULL,
+    time VARCHAR(50) NOT NULL,
+    FOREIGN KEY (userid) REFERENCES usertable(userid) ON DELETE CASCADE,
+    FOREIGN KEY (shopid) REFERENCES shoptable(shopid) ON DELETE CASCADE
+);

@@ -1,0 +1,11 @@
+CREATE TABLE shoptable (
+    shopid INT NOT NULL,
+    shopname VARCHAR(255) NOT NULL,
+    latitude FLOAT NOT NULL,
+    longtitude FLOAT NOT NULL,
+    addressname VARCHAR(255) NOT NULL,
+    website VARCHAR(255),
+    actiontype VARCHAR(255) NOT NULL,
+    PRIMARY KEY (shopid),
+    FOREIGN KEY (shopid) REFERENCES usertable(userid) ON DELETE CASCADE
+);

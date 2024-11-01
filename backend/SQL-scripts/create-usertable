@@ -1,0 +1,7 @@
+CREATE TABLE usertable (
+    userid SERIAL PRIMARY KEY,
+    username VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    points BIGINT DEFAULT 0 NOT NULL,
+    usertype VARCHAR NOT NULL
+);

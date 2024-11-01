@@ -1,0 +1,353 @@
+.directions-box {
+    border: 1px solid #031eed;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px 0;
+    background-color: #77e63b;
+}
+
+.pills-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px
+}
+
+.nav-pills .nav-link {
+    border-radius: 5rem;
+    margin-right: 10px;
+    color: #4caf50;
+    cursor: pointer;
+    padding: 10px 15px;
+    text-decoration: none;
+    border: 5px solid #fff;
+    transition: border-color 0.3s;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+}
+
+.nav-pills .nav-item {
+    display: inline-block;
+}
+
+.nav-pills .nav-link.active {
+    background-color: #4caf50;
+    color: white;
+    border: 5px solid #4caf50;
+}
+
+.nav-pills .nav-link:hover {
+    border-color: #4caf50;
+    background-color: white;
+    color: #4caf50;
+}
+
+.nav-pills .nav-link.active:hover {
+    background-color: #388e3c;
+    color: white;
+}
+
+.nav-pills {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.instructions-container {
+    width: 800px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 8px;
+    text-align: justify;
+}
+
+@media (max-width: 600px) {
+    .instructions-container {
+        width: 90%;
+        max-height: 200px;
+        padding: 15px;
+    }
+}
+
+.find-locations-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.find-locations-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-2px);
+}
+
+.input-container {
+    height: 60px;
+    transition: height 0.3s ease;
+    overflow: hidden;
+}
+
+.location-input {
+    width: 70%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 50px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.location-input:focus {
+    border-color: #4caf50;
+    outline: none;
+}
+
+.transport-mode-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.transport-mode-container label {
+    margin-right: 10px;
+    color: #333;
+}
+
+.transport-mode-select {
+    padding: 10px;
+    border-radius: 50px;
+    border: 2px solid #ccc;
+    cursor: pointer;
+    transition: border-color 0.3s;
+}
+
+.transport-mode-select:focus {
+    border-color: #007bff;
+    outline: none;
+}
+
+.location-info {
+    text-align: left;
+    margin: 15px 0;
+}
+
+.shop-name {
+    color: black;
+}
+
+.shop-address {
+    color: black;
+}
+
+.website-link,
+.maps-link {
+    color: blue;
+    text-decoration: none;
+}
+
+.website-link:hover,
+.maps-link:hover {
+    text-decoration: underline;
+}
+
+.forum-button-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.forum-button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.forum-button:hover {
+    background-color: #388e3c;
+}
+
+.instructions-container ol {
+    padding-left: 20px;
+    font-size: 0.8em;
+}
+
+.instructions-container h3 {
+    font-size: 0.9em;
+}
+
+.instructions-container li {
+    margin-bottom: 10px;
+}
+
+.location-details {
+    width: 800px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #4caf50;
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: justify;
+}
+
+@media (max-width: 600px) {
+    .location-details {
+        width: 90%;
+        max-height: 200px;
+        padding: 15px;
+    }
+}
+
+.location-details h2 {
+    color: #4caf50;
+    margin-bottom: 10px;
+}
+
+.location-details ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.location-details li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.location-details li:hover {
+    background-color: #e0f7fa;
+    color: #007bff;
+}
+
+.location-details li.active {
+    background-color: #b2ebf2;
+    color: #0056b3;
+}
+
+.location-details li:last-child {
+    border-bottom: none;
+}
+
+.location-details h3 {
+    margin: 0;
+    color: black;
+    font-size: 0.9em;
+}
+
+.location-details p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 0.85em;
+}
+
+.location-details a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.location-details a:hover {
+    text-decoration: underline;
+}
+
+.history-details {
+    width: 800px;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #4caf50;
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    text-align: justify;
+}
+
+@media (max-width: 600px) {
+    .history-details {
+        width: 90%;
+        max-height: 200px;
+        padding: 15px;
+    }
+}
+
+.history-details h2 {
+    color: #FF8C00;
+    margin-bottom: 10px;
+}
+
+.history-details ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.history-details li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.history-details li:hover {
+    background-color: #e0f7fa;
+    color: #007bff;
+}
+
+.history-details li.active {
+    background-color: #b2ebf2;
+    color: #0056b3;
+}
+
+.history-details li:last-child {
+    border-bottom: none;
+}
+
+.history-details h3 {
+    margin: 0;
+    color: black;
+    font-size: 0.9em;
+}
+
+.history-details p {
+    margin: 5px 0;
+    color: #555;
+    font-size: 0.85em;
+}
+
+.history-details a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.history-details a:hover {
+    text-decoration: underline;
+}
+
+.back-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.2s;
+    margin-bottom: 20px;
+}
+
+.back-button:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+}

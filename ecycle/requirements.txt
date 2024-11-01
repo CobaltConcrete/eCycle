@@ -1,9 +1,0 @@
-flask
-flask-cors
-flask-sqlalchemy
-flask-bcrypt
-psycopg2-binary
-python-dotenv
-requests
-geopy
-pandas
