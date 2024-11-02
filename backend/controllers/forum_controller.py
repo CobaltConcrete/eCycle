@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, ShopTable, ForumTable, CommentTable
+from models import db, ShopTable, ForumTable, CommentTable, ReportTable
 from datetime import datetime
 
 forum_bp = Blueprint('forum', __name__)
@@ -77,12 +77,17 @@ def delete_forum(forumid):
     if not forum:
         return jsonify({'error': 'Forum not found'}), 404
 
+    comments = CommentTable.query.filter_by(forumid=forumid).all()
+    comment_ids = [comment.commentid for comment in comments]
+
+    ReportTable.query.filter(ReportTable.commentid.in_(comment_ids)).delete()
     CommentTable.query.filter_by(forumid=forumid).delete()
 
     db.session.delete(forum)
     db.session.commit()
-    
-    return jsonify({'message': 'Forum deleted successfully'}), 200
+
+    return jsonify({'message': 'Forum and associated comments and reports deleted successfully'}), 200
+
 
 @forum_bp.route('/get-actiontype-from-shopid/<int:shopid>', methods=['GET'])
 def get_actiontype(shopid):

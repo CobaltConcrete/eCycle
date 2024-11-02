@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, ForumTable, CommentTable
+from models import db, ForumTable, CommentTable, ReportTable
 from datetime import datetime
 
 comment_bp = Blueprint('comment', __name__)
@@ -83,9 +83,12 @@ def delete_comment(commentid):
 
     comment.commenttext = '[deleted]'
     comment.deleted = True
+
+    ReportTable.query.filter_by(commentid=commentid).delete()
     db.session.commit()
 
-    return jsonify({'message': 'Comment marked as deleted successfully'}), 200
+    return jsonify({'message': 'Comment marked as deleted and associated reports removed successfully'}), 200
+
 
 @comment_bp.route('/get-shopid-from-forumid/<int:forumid>', methods=['GET'])
 def get_shopid(forumid):

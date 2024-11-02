@@ -6,9 +6,8 @@ import './Report.css';
 const Report = () => {
     const [reports, setReports] = useState([]);
     const [error, setError] = useState('');
-    const [sortCriteria, setSortCriteria] = useState('report_count'); // Default to 'Number of Reports'
-    const [sortDirection, setSortDirection] = useState('desc'); // Default to descending
-    const navigate = useNavigate();
+    const [sortCriteria, setSortCriteria] = useState('report_count');
+    const [sortDirection, setSortDirection] = useState('desc');
 
     useEffect(() => {
         const fetchReports = async () => {
@@ -24,7 +23,6 @@ const Report = () => {
         fetchReports();
     }, []);
 
-    // Function to sort reports based on criteria and direction
     const sortedReports = () => {
         const sorted = [...reports].sort((a, b) => {
             if (sortCriteria === 'report_count') {
@@ -41,10 +39,8 @@ const Report = () => {
 
     const handleSortChange = (criteria) => {
         if (criteria === sortCriteria) {
-            // Toggle sort direction if the same criteria is selected
             setSortDirection((prevDirection) => (prevDirection === 'asc' ? 'desc' : 'asc'));
         } else {
-            // Set new sort criteria and default to descending
             setSortCriteria(criteria);
             setSortDirection('desc');
         }
@@ -55,7 +51,6 @@ const Report = () => {
             <h2>Reported Comments</h2>
             {error && <p className="error-message">{error}</p>}
 
-            {/* Sorting Controls */}
             <div className="sorting-controls">
                 <button onClick={() => handleSortChange('report_count')}>
                     Sort by Number of Reports {sortCriteria === 'report_count' && (sortDirection === 'asc' ? '▲' : '▼')}
@@ -86,7 +81,7 @@ const Report = () => {
                             <td>{report.latest_report_time}</td>
                             <td>
                                 <button
-                                    onClick={() => navigate(`/comments/${report.forumid}`)}
+                                    onClick={() => window.open(`/comments/${report.forumid}`, '_blank')}
                                     className="btn link-button"
                                 >
                                     View Forum
