@@ -11,7 +11,6 @@ def verify_shop():
     usertype = data['usertype']
     userhashedpassword = data['userhashedpassword']
 
-    # Check if the user exists in the database
     user = UserTable.query.filter_by(
         userid=userid,
         username=username,
@@ -52,15 +51,12 @@ def signup_shop():
     latitude = data.get('latitude')
     longtitude = data.get('longtitude')
 
-    # Check if latitude and longtitude are provided
     if latitude is None or longtitude is None:
         return jsonify({'error': 'Invalid address; unable to get coordinates.'}), 400
 
-    # Check if shop with the given shopid already exists
     existing_shop = ShopTable.query.filter_by(shopid=shopid).first()
 
     if existing_shop:
-        # Update existing shop record
         existing_shop.shopname = shopname
         existing_shop.addressname = addressname
         existing_shop.website = website
@@ -71,7 +67,6 @@ def signup_shop():
         db.session.commit()
         return jsonify({'message': 'Shop information updated successfully!'}), 200
     else:
-        # Create a new shop record
         new_shop = ShopTable(
             shopid=shopid,
             shopname=shopname,

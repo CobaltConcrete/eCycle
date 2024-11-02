@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from datetime import datetime
-from models import db, ReportTable, CommentTable
+from models import db, ReportTable, UserTable, CommentTable
 from sqlalchemy import func
 
 report_bp = Blueprint('report', __name__)
@@ -55,3 +55,26 @@ def get_reported_comments_summary():
     ]
 
     return jsonify(response_data), 200
+
+@report_bp.route('/verify-admin', methods=['POST'])
+def verify_admin():
+    data = request.get_json()
+    userid = data['userid']
+    username = data['username']
+    usertype = data['usertype']
+    userhashedpassword = data['userhashedpassword']
+
+    user = UserTable.query.filter_by(
+        userid=userid,
+        username=username,
+        usertype=usertype,
+        password=userhashedpassword
+    ).first()
+    
+    if user:
+        if user.usertype == "admin":
+            return jsonify({'isValid': True, 'usertype': user.usertype}), 200
+        else:
+            return jsonify({'isValid': False, 'message': 'User is not an admin.'}), 403
+        
+    return jsonify({'isValid': False, 'message': 'Invalid credentials.'}), 401

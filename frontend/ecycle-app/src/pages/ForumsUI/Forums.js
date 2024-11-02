@@ -294,9 +294,25 @@ const Forums = () => {
         ) : (
             <p>Verifying user...</p>
         )}
-            <button onClick={() => navigate(`/map/${shopDetails.actiontype}`)} className="btn back-button">
-                Back to Map
-            </button>
+        
+            <div className="button-container">
+                <button 
+                    onClick={() => navigate(`/map/${shopDetails.actiontype}`)} 
+                    className="button back-button"
+                >
+                    Back to Map
+                </button>
+
+                {usertype === 'admin' && (
+                    <button 
+                        type="button" 
+                        onClick={() => navigate('/report')} 
+                        className="button reportpage-button"
+                    >
+                        Go to Report Page 
+                    </button>
+                )}
+            </div>
         </div>
     );
 };

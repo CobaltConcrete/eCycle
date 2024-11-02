@@ -496,20 +496,28 @@ const Map = () => {
     </div>
 </div>
 
-            {usertype === 'shop' && (
-                <button className="back-button" onClick={() => navigate(`/forums/${userid}`)}>
-                    Back to Forums
-                </button>
-            )}
+            <div className="button-container">
+                {usertype === 'shop' && (
+                    <button className="back-button" onClick={() => navigate(`/forums/${userid}`)}>
+                        Back to Forums
+                    </button>
+                )}
 
-            {usertype !== 'shop' && (
-                <button className="back-button" onClick={() => navigate('/select-waste')}>
-                    Back to Waste Selection
-                </button>
-            )}
+                {usertype !== 'shop' && (
+                    <button className="back-button" onClick={() => navigate('/select-waste')}>
+                        Back to Waste Selection
+                    </button>
+                )}
+                {usertype === 'admin' && (
+                    <button className="reportpage-button" onClick={() => navigate('/report')}>
+                        Back to Report Page
+                    </button>
+                )}
+            </div>
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
+
     );
 };
 

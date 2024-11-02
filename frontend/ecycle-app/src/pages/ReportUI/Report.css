@@ -45,3 +45,24 @@
 .sorting-controls button:hover {
     background-color: #ddd;
 }
+
+.selectwaste-button {
+    margin-top: 20px;
+    padding: 10px 15px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 200px;
+    max-width: 200px;
+    text-align: center;
+}
+
+.selectwaste-button {
+    background-color: #4caf50;
+}
+
+.selectwaste-button:hover {
+    background-color: #388e3c;
+}

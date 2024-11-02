@@ -69,7 +69,8 @@
 }
 
 .help-button,
-.checklist-button {
+.checklist-button,
+.reportpage-button {
     margin-top: 20px;
     padding: 10px 15px;
     color: white;
@@ -96,6 +97,13 @@
 
 .checklist-button:hover {
     background-color: #388e3c;
+}
+.reportpage-button {
+    background-color: #f44336;
+}
+
+.reportpage-button:hover {
+    background-color: #c62828;
 }
 
 .modal-overlay {

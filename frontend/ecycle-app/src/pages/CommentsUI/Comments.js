@@ -151,6 +151,8 @@ const Comments = () => {
     const [imageFile, setImageFile] = useState(null);
     const navigate = useNavigate();
 
+    const usertype = localStorage.getItem('usertype');
+
     useEffect(() => {
         const verifyUser = async () => {
             const userid = localStorage.getItem('userid');
@@ -466,9 +468,22 @@ const Comments = () => {
                 </div>
             </div>
             
-            <button onClick={handleBackClick} className="back-button">
-                Back to Forum
-            </button>
+            <div className="button-container">
+                <button onClick={handleBackClick} className="button back-button">
+                    Back to Forum
+                </button>
+
+                {usertype === 'admin' && (
+                    <button 
+                        type="button" 
+                        onClick={() => navigate('/report')} 
+                        className="button reportpage-button"
+                    >
+                        Go to Report Page 
+                    </button>
+                )}
+            </div>
+
         </div>
     );
 };

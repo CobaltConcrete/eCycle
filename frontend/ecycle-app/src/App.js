@@ -29,7 +29,7 @@ const App = () => {
                     <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} />
                     <Route path="/forums/:shopid" element={<ProtectedRoute element={<Forums />} />} />
                     <Route path="/comments/:forumid" element={<ProtectedRoute element={<Comments />} />} />
-                    <Route path="/report" element={<Report />} />
+                    <Route path="/report" element={<ProtectedRoute element={<Report />} />} />
                 </Routes>
             </header>
         </div>

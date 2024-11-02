@@ -144,6 +144,16 @@ const SelectWaste = () => {
             <button className="checklist-button" onClick={() => navigate('/checklist')}>
                 Go to Checklist
             </button>
+
+            {usertype === 'admin' && (
+            <button 
+                type="button" 
+                onClick={() => navigate('/report')} 
+                className="reportpage-button"
+            >
+                Go to Report Page 
+            </button>
+            )}
         </div>
     );
 };

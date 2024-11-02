@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Report.css';
@@ -8,6 +8,39 @@ const Report = () => {
     const [error, setError] = useState('');
     const [sortCriteria, setSortCriteria] = useState('report_count');
     const [sortDirection, setSortDirection] = useState('desc');
+    const navigate = useNavigate();
+
+    const verifyUser = useCallback(async () => {
+        const userid = localStorage.getItem('userid');
+        const username = localStorage.getItem('username');
+        const usertype = localStorage.getItem('usertype');
+        const userhashedpassword = localStorage.getItem('userhashedpassword');
+
+        if (!userid || !username || !usertype || !userhashedpassword || usertype !== 'admin') {
+            navigate('/');
+            return;
+        }
+
+        try {
+            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify-admin`, {
+                userid,
+                username,
+                usertype,
+                userhashedpassword,
+            });
+
+            if (!response.data.isValid) {
+                navigate('/');
+            }
+        } catch (error) {
+            console.error('Verification failed:', error);
+            navigate('/');
+        }
+    }, [navigate]);
+
+    useEffect(() => {
+        verifyUser();
+    }, [verifyUser]);
 
     useEffect(() => {
         const fetchReports = async () => {
@@ -91,6 +124,14 @@ const Report = () => {
                     ))}
                 </tbody>
             </table>
+
+            <button 
+                type="button" 
+                onClick={() => navigate('/select-waste')} 
+                className="selectwaste-button"
+            >
+                Go to Select Waste Service
+            </button>
         </div>
     );
 };
