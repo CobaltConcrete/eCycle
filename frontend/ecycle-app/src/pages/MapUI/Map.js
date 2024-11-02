@@ -25,6 +25,9 @@ const Map = () => {
     const [selectedTransportMode, setSelectedTransportMode] = useState(transportMode);
     const [markers, setMarkers] = useState([]);
     const [history, setHistory] = useState([]);
+    const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
+    const [isLocationsOpen, setIsLocationsOpen] = useState(false);
+    const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
@@ -334,6 +337,18 @@ const Map = () => {
         }
     };
 
+    const handleInstructionsToggle = () => {
+        setIsInstructionsOpen(!isInstructionsOpen); // Toggle instructions
+    };
+
+    const handleLocationsToggle = () => {
+        setIsLocationsOpen(!isLocationsOpen);
+    };
+
+    const handleHistoryToggle = () => {
+        setIsHistoryOpen(!isHistoryOpen);
+    };
+
     const handleLocationClick = (location, index) => {
         const marker = markers[index];
         window.google.maps.event.trigger(marker, 'click');
@@ -408,55 +423,76 @@ const Map = () => {
 
             <div id="map" style={{ height: '400px', width: '100%' }}></div>
 
-            <div>
-                {instructions.length > 0 && (
-                    <div className="instructions-container" style={{ fontSize: '0.8em' }}>
-                        <h3>Directions Instructions:</h3>
-                        <ol>
-                            {instructions.map((step, index) => (
-                                <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
-                            ))}
-                        </ol>
-                    </div>
-                )}
-            </div>
-
-        <div className="location-details">
-            <h2>Nearby Locations Details</h2>
-            <ul>
-                {locations.map((location, index) => (
-                    <li
-                        key={index}
-                        onClick={() => handleItemClick(location, index)}
-                        className={activeIndex === index ? 'active' : ''}
-                    >
-                        <h3>{location.shopname}</h3>
-                        <p>{location.addressname}</p>
-                        <a href={location.website} target="_blank" rel="noopener noreferrer">
-                            Visit Website
-                        </a>
-                    </li>
-                ))}
-            </ul>
+<div>
+    {instructions.length > 0 && (
+        <div className="instructions-container">
+            <h3 onClick={handleInstructionsToggle} style={{ cursor: 'pointer' }}>
+                Directions Instructions:
+            </h3>
+            {isInstructionsOpen && (
+                <div className="scrollable-content">
+                    <ol>
+                        {instructions.map((step, index) => (
+                            <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
+                        ))}
+                    </ol>
+                </div>
+            )}
         </div>
+    )}
 
-<div className="history-details">
-    <h2>History</h2>
-    <ul>
-        {history.length > 0 ? (
-            history.map((entry, index) => (
-                <li key={index} onClick={() => handleHistoryItemClick(entry)}>
-                    <h3>{entry.shopname}</h3>
-                    <p>{entry.addressname}</p>
-                    <p>Visited on: {entry.time}</p>
-                    <a href={entry.website} target="_blank" rel="noopener noreferrer">Visit Website</a>
-                </li>
-            ))
-        ) : (
-            <p>No history available.</p>
+    <div className="location-details">
+        <h2 onClick={handleLocationsToggle} style={{ cursor: 'pointer' }}>
+            Nearby Locations Details
+        </h2>
+        {isLocationsOpen && (
+            <div className="scrollable-content">
+                <ul>
+                    {locations.map((location, index) => (
+                        <li
+                            key={index}
+                            onClick={() => handleItemClick(location, index)}
+                            className={activeIndex === index ? 'active' : ''}
+                        >
+                            <h3>{location.shopname}</h3>
+                            <p>{location.addressname}</p>
+                            <a href={location.website} target="_blank" rel="noopener noreferrer">
+                                Visit Website
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         )}
-    </ul>
+    </div>
+
+    <div className="history-details">
+        <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer' }}>
+            History
+        </h2>
+        {isHistoryOpen && (
+            <div className="scrollable-content">
+                <ul>
+                    {history.length > 0 ? (
+                        history.map((entry, index) => (
+                            <li key={index} onClick={() => handleHistoryItemClick(entry)}>
+                                <h3>{entry.shopname}</h3>
+                                <p>{entry.addressname}</p>
+                                <p>Visited on: {entry.time}</p>
+                                <a href={entry.website} target="_blank" rel="noopener noreferrer">
+                                    Visit Website
+                                </a>
+                            </li>
+                        ))
+                    ) : (
+                        <p>No history available.</p>
+                    )}
+                </ul>
+            </div>
+        )}
+    </div>
 </div>
+
 
             {usertype === 'shop' && (
                 <button className="back-button" onClick={() => navigate(`/forums/${userid}`)}>
