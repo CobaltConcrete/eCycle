@@ -71,7 +71,8 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
                 ) : (
                     <div>
                         <p className="comment-text">{comment.commenttext}</p>
-                        {comment.encodedimage && <img src={`data:image/jpeg;base64,${comment.encodedimage}`} alt="Comment Attachment" />}
+                        {comment.encodedimage && (
+                        <img src={`data:image/jpeg;base64,${comment.encodedimage}`} alt="Comment Attachment" className="comment-image" />)}
                     </div>
                 )}
 
