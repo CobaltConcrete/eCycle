@@ -426,8 +426,9 @@ const Map = () => {
 <div>
     {instructions.length > 0 && (
         <div className="instructions-container">
-            <h3 onClick={handleInstructionsToggle} style={{ cursor: 'pointer' }}>
-                Directions Instructions:
+            <h3 onClick={handleInstructionsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                <span className={`arrow ${isInstructionsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
+                Directions Instructions
             </h3>
             {isInstructionsOpen && (
                 <div className="scrollable-content">
@@ -442,7 +443,8 @@ const Map = () => {
     )}
 
     <div className="location-details">
-        <h2 onClick={handleLocationsToggle} style={{ cursor: 'pointer' }}>
+        <h2 onClick={handleLocationsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+            <span className={`arrow ${isLocationsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
             Nearby Locations Details
         </h2>
         {isLocationsOpen && (
@@ -467,7 +469,8 @@ const Map = () => {
     </div>
 
     <div className="history-details">
-        <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer' }}>
+        <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+            <span className={`arrow ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>▶</span>
             History
         </h2>
         {isHistoryOpen && (
@@ -492,7 +495,6 @@ const Map = () => {
         )}
     </div>
 </div>
-
 
             {usertype === 'shop' && (
                 <button className="back-button" onClick={() => navigate(`/forums/${userid}`)}>

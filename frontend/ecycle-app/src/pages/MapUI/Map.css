@@ -53,42 +53,6 @@
     align-items: center;
 }
 
-.instructions-container,
-.location-details,
-.history-details {
-    margin: 20px auto;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-    padding: 10px;
-}
-
-.scrollable-content {
-    max-height: 300px;
-    overflow-y: auto;
-    padding: 15px;
-    border-top: 1px solid #ccc;
-}
-
-
-
-.instructions-container {
-    width: 800px;
-    max-height: 300px;
-    overflow-y: hidden;
-    border: 1px solid #007bff;
-    padding: 30px;
-    margin: 20px auto;
-    border-radius: 8px;
-    text-align: justify;
-}
-
-.instructions-container h3 {
-    font-size: 0.9rem;
-    color: #007bff;
-    margin: 0;
-    cursor: pointer;
-}
-
 @media (max-width: 600px) {
     .instructions-container {
         width: 90%;
@@ -199,6 +163,40 @@
 
 .forum-button:hover {
     background-color: #388e3c;
+}
+
+.instructions-container,
+.location-details,
+.history-details {
+    margin: 20px auto;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    padding: 10px;
+}
+
+.scrollable-content {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 15px;
+    border-top: 1px solid #ccc;
+}
+
+.instructions-container {
+    width: 800px;
+    max-height: 300px;
+    overflow-y: hidden;
+    border: 1px solid #007bff;
+    padding: 30px;
+    margin: 20px auto;
+    border-radius: 8px;
+    text-align: justify;
+}
+
+.instructions-container h3 {
+    font-size: 0.9rem;
+    color: #007bff;
+    margin: 0;
+    cursor: pointer;
 }
 
 .instructions-container ol {
@@ -364,6 +362,20 @@
 
 .history-details a:hover {
     text-decoration: underline;
+}
+
+.arrow {
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+    display: inline-block;
+}
+
+.arrow.expanded {
+    transform: rotate(90deg);
+}
+
+.arrow.collapsed {
+    transform: rotate(0deg);
 }
 
 .back-button {
