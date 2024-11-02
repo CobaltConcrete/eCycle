@@ -87,3 +87,13 @@ class UserHistoryTable(db.Model):
     user = db.relationship('UserTable', backref=db.backref('history', lazy=True))
     shop = db.relationship('ShopTable', backref=db.backref('history', lazy=True))
 
+class ReportTable(db.Model):
+    __tablename__ = 'reporttable'
+
+    reportid = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    commentid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid', ondelete="CASCADE"), nullable=False)
+    reporterid = db.Column(db.Integer, db.ForeignKey('usertable.userid', ondelete="CASCADE"), nullable=False)
+    time = db.Column(db.String(50), nullable=False)
+
+    comment = db.relationship('CommentTable', backref=db.backref('reports', lazy=True))
+    reporter = db.relationship('UserTable', backref=db.backref('reports', lazy=True))

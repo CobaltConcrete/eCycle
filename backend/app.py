@@ -8,6 +8,7 @@ from controllers.shop_controller import shop_bp
 from controllers.forum_controller import forum_bp
 from controllers.comment_controller import comment_bp
 from controllers.history_controller import history_bp
+from controllers.report_controller import report_bp
 from config import Config
 from models import db
 
@@ -26,6 +27,7 @@ app.register_blueprint(shop_bp)
 app.register_blueprint(forum_bp)
 app.register_blueprint(comment_bp)
 app.register_blueprint(history_bp)
+app.register_blueprint(report_bp)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

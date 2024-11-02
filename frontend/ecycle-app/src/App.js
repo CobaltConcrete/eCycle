@@ -10,6 +10,7 @@ import Checklist from './pages/ChecklistUI/Checklist';
 import Map from './pages/MapUI/Map';
 import Forums from './pages/ForumsUI/Forums';
 import Comments from './pages/CommentsUI/Comments';
+import Report from './pages/ReportUI/Report';
 
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
                     <Route path="/map/:type" element={<ProtectedRoute element={<Map />} />} />
                     <Route path="/forums/:shopid" element={<ProtectedRoute element={<Forums />} />} />
                     <Route path="/comments/:forumid" element={<ProtectedRoute element={<Comments />} />} />
+                    <Route path="/report" element={<Report />} />
                 </Routes>
             </header>
         </div>

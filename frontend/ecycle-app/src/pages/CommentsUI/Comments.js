@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './Comments.css';
 
-const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => {
+const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onReport }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [editText, setEditText] = useState(comment.commenttext);
     const [isReplying, setIsReplying] = useState(false);
@@ -89,6 +89,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
                     )}
                     
                     <button onClick={() => setIsReplying(!isReplying)} className="btn reply-button">Reply</button>
+                    <button onClick={() => onReport(comment.commentid)} className="btn report-button">Report</button>
                 </div>
 
                 {isReplying && (
@@ -130,6 +131,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply }) => 
                                 onEdit={onEdit}
                                 onDelete={onDelete}
                                 onReply={onReply}
+                                onReport={onReport}
                             />
                         ))}
                     </div>
@@ -357,6 +359,21 @@ const Comments = () => {
         }
     };
 
+    const handleReportComment = async (commentid) => {
+        await verifyAndExecute(async () => {
+            try {
+                const userid = localStorage.getItem('userid');
+                await axios.post(`http://${process.env.REACT_APP_localhost}:5000/comments/report/${commentid}`, {
+                    reporterid: userid
+                });
+                setError('Comment reported successfully.');
+            } catch (error) {
+                console.error('Error reporting comment:', error);
+                setError('Error reporting comment. Please try again later.');
+            }
+        });
+    };
+
     const organizeComments = (comments) => {
         const commentMap = new Map();
         const topLevelComments = [];
@@ -439,7 +456,8 @@ const Comments = () => {
                                 replies={comment.replies} 
                                 onEdit={handleEditComment} 
                                 onDelete={handleDeleteComment} 
-                                onReply={handleReplyComment} 
+                                onReply={handleReplyComment}
+                                onReport={handleReportComment} 
                             />
                         ))
                     ) : (

@@ -1,0 +1,9 @@
+CREATE TABLE reporttable (
+    reportid SERIAL PRIMARY KEY,
+    commentid INT NOT NULL,
+    reporterid INT NOT NULL,
+    time VARCHAR(50) NOT NULL,
+
+    FOREIGN KEY (commentid) REFERENCES commenttable(commentid) ON DELETE CASCADE,
+    FOREIGN KEY (reporterid) REFERENCES usertable(userid) ON DELETE CASCADE
+);
