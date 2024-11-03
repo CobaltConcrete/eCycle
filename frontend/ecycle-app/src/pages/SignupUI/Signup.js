@@ -13,7 +13,7 @@ const Signup = () => {
 
     const registerUser = async (usertype) => {
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/register`, {
+            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/register`, {
                 username,
                 password,
                 usertype,

@@ -72,7 +72,7 @@ const SelectWaste = () => {
             }
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
+                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
                     userid,
                     username,
                     usertype,

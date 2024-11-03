@@ -23,7 +23,7 @@ const Checklist = () => {
         }
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify`, {
+            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
                 userid,
                 username,
                 usertype,
@@ -42,7 +42,7 @@ const Checklist = () => {
     const fetchUserChecklist = async () => {
         const userid = localStorage.getItem('userid');
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/user-checklist/${userid}`);
+            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/user-checklist/${userid}`);
             setSelectedOptions(response.data); // Set saved checklist options as selected
         } catch (err) {
             setError('Error loading user checklist. Please try again later.');
@@ -56,7 +56,7 @@ const Checklist = () => {
     useEffect(() => {
         const fetchChecklistOptions = async () => {
             try {
-                const response = await axios.get(`http://${process.env.REACT_APP_localhost}:5000/checklist-options`);
+                const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/checklist-options`);
                 setChecklistOptions(response.data);
             } catch (err) {
                 setError('Error fetching checklist options. Please try again later.');
@@ -89,7 +89,7 @@ const Checklist = () => {
         const userid = localStorage.getItem('userid');
 
         try {
-            await axios.post(`http://${process.env.REACT_APP_localhost}:5000/user-checklist`, {
+            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/user-checklist`, {
                 userid,
                 checklistoptionids: selectedOptions,
             });

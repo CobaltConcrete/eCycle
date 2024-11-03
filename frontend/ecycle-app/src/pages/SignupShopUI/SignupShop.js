@@ -25,7 +25,7 @@ const SignupShop = () => {
         }
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/verify-shop`, {
+            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify-shop`, {
                 userid,
                 username,
                 usertype,
@@ -47,7 +47,7 @@ const SignupShop = () => {
 
     const getLocationName = async (lat, lon) => {
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/get-location-name`, {
+            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/get-location-name`, {
                 lat,
                 lon,
             });
@@ -70,7 +70,7 @@ const SignupShop = () => {
             let lat, lon;
 
             try {
-                const coordsResponse = await axios.post(`http://${process.env.REACT_APP_localhost}:5000/get-coordinates`, { address: addressname });
+                const coordsResponse = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/get-coordinates`, { address: addressname });
                 ({ lat, lon } = coordsResponse.data); 
 
             } catch (addressError) {
@@ -127,7 +127,7 @@ const SignupShop = () => {
                 longtitude: lon,
             };
 
-            await axios.post(`http://${process.env.REACT_APP_localhost}:5000/add-shop`, shopData);
+            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-shop`, shopData);
 
             if (currentLocationUsed) {
                 alert('Your current location has been used because the address you entered could not be located.');
