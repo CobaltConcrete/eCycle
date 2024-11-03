@@ -1,1 +1,24 @@
-./ecycle/.env
+./backend/.env
+
+# dependencies
+./frontend/ecycle-app/node_modules
+./frontend/ecycle-app/.pnp
+./frontend/ecycle-app/.pnp.js
+
+# testing
+./frontend/ecycle-app/coverage
+
+# production
+./frontend/ecycle-app/build
+
+# misc
+./frontend/ecycle-app/.DS_Store
+./frontend/ecycle-app/.env
+./frontend/ecycle-app/.env.local
+./frontend/ecycle-app/.env.development.local
+./frontend/ecycle-app/.env.test.local
+./frontend/ecycle-app/.env.production.local
+
+./frontend/ecycle-app/npm-debug.log*
+./frontend/ecycle-app/yarn-debug.log*
+./frontend/ecycle-app/yarn-error.log*
