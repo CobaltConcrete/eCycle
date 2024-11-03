@@ -1,3 +1,5 @@
+Create .env file in this same folder with the following information below:
+
 REACT_APP_DATABASE_URL=postgresql://postgres:password@localhost/ecycle
 REACT_APP_DATABASE_PASSWORD=password
 REACT_APP_GOOGLE_MAPS_API_KEY=ABCdefGHIjkl
