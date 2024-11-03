@@ -1,0 +1,4 @@
+REACT_APP_DATABASE_URL=postgresql://postgres:password@localhost/ecycle
+REACT_APP_DATABASE_PASSWORD=password
+REACT_APP_GOOGLE_MAPS_API_KEY=ABCdefGHIjkl
+REACT_APP_serverIP=192.123.12.12
