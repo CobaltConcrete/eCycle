@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, UserTable, ShopTable, ChecklistOptionTable, UserChecklistTable, ForumTable, CommentTable
+from models import db, UserTable, ShopTable, ForumTable, CommentTable
 
 shop_bp = Blueprint('shop', __name__)
 

@@ -40,7 +40,7 @@ def get_forum_details(forumid):
     except Exception as e:
         print('Error fetching forum details:', e)
         return jsonify({'error': 'Server error'}), 500
-    
+
 @forum_bp.route('/forums/add', methods=['POST'])
 def add_forum():
     data = request.get_json()

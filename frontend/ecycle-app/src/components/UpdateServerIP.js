@@ -1,7 +1,6 @@
 const fs = require('fs');
 const os = require('os');
 
-// Function to retrieve the server IP address for the Wi-Fi adapter
 function getServerIP() {
     const interfaces = os.networkInterfaces();
     for (const iface in interfaces) {
@@ -12,10 +11,9 @@ function getServerIP() {
             }
         }
     }
-    return null;  // Return null if no valid address is found
+    return null;
 }
 
-// Function to update the .env file
 function updateEnvFile(serverIP) {
     const envFilePath = './.env';
     fs.readFile(envFilePath, 'utf8', (err, data) => {
@@ -24,7 +22,6 @@ function updateEnvFile(serverIP) {
             return;
         }
 
-        // Update the REACT_APP_serverIP variable
         const updatedData = data.replace(/REACT_APP_serverIP=.*/g, `REACT_APP_serverIP=${serverIP}`);
         fs.writeFile(envFilePath, updatedData, 'utf8', (err) => {
             if (err) {
@@ -36,7 +33,6 @@ function updateEnvFile(serverIP) {
     });
 }
 
-// Main execution
 const serverIP = getServerIP();
 if (serverIP) {
     updateEnvFile(serverIP);
