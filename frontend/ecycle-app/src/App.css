@@ -1,8 +1,12 @@
 .App {
   text-align: center;
-  height: 100vh;
-  /* Ensure it takes full height of the viewport */
+  height: 100%;
+  background-repeat: repeat;
+  background-size: auto;
+  background-color: rgba(255, 255, 255, 0.6);
+  background-blend-mode: overlay;
 }
+
 
 .App-logo {
   height: 40vmin;
@@ -16,7 +20,6 @@
 }
 
 .App-header {
-  background-color: #FFFFFF;
   min-height: 60vh;
   display: flex;
   flex-direction: column;
@@ -27,10 +30,8 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
-  /* Allow it to expand to full width */
   margin: 0 auto;
   padding: 2rem 0;
-  /* Add padding for spacing */
 }
 
 .title-container {
@@ -43,7 +44,6 @@
   align-items: center;
   width: 100%;
   max-width: 100%;
-  /* Allow it to expand to full width */
 }
 
 h1 {

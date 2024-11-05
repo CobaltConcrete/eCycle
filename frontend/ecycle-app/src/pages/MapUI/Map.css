@@ -157,6 +157,8 @@
     background-color: #388e3c;
 }
 
+
+
 .instructions-container,
 .location-details,
 .history-details {
@@ -181,7 +183,7 @@
     .scrollable-content {
         max-height: 300px;
         overflow-y: auto;
-        padding: 15px;
+        padding: 30px;
         border-top: 1px solid #ccc;
 }
 
