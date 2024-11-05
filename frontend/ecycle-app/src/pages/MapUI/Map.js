@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Map.css';
@@ -28,6 +28,8 @@ const Map = () => {
     const [isInstructionsOpen, setIsInstructionsOpen] = useState(false);
     const [isLocationsOpen, setIsLocationsOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+    const mapRef = useRef(null);
+    const infoWindow = new window.google.maps.InfoWindow();
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
@@ -191,100 +193,126 @@ const Map = () => {
         fetchHistory();
     }, [userid]);
 
-    const addMarkersToMap = (locations) => {
-        const map = new window.google.maps.Map(document.getElementById('map'), {
-            center,
-            zoom: 13,
-        });
+const addMarkersToMap = (locations) => {
+    // Initialize the map with the user's current location
+    const map = new window.google.maps.Map(document.getElementById('map'), {
+        center,
+        zoom: 13,
+    });
 
-        const newMarkers = [];
+    mapRef.current = map;
 
-        new window.google.maps.Marker({
+    // Array to store all markers
+    const newMarkers = [];
+
+    // Create bounds to fit all markers and user location
+    const bounds = new window.google.maps.LatLngBounds();
+
+    // Add user location marker
+    const userMarker = new window.google.maps.Marker({
+        map,
+        position: center,
+        title: "You are here!",
+        clickable: true,
+    });
+    newMarkers.push(userMarker);
+    bounds.extend(center);
+
+    const infoWindow = new window.google.maps.InfoWindow();
+
+    // Initialize directions service and renderer if not already set
+    if (!directionsService) {
+        directionsService = new window.google.maps.DirectionsService();
+    }
+    const directionsRenderer = new window.google.maps.DirectionsRenderer();
+    directionsRenderer.setMap(map);
+    setDirectionsRenderer(directionsRenderer);
+
+    // Loop through locations and add markers
+    locations.forEach((location) => {
+        const markerPosition = { lat: location.latitude, lng: location.longitude };
+        const marker = new window.google.maps.Marker({
             map,
-            position: center,
-            title: "You are here!",
-            clickable: true
+            position: markerPosition,
+            title: location.Name,
+            icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
+            clickable: true,
         });
 
-        const infoWindow = new window.google.maps.InfoWindow();
-        
-        if (!directionsService) {
-            directionsService = new window.google.maps.DirectionsService();
-        }
-        const directionsRenderer = new window.google.maps.DirectionsRenderer();
-        directionsRenderer.setMap(map);
-        setDirectionsRenderer(directionsRenderer);
+        // Extend bounds to include each location's marker
+        bounds.extend(markerPosition);
 
-        locations.forEach((location) => {
-            const marker = new window.google.maps.Marker({
-                map,
-                position: { lat: location.latitude, lng: location.longitude },
-                title: location.Name,
-                icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
-                clickable: true
-            });
+        // Store each new marker in the array
+        newMarkers.push(marker);
 
-            newMarkers.push(marker);
+        // Add click event listener to marker
+        marker.addListener('click', async () => {
+            loc = location;
 
-            marker.addListener('click', async () => {
-                loc = location;
+            try {
+                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-history`, {
+                    userid: localStorage.getItem('userid'),
+                    shopid: location.shopid,
+                });
+                console.log(response.data.message);
+            } catch (error) {
+                console.error("Error adding history entry:", error);
+            }
 
-                try {
-                    const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-history`, {
-                        userid: localStorage.getItem('userid'),
-                        shopid: location.shopid
-                    });
-                    console.log(response.data.message);
-                } catch (error) {
-                    console.error("Error adding history entry:", error);
-                }
+            // Clear previous directions if they exist
+            if (directionsRenderer) {
+                directionsRenderer.set('directions', null);
+            }
 
-                if (directionsRenderer) {
-                    directionsRenderer.set('directions', null);
-                }
-
-                directionsService.route(
-                    {
-                        origin: center,
-                        destination: { lat: loc.latitude, lng: loc.longitude },
-                        travelMode: transportMode, 
-                        transitOptions: {
-                            routingPreference: 'LESS_WALKING'
-                        }
-                    },
-                    (result, status) => {
-                        if (status === window.google.maps.DirectionsStatus.OK) {
-                            directionsRenderer.setDirections(result);
-                            setInstructions(result.routes[0].legs[0].steps);
-                        } else {
-                            console.error(`Directions request failed due to ${status}`);
-                        }
+            // Request directions to the selected location
+            directionsService.route(
+                {
+                    origin: center,
+                    destination: markerPosition,
+                    travelMode: transportMode,
+                    transitOptions: { routingPreference: 'LESS_WALKING' },
+                },
+                (result, status) => {
+                    if (status === window.google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                        setInstructions(result.routes[0].legs[0].steps);
+                    } else {
+                        console.error(`Directions request failed due to ${status}`);
                     }
-                );
-                
-                infoWindow.setContent(`
-                    <div class="location-info">
-                        <h3 class="shop-name">${location.shopname}</h3>
-                        <p class="shop-address">${location.addressname}</p>
-                        <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
-                        <br />
-                        <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
-                            View on Google Maps
-                        </a>
-                        <br />
-                        <div class="forum-button-container">
-                            <button class="forum-button" onclick="window.location.href='/forums/${location.shopid}'">
-                                Visit Forum
-                            </button>
-                        </div>
-                    </div>
-                `);
+                }
+            );
 
-                infoWindow.open(map, marker);   
-            });
+            // Set info window content and open it
+            infoWindow.setContent(`
+                <div class="location-info">
+                    <h3 class="shop-name">${location.shopname}</h3>
+                    <p class="shop-address">${location.addressname}</p>
+                    <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
+                    <br />
+                    <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
+                        View on Google Maps
+                    </a>
+                    <br />
+                    <div class="forum-button-container">
+                        <button class="forum-button" onclick="window.location.href='/forums/${location.shopid}'">
+                            Visit Forum
+                        </button>
+                    </div>
+                </div>
+            `);
+
+            infoWindow.open(map, marker);   
         });
-        setMarkers(newMarkers);
-    };
+    });
+
+    // Adjust map to fit all markers within the view with padding
+    const padding = 20; // Adjust padding as needed
+    map.fitBounds(bounds, { top: padding, right: padding, bottom: padding, left: padding });
+
+    // Update markers state
+    setMarkers(newMarkers);
+};
+
 
     const handleAddressChange = (e) => setManualAddress(e.target.value);
 
@@ -359,16 +387,100 @@ const Map = () => {
         handleLocationClick(location, index);
     };
 
-    const handleHistoryItemClick = (entry) => {
-        const lat = entry.lat;
-        const lon = entry.lon;
-        setUserLocation({ lat, lng: lon });
-        loadMap(lat, lon);
-    };
+const handleHistoryItemClick = (entry) => {
+    const lat = entry.lat;
+    const lon = entry.lon;
+
+    // Add a new marker at the history location
+    const newMarker = new window.google.maps.Marker({
+        map: mapRef.current, // Ensure you have a reference to the map
+        position: { lat, lng: lon },
+        title: entry.Name || "History Location",
+        icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),
+        clickable: true,
+    });
+
+    const infoWindow = new window.google.maps.InfoWindow();
+
+    // Optional: Store the marker in state if you need to manipulate or clear it later
+    setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
+
+    // Create bounds to include both the user's location and the new marker location
+    const bounds = new window.google.maps.LatLngBounds();
+
+    // Add user's location to bounds
+    bounds.extend(new window.google.maps.LatLng(center.lat, center.lng));
+    
+    // Add new marker's location to bounds
+    bounds.extend(new window.google.maps.LatLng(lat, lon));
+
+    // Adjust the map to fit within the bounds
+    mapRef.current.fitBounds(bounds);
+
+    // Add a click listener for the new marker
+    newMarker.addListener('click', async () => {
+        const loc = entry;
+
+        try {
+            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-history`, {
+                userid: localStorage.getItem('userid'),
+                shopid: loc.shopid,
+            });
+            console.log(response.data.message);
+        } catch (error) {
+            console.error("Error adding history entry:", error);
+        }
+
+        // Clear previous directions if they exist
+        if (directionsRenderer) {
+            directionsRenderer.set('directions', null);
+        }
+
+        // Request directions to the selected location
+        directionsService.route(
+            {
+                origin: center,
+                destination: { lat: loc.lat, lng: loc.lon }, // Corrected property names
+                travelMode: transportMode,
+                transitOptions: { routingPreference: 'LESS_WALKING' },
+            },
+            (result, status) => {
+                if (status === window.google.maps.DirectionsStatus.OK) {
+                    directionsRenderer.setDirections(result);
+                    setInstructions(result.routes[0].legs[0].steps);
+                } else {
+                    console.error(`Directions request failed due to ${status}`);
+                }
+            }
+        );
+
+        // Set content and open the info window
+        infoWindow.setContent(`
+            <div class="location-info">
+                <h3 class="shop-name">${loc.shopname}</h3>
+                <p class="shop-address">${loc.addressname}</p>
+                <a href="${loc.website}" target="_blank" class="website-link">Visit Website</a>
+                <br />
+                <a href="https://www.google.com/maps?q=${loc.lat},${loc.lon}" target="_blank" class="maps-link">
+                    View on Google Maps
+                </a>
+                <br />
+                <div class="forum-button-container">
+                    <button class="forum-button" onclick="window.location.href='/forums/${loc.shopid}'">
+                        Visit Forum
+                    </button>
+                </div>
+            </div>
+        `);
+
+        infoWindow.open(mapRef.current, newMarker);
+    });
+};
 
     return (
         <div>
             <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
+
             <div className="pills-container">
                 <ul className="nav nav-pills mb-3" id="pills-tab" role="tablist">
                     <li className="nav-item" role="presentation">
@@ -423,78 +535,78 @@ const Map = () => {
 
             <div id="map" style={{ height: '400px', width: '100%' }}></div>
 
-<div>
-    {instructions.length > 0 && (
-        <div className="instructions-container">
-            <h3 onClick={handleInstructionsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                <span className={`arrow ${isInstructionsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
-                Directions Instructions
-            </h3>
-            {isInstructionsOpen && (
-                <div className="scrollable-content">
-                    <ol>
-                        {instructions.map((step, index) => (
-                            <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
-                        ))}
-                    </ol>
-                </div>
-            )}
-        </div>
-    )}
+            <div>
+                {instructions.length > 0 && (
+                    <div className="instructions-container">
+                        <h3 onClick={handleInstructionsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                            <span className={`arrow ${isInstructionsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
+                            Directions Instructions
+                        </h3>
+                        {isInstructionsOpen && (
+                            <div className="scrollable-content">
+                                <ol>
+                                    {instructions.map((step, index) => (
+                                        <li key={index}>{step.instructions.replace(/<[^>]*>/g, '')}</li>
+                                    ))}
+                                </ol>
+                            </div>
+                        )}
+                    </div>
+                )}
 
-    <div className="location-details">
-        <h2 onClick={handleLocationsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <span className={`arrow ${isLocationsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
-            Nearby Locations Details
-        </h2>
-        {isLocationsOpen && (
-            <div className="scrollable-content">
-                <ul>
-                    {locations.map((location, index) => (
-                        <li
-                            key={index}
-                            onClick={() => handleItemClick(location, index)}
-                            className={activeIndex === index ? 'active' : ''}
-                        >
-                            <h3>{location.shopname}</h3>
-                            <p>{location.addressname}</p>
-                            <a href={location.website} target="_blank" rel="noopener noreferrer">
-                                Visit Website
-                            </a>
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        )}
-    </div>
-
-    <div className="history-details">
-        <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-            <span className={`arrow ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>▶</span>
-            History
-        </h2>
-        {isHistoryOpen && (
-            <div className="scrollable-content">
-                <ul>
-                    {history.length > 0 ? (
-                        history.map((entry, index) => (
-                            <li key={index} onClick={() => handleHistoryItemClick(entry)}>
-                                <h3>{entry.shopname}</h3>
-                                <p>{entry.addressname}</p>
-                                <p>Visited on: {entry.time}</p>
-                                <a href={entry.website} target="_blank" rel="noopener noreferrer">
-                                    Visit Website
-                                </a>
-                            </li>
-                        ))
-                    ) : (
-                        <p>No history available.</p>
+                <div className="location-details">
+                    <h2 onClick={handleLocationsToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                        <span className={`arrow ${isLocationsOpen ? 'expanded' : 'collapsed'}`}>▶</span>
+                        Nearby Locations Details
+                    </h2>
+                    {isLocationsOpen && (
+                        <div className="scrollable-content">
+                            <ul>
+                                {locations.map((location, index) => (
+                                    <li
+                                        key={index}
+                                        onClick={() => handleItemClick(location, index)}
+                                        className={activeIndex === index ? 'active' : ''}
+                                    >
+                                        <h3>{location.shopname}</h3>
+                                        <p>{location.addressname}</p>
+                                        <a href={location.website} target="_blank" rel="noopener noreferrer">
+                                            Visit Website
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     )}
-                </ul>
+                </div>
+
+                <div className="history-details">
+                    <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                        <span className={`arrow ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>▶</span>
+                        History
+                    </h2>
+                    {isHistoryOpen && (
+                        <div className="scrollable-content">
+                            <ul>
+                                {history.length > 0 ? (
+                                    history.map((entry, index) => (
+                                        <li key={index} onClick={() => handleHistoryItemClick(entry)}>
+                                            <h3>{entry.shopname}</h3>
+                                            <p>{entry.addressname}</p>
+                                            <p>Visited on: {entry.time}</p>
+                                            <a href={entry.website} target="_blank" rel="noopener noreferrer">
+                                                Visit Website
+                                            </a>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p>No history available.</p>
+                                )}
+                            </ul>
+                        </div>
+                    )}
+                </div>
             </div>
-        )}
-    </div>
-</div>
 
             <div className="button-container">
                 {usertype === 'shop' && (
@@ -508,6 +620,7 @@ const Map = () => {
                         Back to Waste Selection
                     </button>
                 )}
+
                 {usertype === 'admin' && (
                     <button className="reportpage-button" onClick={() => navigate('/report')}>
                         Back to Report Page
@@ -517,7 +630,6 @@ const Map = () => {
 
             {error && <p style={{ color: 'red' }}>{error}</p>}
         </div>
-
     );
 };
 
