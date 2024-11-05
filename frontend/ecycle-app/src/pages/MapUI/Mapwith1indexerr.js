@@ -14,7 +14,6 @@ const Map = () => {
     const [manualLocation, setManualLocation] = useState(null);
     const [locations, setLocations] = useState([]);
     const [activeIndex, setActiveIndex] = useState(null);
-    const [activeHistoryIndex, setActiveHistoryIndex] = useState(null);
     const [manualAddress, setManualAddress] = useState('');
     const [useCurrentLocation, setUseCurrentLocation] = useState(true);
     const [error, setError] = useState('');
@@ -397,7 +396,7 @@ const addMarkersToMap = (locations) => {
     };
 
     const handleLocationClick = (location, index) => {
-        const marker = markers[index+1];
+        const marker = markers[index];
         window.google.maps.event.trigger(marker, 'click');
     };
 
@@ -406,10 +405,9 @@ const addMarkersToMap = (locations) => {
         handleLocationClick(location, index);
     };
 
-const handleHistoryItemClick = (entry, index) => {
+const handleHistoryItemClick = (entry) => {
     const lat = entry.lat;
     const lon = entry.lon;
-    setActiveHistoryIndex(index);
 
     // Add a new marker at the history location
     const newMarker = new window.google.maps.Marker({
@@ -485,10 +483,7 @@ const handleHistoryItemClick = (entry, index) => {
         `);
 
         infoWindowRef.current.open(mapRef.current, newMarker);
-
     });
-    infoWindowRef.current.close();
-    window.google.maps.event.trigger(newMarker, 'click');
 };
 
     return (
@@ -594,37 +589,32 @@ const handleHistoryItemClick = (entry, index) => {
                     )}
                 </div>
 
-<div className="history-details">
-    <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-        <span className={`arrow ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>▶</span>
-        History
-    </h2>
-    {isHistoryOpen && (
-        <div className="scrollable-content">
-            <ul>
-                {history.length > 0 ? (
-                    history.map((entry, index) => (
-                        <li
-                            key={index}
-                            onClick={() => handleHistoryItemClick(entry, index)}
-                            className={activeHistoryIndex === index ? 'active' : ''}
-                        >
-                            <h3>{entry.shopname}</h3>
-                            <p>{entry.addressname}</p>
-                            <p>Visited on: {entry.time}</p>
-                            <a href={entry.website} target="_blank" rel="noopener noreferrer">
-                                Visit Website
-                            </a>
-                        </li>
-                    ))
-                ) : (
-                    <p>No history available.</p>
-                )}
-            </ul>
-        </div>
-    )}
-</div>
-
+                <div className="history-details">
+                    <h2 onClick={handleHistoryToggle} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                        <span className={`arrow ${isHistoryOpen ? 'expanded' : 'collapsed'}`}>▶</span>
+                        History
+                    </h2>
+                    {isHistoryOpen && (
+                        <div className="scrollable-content">
+                            <ul>
+                                {history.length > 0 ? (
+                                    history.map((entry, index) => (
+                                        <li key={index} onClick={() => handleHistoryItemClick(entry)}>
+                                            <h3>{entry.shopname}</h3>
+                                            <p>{entry.addressname}</p>
+                                            <p>Visited on: {entry.time}</p>
+                                            <a href={entry.website} target="_blank" rel="noopener noreferrer">
+                                                Visit Website
+                                            </a>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <p>No history available.</p>
+                                )}
+                            </ul>
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div className="button-container">
