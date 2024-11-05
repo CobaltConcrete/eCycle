@@ -29,7 +29,9 @@ const Map = () => {
     const [isLocationsOpen, setIsLocationsOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const mapRef = useRef(null);
-    const infoWindow = new window.google.maps.InfoWindow();
+    // const infoWindow = new window.google.maps.InfoWindow();
+    // const [infoWindow] = useState(new window.google.maps.InfoWindow());
+    const infoWindowRef = useRef(null);
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
@@ -44,6 +46,7 @@ const Map = () => {
             document.body.appendChild(script);
             script.onload = () => {
                 if (callback) callback();
+                infoWindowRef.current = new window.google.maps.InfoWindow();
             };
         } else {
             if (callback) callback();
@@ -83,6 +86,26 @@ const Map = () => {
 
         verifyUser();
     }, [navigate]);
+
+    useEffect(() => {
+        if (window.google) {
+            initializeMap();
+        } else {
+            console.error("Google Maps API is not loaded.");
+        }
+    }, []);
+
+    const initializeMap = () => {
+        const map = new window.google.maps.Map(document.getElementById('map'), {
+            center: { lat: 0, lng: 0 }, // Replace with your desired coordinates
+            zoom: 13,
+        });
+
+        mapRef.current = map;
+
+        // Initialize a single InfoWindow instance after Google Maps is ready
+        infoWindowRef.current = new window.google.maps.InfoWindow();
+    };
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
@@ -202,13 +225,9 @@ const addMarkersToMap = (locations) => {
 
     mapRef.current = map;
 
-    // Array to store all markers
     const newMarkers = [];
-
-    // Create bounds to fit all markers and user location
     const bounds = new window.google.maps.LatLngBounds();
 
-    // Add user location marker
     const userMarker = new window.google.maps.Marker({
         map,
         position: center,
@@ -218,9 +237,8 @@ const addMarkersToMap = (locations) => {
     newMarkers.push(userMarker);
     bounds.extend(center);
 
-    const infoWindow = new window.google.maps.InfoWindow();
+    // const infoWindow = new window.google.maps.InfoWindow();
 
-    // Initialize directions service and renderer if not already set
     if (!directionsService) {
         directionsService = new window.google.maps.DirectionsService();
     }
@@ -239,13 +257,11 @@ const addMarkersToMap = (locations) => {
             clickable: true,
         });
 
-        // Extend bounds to include each location's marker
-        bounds.extend(markerPosition);
+        const infoWindow = new window.google.maps.InfoWindow();
 
-        // Store each new marker in the array
+        bounds.extend(markerPosition);
         newMarkers.push(marker);
 
-        // Add click event listener to marker
         marker.addListener('click', async () => {
             loc = location;
 
@@ -282,8 +298,8 @@ const addMarkersToMap = (locations) => {
                 }
             );
 
-            // Set info window content and open it
-            infoWindow.setContent(`
+            infoWindowRef.current.close();
+            infoWindowRef.current.setContent(`
                 <div class="location-info">
                     <h3 class="shop-name">${location.shopname}</h3>
                     <p class="shop-address">${location.addressname}</p>
@@ -301,7 +317,7 @@ const addMarkersToMap = (locations) => {
                 </div>
             `);
 
-            infoWindow.open(map, marker);   
+            infoWindowRef.current.open(map, marker);   
         });
     });
 
@@ -402,22 +418,13 @@ const handleHistoryItemClick = (entry) => {
 
     const infoWindow = new window.google.maps.InfoWindow();
 
-    // Optional: Store the marker in state if you need to manipulate or clear it later
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
 
-    // Create bounds to include both the user's location and the new marker location
     const bounds = new window.google.maps.LatLngBounds();
-
-    // Add user's location to bounds
     bounds.extend(new window.google.maps.LatLng(center.lat, center.lng));
-    
-    // Add new marker's location to bounds
     bounds.extend(new window.google.maps.LatLng(lat, lon));
-
-    // Adjust the map to fit within the bounds
     mapRef.current.fitBounds(bounds);
 
-    // Add a click listener for the new marker
     newMarker.addListener('click', async () => {
         const loc = entry;
 
@@ -454,8 +461,8 @@ const handleHistoryItemClick = (entry) => {
             }
         );
 
-        // Set content and open the info window
-        infoWindow.setContent(`
+        infoWindowRef.current.close();
+        infoWindowRef.current.setContent(`
             <div class="location-info">
                 <h3 class="shop-name">${loc.shopname}</h3>
                 <p class="shop-address">${loc.addressname}</p>
@@ -473,7 +480,7 @@ const handleHistoryItemClick = (entry) => {
             </div>
         `);
 
-        infoWindow.open(mapRef.current, newMarker);
+        infoWindowRef.current.open(mapRef.current, newMarker);
     });
 };
 
