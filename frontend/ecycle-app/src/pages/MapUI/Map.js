@@ -121,7 +121,7 @@ const Map = () => {
             setLocations(response.data.slice(0, 5));
             addMarkersToMap(response.data.slice(0, 5));
         } catch (err) {
-            setError('Failed to fetch nearby locations');
+            window.alert('Failed to fetch nearby locations');
         }
     }, [type, userid]);
 
@@ -154,7 +154,7 @@ const Map = () => {
     //                 },
     //                 (error) => {
     //                     console.error("Error obtaining location", error);
-    //                     setError('Failed to retrieve your current location');
+    //                     window.alert('Failed to retrieve your current location');
     //                 }
     //             );
     //         });
@@ -183,7 +183,7 @@ const Map = () => {
                     })
                     .catch(error => {
                         console.error("Error obtaining location via Google API", error);
-                        setError('Failed to retrieve your current location: ' + error.message);
+                        window.alert('Failed to retrieve your current location: ' + error.message);
                     });
             });
         }
@@ -350,7 +350,7 @@ const addMarkersToMap = (locations) => {
             setManualLocation({ lat, lng: lon });
             loadMap(lat, lon);
         } catch (err) {
-            setError('Failed to fetch coordinates for the given address');
+            window.alert('Failed to fetch coordinates for the given address');
         }
     };
 

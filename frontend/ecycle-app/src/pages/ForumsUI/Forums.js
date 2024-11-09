@@ -27,7 +27,7 @@ const Forums = () => {
             setUsername(userResponse.data.username);
         } catch (error) {
             console.error('Error fetching shop or user data:', error);
-            setError('Error fetching shop or user data. Please try again later.');
+            window.alert('Error fetching shop or user data. Please try again later.');
         }
     }, [shopid]);
 
@@ -37,7 +37,7 @@ const Forums = () => {
             setActionType(response.data.actiontype);
         } catch (error) {
             console.error('Error fetching action type:', error);
-            setError('Error fetching action type. Please try again later.');
+            window.alert('Error fetching action type. Please try again later.');
         }
     }, [shopid]);
 
@@ -47,7 +47,7 @@ const Forums = () => {
             setForums(response.data);
         } catch (error) {
             console.error('Error fetching forum data:', error);
-            setError('Error fetching forum data. Please try again later.');
+            window.alert('Error fetching forum data. Please try again later.');
         }
     }, [shopid]);
 
@@ -105,18 +105,27 @@ const Forums = () => {
             if (response.data.isValid) {
                 await action();
             } else {
-                setError('User verification failed. Please try again.');
+                window.alert('User verification failed. Please try again.');
                 navigate('/');
             }
         } catch (error) {
             console.error('Verification failed:', error);
-            setError('Error verifying user. Please try again later.');
+            window.alert('Error verifying user. Please try again later.');
+        }
+    };
+
+    const updateAllUserPoints = async () => {
+        try {
+            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/update-all-user-points`, {});
+        } catch (error) {
+            console.error('Error updating user points:', error);
+            window.alert('Error updating user points. Please try again later.');
         }
     };
 
     const handleAddForum = async () => {
         if (!newForumText.trim()) {
-            setError('Forum text cannot be empty.');
+            window.alert('Forum text cannot be empty.');
             return;
         }
 
@@ -134,10 +143,12 @@ const Forums = () => {
 
                 if (response.status !== 201) throw new Error('Error adding new forum.');
                 setNewForumText('');
+                window.alert('Forum posted successfully.');
                 fetchForums();
+                await updateAllUserPoints();
             } catch (error) {
                 console.error('Error adding new forum:', error);
-                setError('Error adding new forum. Please try again later.');
+                window.alert('Error adding new forum. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -154,10 +165,12 @@ const Forums = () => {
 
                 if (response.status !== 200) throw new Error('Error editing forum.');
                 setEditMode({ status: false, forumid: null, forumtext: '' });
+                window.alert('Forum edited successfully.');
                 fetchForums();
+                await updateAllUserPoints();
             } catch (error) {
                 console.error('Error editing forum:', error);
-                setError('Error editing forum. Please try again later.');
+                window.alert('Error editing forum. Please try again later.');
             } finally {
                 setLoading(false);
             }
@@ -170,10 +183,12 @@ const Forums = () => {
                 const response = await axios.delete(`http://${process.env.REACT_APP_serverIP}:5000/forums/delete/${forumid}`);
 
                 if (response.status !== 200) throw new Error('Error deleting forum.');
+                window.alert('Forum deleted successfully.');
                 fetchForums();
+                await updateAllUserPoints();
             } catch (error) {
                 console.error('Error deleting forum:', error);
-                setError('Error deleting forum. Please try again later.');
+                window.alert('Error deleting forum. Please try again later.');
             }
         });
     };
@@ -187,10 +202,11 @@ const Forums = () => {
             if (response.data.message) {
                 alert('Shop removed successfully!');
                 navigate('/');
+                await updateAllUserPoints();
             }
         } catch (error) {
             console.error('Error removing shop:', error);
-            setError('Failed to remove shop. Please try again later.');
+            window.alert('Failed to remove shop. Please try again later.');
         }
     };
 

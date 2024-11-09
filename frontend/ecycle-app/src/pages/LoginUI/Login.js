@@ -15,7 +15,6 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError('');
 
         try {
             const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/login`, {
@@ -43,9 +42,9 @@ const Login = () => {
             }
         } catch (err) {
             if (err.response && err.response.status === 401) {
-                setError('Invalid credentials. Please try again.');
+                window.alert('Invalid credentials. Please try again.');
             } else {
-                setError('An error occurred. Please try again later.');
+                window.alert('An error occurred. Please try again later.');
             }
         } finally {
             setLoading(false);

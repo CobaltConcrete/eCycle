@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import UserTable, UserChecklistTable, db
+from models import db, UserTable, UserChecklistTable, ForumTable, CommentTable
 
 user_bp = Blueprint('user', __name__)
 
@@ -71,3 +71,42 @@ def get_user_checklist(userid):
     user_checklist = UserChecklistTable.query.filter_by(userid=userid).all()
     checklistoptionids = [item.checklistoptionid for item in user_checklist]
     return jsonify(checklistoptionids), 200
+
+@user_bp.route('/update-single-user-points/<int:userid>', methods=['POST'])
+def update_single_user_points(userid):
+    try:
+        user = UserTable.query.filter_by(userid=userid).first()
+
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        forum_count = ForumTable.query.filter_by(posterid=user.userid).count()
+        comment_count = CommentTable.query.filter_by(posterid=user.userid, deleted=False).count()
+        new_points = (forum_count * 10) + (comment_count * 5)
+
+        user.points = new_points
+
+        db.session.commit()
+        return jsonify({'message': f'Points updated for user {userid}', 'points': new_points}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@user_bp.route('/update-all-user-points', methods=['POST'])
+def update_user_points():
+    try:
+        users = UserTable.query.all()
+        
+        for user in users:
+            forum_count = ForumTable.query.filter_by(posterid=user.userid).count()
+            comment_count = CommentTable.query.filter_by(posterid=user.userid, deleted=False).count()
+            new_points = (forum_count * 10) + (comment_count * 5)
+            user.points = new_points
+
+        db.session.commit()
+        return jsonify({'message': 'User points updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500

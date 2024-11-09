@@ -90,6 +90,7 @@
     text-align: left;
 }
 
+.comment-points,
 .comment-time {
     color: rgba(0, 0, 0, 0.4);
 }

@@ -29,8 +29,9 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
         return (
             <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: depth * 20 }}>
                 <p className="comment-header">
-                    {comment.postername} · <span className="comment-time">{comment.time}</span>
+                    {comment.postername} <span className="comment-points">  ·  {comment.userpoints} points  ·  </span> <span className="comment-time">{comment.time}</span>
                 </p>
+
                 <p className="comment-text deleted">[deleted]</p>
                 {replies && replies.length > 0 && (
                     <div className="reply-list">
@@ -55,7 +56,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
         <div className={`comment-box ${depth % 2 === 0 ? 'even' : 'odd'}`} style={{ marginLeft: 0 }}>
             <div>
                 <p className="comment-header">
-                    {comment.postername} · <span className="comment-time">{comment.time}</span>
+                    {comment.postername} <span className="comment-points">  ·  {comment.userpoints} points  ·  </span> <span className="comment-time">{comment.time}</span>
                 </p>
                 {isEditing ? (
                     <div>
@@ -201,7 +202,7 @@ const Comments = () => {
             setComments(response.data);
         } catch (error) {
             console.error('Error fetching comments:', error);
-            setError('Error fetching comments. Please try again later.');
+            window.alert('Error fetching comments. Please try again later.');
         }
     };
 
@@ -211,7 +212,7 @@ const Comments = () => {
             setForumDetails(response.data);
         } catch (error) {
             console.error('Error fetching forum details:', error);
-            setError('Error fetching forum details. Please try again later.');
+            window.alert('Error fetching forum details. Please try again later.');
         }
     };
 
@@ -232,25 +233,86 @@ const Comments = () => {
             if (response.data.isValid) {
                 await action();
             } else {
-                setError('User verification failed. Please try again.');
+                window.alert('User verification failed. Please try again.');
                 navigate('/');
             }
         } catch (error) {
             console.error('Verification failed:', error);
-            setError('Error verifying user. Please try again later.');
+            window.alert('Error verifying user. Please try again later.');
         }
+    };
+
+    const updateAllUserPoints = async () => {
+        try {
+            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/update-all-user-points`, {});
+        } catch (error) {
+            console.error('Error updating user points:', error);
+            window.alert('Error updating user points. Please try again later.');
+        }
+    };
+
+    const compressImage = async (file, maxWidth = 320, maxHeight = 320) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
+                    }
+                }
+
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob(
+                    (blob) => {
+                        resolve(blob);
+                    },
+                    'image/jpeg',
+                    0.8
+                );
+            };
+
+            img.onerror = (error) => reject(error);
+        });
     };
 
     const handleAddComment = async () => {
         if (!newComment.trim()) {
-            setError('Comment text cannot be empty.');
+            window.alert('Comment text cannot be empty.');
             return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const encodedImage = reader.result.split(',')[1];
+        const processImage = async () => {
+            if (imageFile) {
+                const compressedImage = await compressImage(imageFile);
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const encodedImage = reader.result.split(',')[1];
+                    await addComment(encodedImage);
+                };
+                reader.readAsDataURL(compressedImage);
+            } else {
+                await addComment(null);
+            }
+        };
 
+        const addComment = async (encodedImage) => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
@@ -262,34 +324,17 @@ const Comments = () => {
                     });
                     setNewComment('');
                     setImageFile(null);
-                    fetchComments();
+                    window.alert('Comment posted successfully.');
+                    await updateAllUserPoints();
+                    await fetchComments();
                 } catch (error) {
                     console.error('Error adding comment:', error);
-                    setError('Error adding comment. Please try again later.');
+                    window.alert('Error adding comment. Please try again later.');
                 }
             });
         };
 
-        if (imageFile) {
-            reader.readAsDataURL(imageFile);
-        } else {
-            await verifyAndExecute(async () => {
-                try {
-                    const userid = localStorage.getItem('userid');
-                    await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/add`, {
-                        forumid,
-                        commenttext: newComment,
-                        posterid: userid,
-                    });
-                    setNewComment('');
-                    setImageFile(null);
-                    fetchComments();
-                } catch (error) {
-                    console.error('Error adding comment:', error);
-                    setError('Error adding comment. Please try again later.');
-                }
-            });
-        }
+        await processImage();
     };
 
     const handleEditComment = async (commentid, newText) => {
@@ -297,9 +342,12 @@ const Comments = () => {
             try {
                 await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/comments/edit/${commentid}`, { commenttext: newText });
                 fetchComments();
+                window.alert('Comment edited successfully.');
+                await updateAllUserPoints();
+                await fetchComments();
             } catch (error) {
                 console.error('Error editing comment:', error);
-                setError('Error editing comment. Please try again later.');
+                window.alert('Error editing comment. Please try again later.');
             }
         });
     };
@@ -309,22 +357,37 @@ const Comments = () => {
             try {
                 await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/comments/delete/${commentid}`);
                 fetchComments();
+                window.alert('Comment deleted successfully.');
+                await updateAllUserPoints();
+                await fetchComments();
             } catch (error) {
                 console.error('Error deleting comment:', error);
-                setError('Error deleting comment. Please try again later.');
+                window.alert('Error deleting comment. Please try again later.');
             }
         });
     };
 
     const handleReplyComment = async (commentid, replyText, replyImage) => {
         if (!replyText.trim()) {
-            setError('Reply text cannot be empty.');
+            window.alert('Reply text cannot be empty.');
             return;
         }
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const encodedImage = reader.result.split(',')[1];
+        const processImage = async () => {
+            if (replyImage) {
+                const compressedImage = await compressImage(replyImage);
+                const reader = new FileReader();
+                reader.onloadend = async () => {
+                    const encodedImage = reader.result.split(',')[1];
+                    await addReply(encodedImage);
+                };
+                reader.readAsDataURL(compressedImage);
+            } else {
+                await addReply(null);
+            }
+        };
+
+        const addReply = async (encodedImage) => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
@@ -334,32 +397,17 @@ const Comments = () => {
                         posterid: userid,
                         encodedimage: encodedImage,
                     });
-                    fetchComments();
+                    window.alert('Reply posted successfully.');
+                    await updateAllUserPoints();
+                    await fetchComments();
                 } catch (error) {
                     console.error('Error replying to comment:', error);
-                    setError('Error replying to comment. Please try again later.');
+                    window.alert('Error replying to comment. Please try again later.');
                 }
             });
         };
 
-        if (replyImage) {
-            reader.readAsDataURL(replyImage);
-        } else {
-            await verifyAndExecute(async () => {
-                try {
-                    const userid = localStorage.getItem('userid');
-                    await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/reply/${commentid}`, {
-                        forumid,
-                        commenttext: replyText,
-                        posterid: userid,
-                    });
-                    fetchComments();
-                } catch (error) {
-                    console.error('Error replying to comment:', error);
-                    setError('Error replying to comment. Please try again later.');
-                }
-            });
-        }
+        await processImage();
     };
 
     const handleReportComment = async (commentid) => {
@@ -369,10 +417,10 @@ const Comments = () => {
                 await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/report/${commentid}`, {
                     reporterid: userid
                 });
-                setError('Comment reported successfully.');
+                window.alert('Comment reported successfully.');
             } catch (error) {
                 console.error('Error reporting comment:', error);
-                setError('Error reporting comment. Please try again later.');
+                window.alert('Error reporting comment. Please try again later.');
             }
         });
     };
@@ -408,7 +456,7 @@ const Comments = () => {
             navigate(`/forums/${shopid}`);
         } catch (error) {
             console.error('Error retrieving shopid:', error);
-            setError('Error retrieving shop information. Please try again later.');
+            window.alert('Error retrieving shop information. Please try again later.');
         }
     };
 

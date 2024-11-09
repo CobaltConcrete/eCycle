@@ -18,7 +18,8 @@ def get_comments(forumid):
             'encodedimage': comment.encodedimage,
             'time': comment.time,
             'deleted': comment.deleted,
-            'postername': comment.poster.username 
+            'postername': comment.poster.username, 
+            'userpoints': comment.poster.points
         }
         for comment in comments
     ]

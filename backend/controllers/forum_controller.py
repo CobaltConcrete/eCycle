@@ -97,3 +97,4 @@ def get_actiontype(shopid):
         return jsonify({'actiontype': shop.actiontype}), 200
     else:
         return jsonify({'message': 'Shop not found'}), 404
+    
