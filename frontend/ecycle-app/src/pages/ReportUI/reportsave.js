@@ -46,7 +46,22 @@ const Report = () => {
         const fetchReports = async () => {
             try {
                 const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/comments/reported`);
-                setReports(response.data);
+                const reports = response.data;
+
+                const analyzedReports = await Promise.all(
+                    reports.map(async (report) => {
+                        const analysisResponse = await axios.post(
+                            `http://${process.env.REACT_APP_serverIP}:5000/classify-comment-AZURE`,
+                            { commenttext: report.commenttext }
+                        );
+                        return {
+                            ...report,
+                            danger_score: analysisResponse.data.danger_score,
+                        };
+                    })
+                );
+
+                setReports(analyzedReports);
             } catch (error) {
                 console.error('Error fetching report data:', error);
                 setError('Error fetching report data. Please try again later.');
@@ -56,6 +71,19 @@ const Report = () => {
         fetchReports();
     }, []);
 
+    const getDangerScoreIcon = (dangerScore) => {
+        switch (dangerScore) {
+            case 1:
+                return '🟢';
+            case 2:
+                return '🟡';
+            case 3:
+                return '🔴';
+            default:
+                return '🟢';
+        }
+    };
+
     const sortedReports = () => {
         const sorted = [...reports].sort((a, b) => {
             if (sortCriteria === 'report_count') {
@@ -64,8 +92,8 @@ const Report = () => {
                 const dateA = new Date(a.latest_report_time);
                 const dateB = new Date(b.latest_report_time);
                 return sortDirection === 'desc' ? dateB - dateA : dateA - dateB;
-            } else if (sortCriteria === 'dangerscore') {
-                return sortDirection === 'desc' ? b.dangerscore - a.dangerscore : a.dangerscore - b.dangerscore;
+            } else if (sortCriteria === 'danger_score') {
+                return sortDirection === 'desc' ? b.danger_score - a.danger_score : a.danger_score - b.danger_score;
             }
             return 0;
         });
@@ -81,19 +109,6 @@ const Report = () => {
         }
     };
 
-    const getDangerScoreIcon = (dangerScore) => {
-        switch (dangerScore) {
-            case 1:
-                return '🟢';
-            case 2:
-                return '🟡';
-            case 3:
-                return '🔴';
-            default:
-                return '⚪';
-        }
-    };
-
     return (
         <div className="report-container">
             <h2>Reported Comments</h2>
@@ -106,8 +121,8 @@ const Report = () => {
                 <button onClick={() => handleSortChange('latest_report_time')}>
                     Sort by Latest Report Time {sortCriteria === 'latest_report_time' && (sortDirection === 'asc' ? '▲' : '▼')}
                 </button>
-                <button onClick={() => handleSortChange('dangerscore')}>
-                    Sort by Danger Score {sortCriteria === 'dangerscore' && (sortDirection === 'asc' ? '▲' : '▼')}
+                <button onClick={() => handleSortChange('danger_score')}>
+                    Sort by Danger Level {sortCriteria === 'danger_score' && (sortDirection === 'asc' ? '▲' : '▼')}
                 </button>
             </div>
 
@@ -131,7 +146,7 @@ const Report = () => {
                             <td>{report.commenttext}</td>
                             <td>{report.report_count}</td>
                             <td>{report.latest_report_time}</td>
-                            <td>{getDangerScoreIcon(report.dangerscore)}</td>
+                            <td className="danger-score-cell">{getDangerScoreIcon(report.danger_score)}</td>
                             <td>
                                 <button
                                     onClick={() => window.open(`/comments/${report.forumid}`, '_blank')}

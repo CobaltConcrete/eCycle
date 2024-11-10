@@ -3,6 +3,7 @@ CREATE TABLE reporttable (
     commentid INT NOT NULL,
     reporterid INT NOT NULL,
     time VARCHAR(50) NOT NULL,
+    dangerscore INT,
 
     FOREIGN KEY (commentid) REFERENCES commenttable(commentid) ON DELETE CASCADE,
     FOREIGN KEY (reporterid) REFERENCES usertable(userid) ON DELETE CASCADE

@@ -94,6 +94,7 @@ class ReportTable(db.Model):
     commentid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid', ondelete="CASCADE"), nullable=False)
     reporterid = db.Column(db.Integer, db.ForeignKey('usertable.userid', ondelete="CASCADE"), nullable=False)
     time = db.Column(db.String(50), nullable=False)
+    dangerscore = db.Column(db.Integer, nullable=False, default=1)  # Added danger score column
 
     comment = db.relationship('CommentTable', backref=db.backref('reports', lazy=True))
     reporter = db.relationship('UserTable', backref=db.backref('reports', lazy=True))

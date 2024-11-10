@@ -414,7 +414,7 @@ const Comments = () => {
         await verifyAndExecute(async () => {
             try {
                 const userid = localStorage.getItem('userid');
-                await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/report/${commentid}`, {
+                await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/report-azure/${commentid}`, {
                     reporterid: userid
                 });
                 window.alert('Comment reported successfully.');
