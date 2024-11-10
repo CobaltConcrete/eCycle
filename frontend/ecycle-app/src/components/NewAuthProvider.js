@@ -25,11 +25,9 @@ const NewAuthProvider = ({ children }) => {
                         throw new Error('User not authenticated');
                     }
                 } catch (error) {
-                    // Redirect to the main page if authentication fails
                     navigate('/');
                 }
             } else {
-                // If any of the credentials are missing, redirect to the main page
                 navigate('/');
             }
         };

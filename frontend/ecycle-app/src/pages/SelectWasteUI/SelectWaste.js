@@ -58,6 +58,9 @@ const SelectWaste = () => {
     const [isVerified, setIsVerified] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const navigate = useNavigate();
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
         useEffect(() => {
         const verifyUser = async () => {
@@ -120,41 +123,44 @@ const SelectWaste = () => {
     };
 
     return (
-        <div className="select-waste-container">
-            <h2>Select Waste</h2>
-            <p>Please select the type of waste you would like to dispose of or recycle.</p>
-            <div className="boxes-container">
-                <div className="waste-box" onClick={() => handleSelectWaste('repair')}>
-                    <h3>Repair E-waste</h3>
-                </div>
-                <div className="waste-box" onClick={() => handleSelectWaste('dispose')}>
-                    <h3>Dispose E-waste</h3>
-                </div>
-                <div className="waste-box" onClick={() => handleSelectWaste('general')}>
-                    <h3>General Waste</h3>
-                </div>
+        <>
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
             </div>
-            <div>
-                <button className="help-button" onClick={() => setIsModalOpen(true)}>
-                    Need help?
+            <div className="select-waste-container">
+                <h2>Select Waste</h2>
+                <p>Please select the type of waste you would like to dispose of or recycle.</p>
+                <div className="boxes-container">
+                    <div className="waste-box" onClick={() => handleSelectWaste('repair')}>
+                        <h3>Repair E-waste</h3>
+                    </div>
+                    <div className="waste-box" onClick={() => handleSelectWaste('dispose')}>
+                        <h3>Dispose E-waste</h3>
+                    </div>
+                    <div className="waste-box" onClick={() => handleSelectWaste('general')}>
+                        <h3>General Waste</h3>
+                    </div>
+                </div>
+                <div>
+                    <button className="help-button" onClick={() => setIsModalOpen(true)}>
+                        Need help?
+                    </button>
+                    <HelpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                </div>
+                <button className="checklist-button" onClick={() => navigate('/checklist')}>
+                    Go to Checklist
                 </button>
-
-                <HelpModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+                {usertype === 'admin' && (
+                    <button 
+                        type="button" 
+                        onClick={() => navigate('/report')} 
+                        className="reportpage-button"
+                    >
+                        Go to Report Page 
+                    </button>
+                )}
             </div>
-            <button className="checklist-button" onClick={() => navigate('/checklist')}>
-                Go to Checklist
-            </button>
-
-            {usertype === 'admin' && (
-            <button 
-                type="button" 
-                onClick={() => navigate('/report')} 
-                className="reportpage-button"
-            >
-                Go to Report Page 
-            </button>
-            )}
-        </div>
+        </>
     );
 };
 

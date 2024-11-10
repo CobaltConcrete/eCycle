@@ -19,7 +19,7 @@ def verify_user():
     ).first()
 
     if user:
-        return jsonify({'message': 'User verified', 'isValid': True}), 200
+        return jsonify({'message': 'User verified', 'isValid': True, 'points': user.points}), 200
     else:
         return jsonify({'message': 'User not verified', 'isValid': False}), 401
 

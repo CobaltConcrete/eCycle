@@ -152,8 +152,10 @@ const Comments = () => {
     const [isVerified, setIsVerified] = useState(false);
     const [imageFile, setImageFile] = useState(null);
     const navigate = useNavigate();
-
     const usertype = localStorage.getItem('usertype');
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     useEffect(() => {
         const verifyUser = async () => {
@@ -176,6 +178,7 @@ const Comments = () => {
                 });
 
                 if (response.data.isValid) {
+                    localStorage.setItem('points', response.data.points);
                     setIsVerified(true);
                 } else {
                     navigate('/');
@@ -463,6 +466,9 @@ const Comments = () => {
 
     return (
         <div className="comments-container">
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
             {forumDetails && (
                 <div className="forum-details">
                     <h2 className="forum-title">{forumDetails.forumtext}</h2>

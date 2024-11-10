@@ -2,4 +2,4 @@ Create .env file in this same folder with the following information below:
 
 REACT_APP_GOOGLE_MAPS_API_KEY=ABCdefGHIjkl
 REACT_APP_OPENAI_KEY=ABCdefGHIjkl
-REACT_APP_AZURE_KEY=
+REACT_APP_AZURE_KEY=ABCdefGHIjkl

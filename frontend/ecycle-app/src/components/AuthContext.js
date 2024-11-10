@@ -1,9 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 
-// Create a Context for authentication
 const AuthContext = createContext();
 
-// Create a provider component
 export const AuthProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
         // Retrieve the auth state from localStorage
@@ -13,12 +11,12 @@ export const AuthProvider = ({ children }) => {
 
     const login = () => {
         setIsAuthenticated(true);
-        localStorage.setItem('isAuthenticated', 'true'); // Save to localStorage
+        localStorage.setItem('isAuthenticated', 'true');
     };
 
     const logout = () => {
         setIsAuthenticated(false);
-        localStorage.removeItem('isAuthenticated'); // Remove from localStorage
+        localStorage.removeItem('isAuthenticated');
     };
 
     useEffect(() => {
@@ -43,7 +41,6 @@ export const AuthProvider = ({ children }) => {
     );
 };
 
-// Create a custom hook for easier access to the context
 export const useAuth = () => {
     return useContext(AuthContext);
 };

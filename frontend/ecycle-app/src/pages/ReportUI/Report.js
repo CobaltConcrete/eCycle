@@ -9,6 +9,9 @@ const Report = () => {
     const [sortCriteria, setSortCriteria] = useState('report_count');
     const [sortDirection, setSortDirection] = useState('desc');
     const navigate = useNavigate();
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     const verifyUser = useCallback(async () => {
         const userid = localStorage.getItem('userid');
@@ -96,6 +99,9 @@ const Report = () => {
 
     return (
         <div className="report-container">
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
             <h2>Reported Comments</h2>
             {error && <p className="error-message">{error}</p>}
 

@@ -207,6 +207,84 @@ def classify_comment_AZURE():
         print(f"Error during comment classification: {e}")
         return jsonify({'message': 'Error classifying comment'}), 500
     
+@report_bp.route('/comments/report-gpt/<int:commentid>', methods=['POST'])
+def report_comment_GPT(commentid):
+    data = request.get_json()
+    reporterid = data.get('reporterid')
+    time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+    if not reporterid:
+        return jsonify({'message': 'Missing reporter ID'}), 400
+
+    try:
+        comment = CommentTable.query.get(commentid)
+        if not comment:
+            return jsonify({'message': 'Comment not found'}), 404
+
+        existing_report = ReportTable.query.filter_by(commentid=commentid).first()
+        if existing_report:
+            danger_score = existing_report.dangerscore
+        else:
+            comment_text = comment.commenttext
+            danger_score = classify_comment_GPT_from_route(comment_text)
+
+        new_report = ReportTable(
+            commentid=commentid, 
+            reporterid=reporterid, 
+            time=time, 
+            dangerscore=danger_score
+        )
+        db.session.add(new_report)
+        db.session.commit()
+
+        return jsonify({'message': 'Comment reported successfully'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        print(f'Error reporting comment: {e}')
+        return jsonify({'message': 'Error reporting comment'}), 500
+
+def classify_comment_GPT_from_route(comment_text):
+    openai.api_key = os.getenv("REACT_APP_OPENAI_KEY")
+
+    messages = [
+        {"role": "system", "content": "You are a content moderation assistant."},
+        {
+            "role": "user",
+            "content": (
+                "Analyze the following comment and determine if it contains hate-speech, violence, racism, illicit content, "
+                "self-harm, pornographic content, offensive language, bullying, harassment, spam, or abuse. "
+                "Return a danger score based on the analysis: "
+                "1 - Low (No harmful content), 2 - Medium (Mildly harmful), 3 - High (Clearly harmful).\n\n"
+                f"Comment: \"{comment_text}\"\n"
+                "Return answer in JSON format:\n"
+                "{'danger_score': _} // '1', '2', or '3'\n"
+            )
+        }
+    ]
+
+    try:
+        response = openai.chat.completions.create(
+            model="babbage-002",
+            messages=messages,
+            max_tokens=20,
+            temperature=0.2
+        )
+
+        response_text = response.choices[0].text.strip()
+        result = json.loads(response_text)
+
+        danger_score = result.get('danger_score')
+        if danger_score in ['1', '2', '3']:
+            return int(danger_score)
+        else:
+            print(f"Invalid danger score received: {danger_score}")
+            return 1
+
+    except Exception as e:
+        print(f"Error during GPT classification: {e}")
+        return 1
+    
 @report_bp.route('/comments/report-azure/<int:commentid>', methods=['POST'])
 def report_comment_AZURE(commentid):
     data = request.get_json()

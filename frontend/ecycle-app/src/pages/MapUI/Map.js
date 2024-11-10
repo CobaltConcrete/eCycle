@@ -32,12 +32,13 @@ const Map = () => {
     const [isLocationsOpen, setIsLocationsOpen] = useState(false);
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
     const mapRef = useRef(null);
-    // const infoWindow = new window.google.maps.InfoWindow();
-    // const [infoWindow] = useState(new window.google.maps.InfoWindow());
     const infoWindowRef = useRef(null);
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     // Function to load Google Maps script dynamically
     const loadGoogleMapsScript = (callback) => {
@@ -493,6 +494,9 @@ const handleHistoryItemClick = (entry, index) => {
 
     return (
         <div>
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
             <h2>Find Nearest {type === 'repair' ? 'Repair' : type === 'dispose' ? 'Disposal' : 'General Waste Disposal'} Locations</h2>
 
             <div className="pills-container">

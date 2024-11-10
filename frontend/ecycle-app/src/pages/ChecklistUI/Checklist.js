@@ -11,10 +11,14 @@ const Checklist = () => {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [usertype, setUsertype] = useState(localStorage.getItem('usertype'));
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     const verifyUser = async () => {
         const userid = localStorage.getItem('userid');
         const username = localStorage.getItem('username');
+        const usertype = localStorage.getItem('usertype');
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         if (!userid || !username || !usertype || !userhashedpassword) {
@@ -30,7 +34,9 @@ const Checklist = () => {
                 userhashedpassword,
             });
 
-            if (!response.data.isValid) {
+            if (response.data.isValid) {
+                localStorage.setItem('points', response.data.points);
+            } else {
                 navigate('/');
             }
         } catch (error) {
@@ -106,6 +112,9 @@ const Checklist = () => {
 
     return (
         <div className="checklist-container">
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
             <h2>
                 {usertype === 'shop' ? 'Select Waste Type You Accept:' : 'Select Waste Type You Have:'}
             </h2>

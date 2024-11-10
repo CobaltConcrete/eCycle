@@ -11,6 +11,9 @@ const SignupShop = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     // Verify user before loading the page
     const verifyUser = useCallback(async () => {
@@ -153,6 +156,9 @@ const SignupShop = () => {
 
     return (
         <div className="signup-shop-container">
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
             <h2>Sign Up Your Shop</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>

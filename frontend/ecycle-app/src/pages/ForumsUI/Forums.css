@@ -1,3 +1,18 @@
+.user-info {
+    top: 20px;
+    right: 20px;
+    color: rgb(0, 0, 0);
+    background-color: #388e3c00;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: left;
+}
+
+.user-info p {
+    margin: 5px 0;
+}
+
 .forums-container {
     max-height: 80vh;
     overflow-y: auto;

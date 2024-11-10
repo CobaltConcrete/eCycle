@@ -17,6 +17,9 @@ const Forums = () => {
     const navigate = useNavigate();
     const userid = localStorage.getItem('userid');
     const usertype = localStorage.getItem('usertype');
+    const current_role = localStorage.getItem('usertype');
+    const current_username = localStorage.getItem('username');
+    const current_points = localStorage.getItem('points');
 
     const fetchShopDetails = useCallback(async () => {
         try {
@@ -212,6 +215,9 @@ const Forums = () => {
 
     return (
         <div className="forums-container">
+            <div className="user-info">
+                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
+            </div>
         {isVerified ? (
             <>
             <h2 className="forums-title">
