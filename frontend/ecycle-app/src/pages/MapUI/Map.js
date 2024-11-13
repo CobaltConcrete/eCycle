@@ -346,12 +346,23 @@ const addMarkersToMap = (locations) => {
 
     const fetchCoordinatesFromAddress = async (address) => {
         try {
+            if (!address) {
+                window.alert('Address cannot be empty');
+                return;
+            }
+
             const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/get-coordinates`, { address });
             const { lat, lon } = response.data;
+
             setManualLocation({ lat, lng: lon });
             loadMap(lat, lon);
+
         } catch (err) {
-            window.alert('Failed to fetch coordinates for the given address');
+            if (!isNaN(address)) {
+                window.alert('Invalid Postal Code');
+            } else {
+                window.alert('Invalid Address');
+            }
         }
     };
 

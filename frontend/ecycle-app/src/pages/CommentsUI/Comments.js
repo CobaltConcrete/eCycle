@@ -63,7 +63,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
                         <textarea 
                             value={editText} 
                             onChange={(e) => setEditText(e.target.value)} 
-                            placeholder="Edit your comment..." 
+                            placeholder="Edit your comment... (10 chars)" 
                             className="edit-input"
                         />
                         <button onClick={handleEdit} className="btn save-button">Save Edit</button>
@@ -99,7 +99,7 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
                         <textarea
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
-                            placeholder="Write your reply..."
+                            placeholder="Write a reply... (10 chars)"
                             className="reply-input"
                         />
                         <input 
@@ -300,6 +300,10 @@ const Comments = () => {
             window.alert('Comment text cannot be empty.');
             return;
         }
+        if (newComment.trim().length < 10) {
+            window.alert('Comment must be at least 10 characters.');
+            return;
+        }
 
         const processImage = async () => {
             if (imageFile) {
@@ -341,6 +345,16 @@ const Comments = () => {
     };
 
     const handleEditComment = async (commentid, newText) => {
+        if (!newText.trim()) {
+            window.alert('Comment text cannot be empty.');
+            return;
+        }
+
+        if (newText.trim().length < 10) {
+            window.alert('Comment must be at least 10 characters.');
+            return;
+        }
+
         await verifyAndExecute(async () => {
             try {
                 await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/comments/edit/${commentid}`, { commenttext: newText });
@@ -373,6 +387,10 @@ const Comments = () => {
     const handleReplyComment = async (commentid, replyText, replyImage) => {
         if (!replyText.trim()) {
             window.alert('Reply text cannot be empty.');
+            return;
+        }
+        if (newComment.trim().length < 10) {
+            window.alert('Comment must be at least 10 characters.');
             return;
         }
 
@@ -480,8 +498,9 @@ const Comments = () => {
                 <textarea
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
-                    placeholder="Write a comment..."
+                    placeholder="Write a comment... (min 10 chars)"
                     className="comment-input"
+                    maxLength={2000}
                 />
                 <input 
                     type="file" 

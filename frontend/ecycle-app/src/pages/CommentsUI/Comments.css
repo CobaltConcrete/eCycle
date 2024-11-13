@@ -134,6 +134,10 @@
     padding-left: 1rem;
 }
 
+.new-comment {
+    margin-bottom: 20px;
+}
+
 .new-comment textarea:focus,
 .reply-container textarea:focus {
     border-color: #4caf50;

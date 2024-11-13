@@ -128,7 +128,12 @@ const Forums = () => {
 
     const handleAddForum = async () => {
         if (!newForumText.trim()) {
-            window.alert('Forum text cannot be empty.');
+            window.alert('Comment text cannot be empty.');
+            return;
+        }
+
+        if (newForumText.trim().length < 10) {
+            window.alert('Comment must be at least 10 characters.');
             return;
         }
 
@@ -159,6 +164,16 @@ const Forums = () => {
     };
 
     const handleEditForum = async (forumid) => {
+        if (!editMode.forumtext.trim()) {
+            window.alert('Forum text cannot be empty.');
+            return;
+        }
+
+        if (editMode.forumtext.trim().length < 10) {
+            window.alert('Forum text must be at least 10 characters.');
+            return;
+        }
+
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
@@ -260,7 +275,7 @@ const Forums = () => {
                 <textarea
                 value={newForumText}
                 onChange={(e) => setNewForumText(e.target.value)}
-                placeholder="Write a forum..."
+                placeholder="Write a forum... (min 10 chars)"
                 className="forum-input"
                 ></textarea>
                 <button onClick={handleAddForum} disabled={loading} className="btn add-forum-button">
@@ -274,24 +289,25 @@ const Forums = () => {
                     <li key={forum.forumid} className="forum-item">
                     {editMode.status && editMode.forumid === forum.forumid ? (
                         <>
-                        <textarea
-                            value={editMode.forumtext}
-                            onChange={(e) => setEditMode({ ...editMode, forumtext: e.target.value })}
-                            className="forum-edit-input"
-                        />
-                        <button onClick={() => handleEditForum(forum.forumid)} disabled={loading} className="btn save-button">
-                            Save
-                        </button>
-                        <button onClick={() => setEditMode({ status: false, forumid: null, forumtext: '' })} className="btn cancel-button">
-                            Cancel
-                        </button>
+                            <textarea
+                                value={editMode.forumtext}
+                                onChange={(e) => setEditMode({ ...editMode, forumtext: e.target.value })}
+                                placeholder="Edit your forum... (min 10 chars)"
+                                className="forum-input"
+                            />
+                            <button onClick={() => handleEditForum(forum.forumid)} disabled={loading} className="btn save-button">
+                                Save
+                            </button>
+                            <button onClick={() => setEditMode({ status: false, forumid: null, forumtext: '' })} className="btn cancel-button">
+                                Cancel
+                            </button>
                         </>
                     ) : (
                         <>
-                        <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                            <p className="forum-text">{forum.forumtext}</p>
-                            <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
-                        </Link>
+                            <Link to={`/comments/${forum.forumid}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <p className="forum-text">{forum.forumtext}</p>
+                                <small className="forum-meta">Posted by {forum.postername} at {forum.time}</small>
+                            </Link>
                             <div className="forum-actions">
                                 {forum.posterid === parseInt(userid) && (
                                     <button onClick={() => setEditMode({ status: true, forumid: forum.forumid, forumtext: forum.forumtext })} className="btn edit-button">
@@ -306,6 +322,7 @@ const Forums = () => {
                             </div>
                         </>
                     )}
+
                     </li>
                 ))
                 ) : (

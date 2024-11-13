@@ -39,6 +39,18 @@ def register():
 
     return jsonify({'message': 'User registered successfully'}), 201
 
+@user_bp.route('/check-username', methods=['POST'])
+def check_username():
+    data = request.get_json()
+    username = data['username']
+
+    user = UserTable.query.filter_by(username=username).first()
+    
+    if user:
+        return jsonify({'exists': True}), 200
+    else:
+        return jsonify({'exists': False}), 200
+    
 @user_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()

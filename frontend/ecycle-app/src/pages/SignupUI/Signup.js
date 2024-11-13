@@ -12,7 +12,24 @@ const Signup = () => {
     const { login } = useAuth();
 
     const registerUser = async (usertype) => {
+        if (!username.trim()) {
+            alert('Username cannot be empty.');
+            return;
+        }
+
+        if (!password.trim()) {
+            alert('Password cannot be empty.');
+            return;
+        }
+
         try {
+            const usernameExists = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/check-username`, { username });
+
+            if (usernameExists.data.exists) {
+                alert('Username is already taken. Please choose a different one.');
+                return;
+            }
+
             const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/register`, {
                 username,
                 password,
@@ -20,7 +37,6 @@ const Signup = () => {
             });
 
             if (response.status === 200 || response.status === 201) {
-                // Successful registration
                 const { userid } = response.data;
                 localStorage.setItem('userid', userid);
                 localStorage.setItem('username', username);
