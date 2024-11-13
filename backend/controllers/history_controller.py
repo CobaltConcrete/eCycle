@@ -50,6 +50,7 @@ def get_history():
 
         history_data = [
             {
+                'shopid': entry.ShopTable.shopid,
                 'shopname': entry.ShopTable.shopname,
                 'addressname': entry.ShopTable.addressname,
                 'website': entry.ShopTable.website,

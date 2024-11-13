@@ -31,6 +31,7 @@ def get_shop_details(shopid):
     shop = ShopTable.query.get(shopid)
     if shop:
         return jsonify({
+            'shopid': shop.shopid,
             'shopname': shop.shopname,
             'latitude': shop.latitude,
             'longtitude': shop.longtitude,

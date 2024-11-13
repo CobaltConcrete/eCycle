@@ -9,7 +9,6 @@ def process_csv(input_file, output_file):
         writer.writeheader()
         
         for row in reader:
-            # Split the Hyperlink field and keep only the first URL
             row['Hyperlink'] = row['Hyperlink'].split(';')[0].strip()
             writer.writerow(row)
 

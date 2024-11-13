@@ -15,7 +15,6 @@ def drop_rows_from_csv(input_file, output_file, drop_condition):
             if drop_condition(row):
                 writer.writerow(row)
 
-# Define the drop condition
 def should_drop_row(row):
     return STRING in row['Description']
 
@@ -38,7 +37,6 @@ print(f"Filtered CSV saved as {output_file}")
 #             if not removal_condition(row):
 #                 writer.writerow(row)
 
-# # Define the removal condition
 # def should_remove_row(row):
 #     return STRING in row['Description']
 

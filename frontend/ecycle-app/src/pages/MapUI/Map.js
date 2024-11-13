@@ -414,7 +414,7 @@ const handleHistoryItemClick = (entry, index) => {
 
     // Add a new marker at the history location
     const newMarker = new window.google.maps.Marker({
-        map: mapRef.current, // Ensure you have a reference to the map
+        map: mapRef.current,
         position: { lat, lng: lon },
         title: entry.Name || "History Location",
         icon: new window.google.maps.MarkerImage('http://maps.gstatic.com/mapfiles/ridefinder-images/mm_20_green.png'),

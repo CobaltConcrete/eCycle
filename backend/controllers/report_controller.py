@@ -326,7 +326,6 @@ def report_comment_AZURE(commentid):
 def classify_comment_AZURE_from_route(comment_text):
     API_KEY = os.getenv("REACT_APP_AZURE_KEY")
     ENDPOINT = "https://gradingv3.openai.azure.com/openai/deployments/gradinv3/chat/completions?api-version=2024-02-15-preview"
-
     headers = {
         "Content-Type": "application/json",
         "api-key": API_KEY,

@@ -15,7 +15,6 @@ def remove_rows_from_csv(input_file, output_file, removal_condition):
             if not removal_condition(row):
                 writer.writerow(row)
 
-# Define the removal condition
 def should_remove_row(row):
     return STRING in row['AcceptedItems']
 
