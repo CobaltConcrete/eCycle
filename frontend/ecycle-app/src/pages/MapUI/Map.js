@@ -192,33 +192,39 @@ const Map = () => {
 
     useEffect(() => {
         const fetchHistory = async () => {
-            try {
-                const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-history`, {
-                    params: { userid }
-                });
-                setHistory(response.data.history);
-            } catch (error) {
-                console.error("Error fetching history:", error.response ? error.response.data.message : error.message);
+            if (userLocation && userLocation.lat && userLocation.lng) {
+                try {
+                    const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-history`, {
+                        params: { 
+                            userid,
+                            lat: userLocation.lat,
+                            lon: userLocation.lng
+                        }
+                    });
+                    setHistory(response.data.history);
+                } catch (error) {
+                    console.error("Error fetching history:", error.response ? error.response.data.message : error.message);
+                }
             }
         };
 
         if (isVerified) {
             fetchHistory();
         }
-    }, [userid, isVerified]);
+    }, [userid, isVerified, userLocation]);
 
-    useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                const response = await axios.get(`/get-history`, { params: { userid } });
-                setHistory(response.data.history);
-            } catch (error) {
-                console.error("Error fetching history:", error.response ? error.response.data.message : error.message);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchHistory = async () => {
+    //         try {
+    //             const response = await axios.get(`/get-history`, { params: { userid } });
+    //             setHistory(response.data.history);
+    //         } catch (error) {
+    //             console.error("Error fetching history:", error.response ? error.response.data.message : error.message);
+    //         }
+    //     };
 
-        fetchHistory();
-    }, [userid]);
+    //     fetchHistory();
+    // }, [userid]);
 
 const addMarkersToMap = (locations) => {
     // Initialize the map with the user's current location
@@ -307,6 +313,7 @@ const addMarkersToMap = (locations) => {
                 <div class="location-info">
                     <h3 class="shop-name">${location.shopname}</h3>
                     <p class="shop-address">${location.addressname}</p>
+                    <p class="shop-address"> Distance: ${loc.distance} km</p>
                     <a href="${location.website}" target="_blank" class="website-link">Visit Website</a>
                     <br />
                     <a href="https://www.google.com/maps?q=${location.latitude},${location.longitude}" target="_blank" class="maps-link">
@@ -482,6 +489,7 @@ const handleHistoryItemClick = (entry, index) => {
             <div class="location-info">
                 <h3 class="shop-name">${loc.shopname}</h3>
                 <p class="shop-address">${loc.addressname}</p>
+                <p class="shop-address"> Distance: ${loc.distance} km</p>
                 <a href="${loc.website}" target="_blank" class="website-link">Visit Website</a>
                 <br />
                 <a href="https://www.google.com/maps?q=${loc.lat},${loc.lon}" target="_blank" class="maps-link">
@@ -599,6 +607,7 @@ const handleHistoryItemClick = (entry, index) => {
                                     >
                                         <h3>{location.shopname}</h3>
                                         <p>{location.addressname}</p>
+                                        <p>Distance: {location.distance} km</p>
                                         <a href={location.website} target="_blank" rel="noopener noreferrer">
                                             Visit Website
                                         </a>
@@ -626,6 +635,7 @@ const handleHistoryItemClick = (entry, index) => {
                         >
                             <h3>{entry.shopname}</h3>
                             <p>{entry.addressname}</p>
+                            <p>Distance: {entry.distance} km</p>
                             <p>Visited on: {entry.time}</p>
                             <a href={entry.website} target="_blank" rel="noopener noreferrer">
                                 Visit Website

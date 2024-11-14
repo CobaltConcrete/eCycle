@@ -4,8 +4,10 @@
     padding: 50px;
     margin: 20px auto;
     background-color: #f9f9f9;
-    width: 500px;
+    width: 100%;
+    max-width: 500px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 }
 
 .signup-container h2 {
@@ -14,7 +16,7 @@
 }
 
 .signup-container input {
-    width: 50%;
+    width: 90%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
@@ -34,6 +36,7 @@
 }
 
 .user-type-container button {
+    width: 40%;
     padding: 10px 20px;
     border: none;
     border-radius: 5px;

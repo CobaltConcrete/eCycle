@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from models import db, UserTable, ShopTable, ForumTable, CommentTable
+from models import db, UserTable, ShopTable, ForumTable, CommentTable, UserHistoryTable
 
 shop_bp = Blueprint('shop', __name__)
 
@@ -95,13 +95,18 @@ def remove_shop():
     if not shop_to_delete:
         return jsonify({'error': 'Shop not found.'}), 404
 
+    # Delete associated forums and comments
     forums_to_delete = ForumTable.query.filter_by(shopid=shopid).all()
     for forum in forums_to_delete:
         CommentTable.query.filter_by(forumid=forum.forumid).delete()
         db.session.delete(forum)
 
+    # Delete associated user history entries
+    UserHistoryTable.query.filter_by(shopid=shopid).delete()
+
+    # Delete the shop itself
     db.session.delete(shop_to_delete)
 
     db.session.commit()
 
-    return jsonify({'message': 'Shop and its associated forums removed successfully!'}), 200
+    return jsonify({'message': 'Shop, its associated forums, and user history entries removed successfully!'}), 200

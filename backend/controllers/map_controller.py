@@ -40,7 +40,7 @@ def get_nearby_locations():
     
     for shop in valid_shops:
         shop_location = (shop.latitude, shop.longtitude)
-        distance = geodesic(user_location, shop_location).km
+        distance = round(geodesic(user_location, shop_location).km, 2)
         shop_list.append({
             'shopid': shop.shopid,
             'shopname': shop.shopname,

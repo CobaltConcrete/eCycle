@@ -14,6 +14,17 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!username.trim()) {
+            alert('Username cannot be empty.');
+            return;
+        }
+        
+        if (!password.trim()) {
+            alert('Password cannot be empty.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -41,10 +52,11 @@ const Login = () => {
                 }
             }
         } catch (err) {
+            // Check if username already exists or if credentials are incorrect
             if (err.response && err.response.status === 401) {
-                window.alert('Invalid credentials. Please try again.');
+                alert('Invalid credentials. Please try again.');
             } else {
-                window.alert('An error occurred. Please try again later.');
+                alert('An error occurred. Please try again later.');
             }
         } finally {
             setLoading(false);
@@ -65,14 +77,12 @@ const Login = () => {
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Username"
-                    required
                 />
                 <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
-                    required
                 />
                 <button type="submit" disabled={loading}>
                     {loading ? 'Logging in...' : 'Login'}
