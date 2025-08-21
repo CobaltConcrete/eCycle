@@ -1,0 +1,10 @@
+flask
+flask-cors
+flask-sqlalchemy
+flask-bcrypt
+openai
+psycopg2-binary
+python-dotenv
+requests
+geopy
+pandas
