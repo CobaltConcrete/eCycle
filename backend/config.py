@@ -5,4 +5,4 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = os.getenv('REACT_APP_DATABASE_PASSWORD')  # Change this for production
 
-#TESTETS
+#TEST MK2
