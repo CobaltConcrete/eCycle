@@ -8,6 +8,7 @@
 ./frontend/.env.test.local
 ./frontend/.env.production.local
 ./backend/.env
+.backend/config.py
 
 # =====================================
 # Node dependencies
