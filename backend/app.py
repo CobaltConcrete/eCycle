@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://ecycle-1.onrender.com/"}})
 load_dotenv()
 
 # Register Blueprints
