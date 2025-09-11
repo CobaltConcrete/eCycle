@@ -23,10 +23,10 @@ const Forums = () => {
 
     const fetchShopDetails = useCallback(async () => {
         try {
-            const shopResponse = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-shop-details/${shopid}`);
+            const shopResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get-shop-details/${shopid}`);
             setShopDetails(shopResponse.data);
 
-            const userResponse = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-username/${shopid}`);
+            const userResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get-username/${shopid}`);
             setUsername(userResponse.data.username);
         } catch (error) {
             console.error('Error fetching shop or user data:', error);
@@ -36,7 +36,7 @@ const Forums = () => {
 
     const fetchActionType = useCallback(async () => {
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-actiontype/${shopid}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-actiontype/${shopid}`);
             setActionType(response.data.actiontype);
         } catch (error) {
             console.error('Error fetching action type:', error);
@@ -46,7 +46,7 @@ const Forums = () => {
 
     const fetchForums = useCallback(async () => {
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/forums/${shopid}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/forums/${shopid}`);
             setForums(response.data);
         } catch (error) {
             console.error('Error fetching forum data:', error);
@@ -65,7 +65,7 @@ const Forums = () => {
             }
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                     userid,
                     username,
                     usertype,
@@ -98,7 +98,7 @@ const Forums = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                 userid,
                 username,
                 usertype,
@@ -119,7 +119,7 @@ const Forums = () => {
 
     const updateAllUserPoints = async () => {
         try {
-            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/update-all-user-points`, {});
+            await axios.post(`${process.env.REACT_APP_API_URL}/update-all-user-points`, {});
         } catch (error) {
             console.error('Error updating user points:', error);
             window.alert('Error updating user points. Please try again later.');
@@ -140,7 +140,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/forums/add`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/forums/add`, {
                     forumtext: newForumText,
                     shopid,
                     posterid: userid,
@@ -177,7 +177,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/forums/edit/${forumid}`, {
+                const response = await axios.put(`${process.env.REACT_APP_API_URL}/forums/edit/${forumid}`, {
                     forumtext: editMode.forumtext,
                 });
 
@@ -198,7 +198,7 @@ const Forums = () => {
     const handleDeleteForum = async (forumid) => {
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.delete(`http://${process.env.REACT_APP_serverIP}:5000/forums/delete/${forumid}`);
+                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/forums/delete/${forumid}`);
 
                 if (response.status !== 200) throw new Error('Error deleting forum.');
                 window.alert('Forum deleted successfully.');
@@ -216,7 +216,7 @@ const Forums = () => {
         if (!confirmRemoval) return;
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/remove-shop`, { shopid });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/remove-shop`, { shopid });
             if (response.data.message) {
                 alert('Shop removed successfully!');
                 navigate('/');

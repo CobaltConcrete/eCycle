@@ -75,7 +75,7 @@ const SelectWaste = () => {
             }
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                     userid,
                     username,
                     usertype,

@@ -25,7 +25,7 @@ const Report = () => {
         }
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify-admin`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify-admin`, {
                 userid,
                 username,
                 usertype,
@@ -48,7 +48,7 @@ const Report = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/comments/reported`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/reported`);
                 setReports(response.data);
             } catch (error) {
                 console.error('Error fetching report data:', error);

@@ -28,7 +28,7 @@ const Login = () => {
         setLoading(true);
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/login`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/login`, {
                 username,
                 password,
             });

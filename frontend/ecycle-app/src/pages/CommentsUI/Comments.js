@@ -170,7 +170,7 @@ const Comments = () => {
             }
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                     userid,
                     username,
                     usertype,
@@ -201,7 +201,7 @@ const Comments = () => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/comments/${forumid}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${forumid}`);
             setComments(response.data);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -211,7 +211,7 @@ const Comments = () => {
 
     const fetchForumDetails = async () => {
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/forums/details/${forumid}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/forums/details/${forumid}`);
             setForumDetails(response.data);
         } catch (error) {
             console.error('Error fetching forum details:', error);
@@ -226,7 +226,7 @@ const Comments = () => {
         const userhashedpassword = localStorage.getItem('userhashedpassword');
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                 userid,
                 username,
                 usertype,
@@ -247,7 +247,7 @@ const Comments = () => {
 
     const updateAllUserPoints = async () => {
         try {
-            await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/update-all-user-points`, {});
+            await axios.post(`${process.env.REACT_APP_API_URL}/update-all-user-points`, {});
         } catch (error) {
             console.error('Error updating user points:', error);
             window.alert('Error updating user points. Please try again later.');
@@ -323,7 +323,7 @@ const Comments = () => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/add`, {
+                    await axios.post(`${process.env.REACT_APP_API_URL}/comments/add`, {
                         forumid,
                         commenttext: newComment,
                         posterid: userid,
@@ -357,7 +357,7 @@ const Comments = () => {
 
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/comments/edit/${commentid}`, { commenttext: newText });
+                await axios.put(`${process.env.REACT_APP_API_URL}/comments/edit/${commentid}`, { commenttext: newText });
                 fetchComments();
                 window.alert('Comment edited successfully.');
                 await updateAllUserPoints();
@@ -372,7 +372,7 @@ const Comments = () => {
     const handleDeleteComment = async (commentid) => {
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`http://${process.env.REACT_APP_serverIP}:5000/comments/delete/${commentid}`);
+                await axios.put(`${process.env.REACT_APP_API_URL}/comments/delete/${commentid}`);
                 fetchComments();
                 window.alert('Comment deleted successfully.');
                 await updateAllUserPoints();
@@ -412,7 +412,7 @@ const Comments = () => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/reply/${commentid}`, {
+                    await axios.post(`${process.env.REACT_APP_API_URL}/comments/reply/${commentid}`, {
                         forumid,
                         commenttext: replyText,
                         posterid: userid,
@@ -435,7 +435,7 @@ const Comments = () => {
         await verifyAndExecute(async () => {
             try {
                 const userid = localStorage.getItem('userid');
-                await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/comments/report-azure/${commentid}`, {
+                await axios.post(`${process.env.REACT_APP_API_URL}/comments/report-azure/${commentid}`, {
                     reporterid: userid
                 });
                 window.alert('Comment reported successfully.');
@@ -472,7 +472,7 @@ const Comments = () => {
 
     const handleBackClick = async () => {
         try {
-            const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-shopid-from-forumid/${forumid}`);
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-shopid-from-forumid/${forumid}`);
             const shopid = response.data.shopid;
             navigate(`/forums/${shopid}`);
         } catch (error) {

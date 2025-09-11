@@ -23,14 +23,14 @@ const Signup = () => {
         }
 
         try {
-            const usernameExists = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/check-username`, { username });
+            const usernameExists = await axios.post(`${process.env.REACT_APP_API_URL}/check-username`, { username });
 
             if (usernameExists.data.exists) {
                 alert('Username is already taken. Please choose a different one.');
                 return;
             }
 
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/register`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, {
                 username,
                 password,
                 usertype,

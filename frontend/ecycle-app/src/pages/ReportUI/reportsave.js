@@ -22,7 +22,7 @@ const Report = () => {
         }
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify-admin`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify-admin`, {
                 userid,
                 username,
                 usertype,
@@ -45,13 +45,13 @@ const Report = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/comments/reported`);
+                const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/reported`);
                 const reports = response.data;
 
                 const analyzedReports = await Promise.all(
                     reports.map(async (report) => {
                         const analysisResponse = await axios.post(
-                            `http://${process.env.REACT_APP_serverIP}:5000/classify-comment-AZURE`,
+                            `${process.env.REACT_APP_API_URL}/classify-comment-AZURE`,
                             { commenttext: report.commenttext }
                         );
                         return {

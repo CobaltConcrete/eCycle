@@ -70,7 +70,7 @@ const Map = () => {
             }
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/verify`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
                     userid,
                     username,
                     usertype,
@@ -113,7 +113,7 @@ const Map = () => {
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/nearby-locations`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/nearby-locations`, {
                 lat,
                 lon: lng,
                 actiontype: type,
@@ -194,7 +194,7 @@ const Map = () => {
         const fetchHistory = async () => {
             if (userLocation && userLocation.lat && userLocation.lng) {
                 try {
-                    const response = await axios.get(`http://${process.env.REACT_APP_serverIP}:5000/get-history`, {
+                    const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-history`, {
                         params: { 
                             userid,
                             lat: userLocation.lat,
@@ -276,7 +276,7 @@ const addMarkersToMap = (locations) => {
             loc = location;
 
             try {
-                const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-history`, {
+                const response = await axios.post(`${process.env.REACT_APP_API_URL}/add-history`, {
                     userid: localStorage.getItem('userid'),
                     shopid: location.shopid,
                 });
@@ -358,7 +358,7 @@ const addMarkersToMap = (locations) => {
                 return;
             }
 
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/get-coordinates`, { address });
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/get-coordinates`, { address });
             const { lat, lon } = response.data;
 
             setManualLocation({ lat, lng: lon });
@@ -452,7 +452,7 @@ const handleHistoryItemClick = (entry, index) => {
         const loc = entry;
 
         try {
-            const response = await axios.post(`http://${process.env.REACT_APP_serverIP}:5000/add-history`, {
+            const response = await axios.post(`${process.env.REACT_APP_API_URL}/add-history`, {
                 userid: localStorage.getItem('userid'),
                 shopid: loc.shopid,
             });
