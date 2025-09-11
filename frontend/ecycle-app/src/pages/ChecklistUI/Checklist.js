@@ -57,7 +57,7 @@ const Checklist = () => {
 
     useEffect(() => {
         verifyUser();
-    }, []);
+    }, [verifyUser]);
 
     useEffect(() => {
         const fetchChecklistOptions = async () => {
