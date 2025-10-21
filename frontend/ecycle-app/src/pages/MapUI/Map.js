@@ -497,7 +497,7 @@ const handleHistoryItemClick = (entry, index) => {
                 </a>
                 <br />
                 <div class="forum-button-container">
-                    <button class="forum-button" onclick="window.location.href='/forums/${loc.shopid}'">
+                    <button className="forum-button" onClick={() => navigate(`/forums/${loc.shopid}`)}>
                         Visit Forum
                     </button>
                 </div>
