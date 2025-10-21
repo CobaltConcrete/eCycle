@@ -83,11 +83,12 @@ def get_coordinates():
     response = requests.get(url)
     data = response.json()
 
-    if data['status'] == 'OK':
+    if data.get('status') == 'OK' and data.get('results'):
         location = data['results'][0]['geometry']['location']
-        return jsonify({'lat': location['lat'], 'lon': location['lng']}), 200
+        return jsonify({'lat': location['lat'], 'lng': location['lng']}), 200
     else:
-        return jsonify({'error': 'Invalid address'}), 400
+        error_msg = data.get('error_message', 'Invalid address')
+        return jsonify({'error': error_msg}), 400
 
 @map_bp.route('/get-location-name', methods=['POST'])
 def get_location_name():
