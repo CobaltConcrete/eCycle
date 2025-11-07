@@ -389,7 +389,7 @@ const Comments = () => {
             window.alert('Reply text cannot be empty.');
             return;
         }
-        if (newComment.trim().length < 10) {
+        if (replyText.trim().length < 10) {
             window.alert('Comment must be at least 10 characters.');
             return;
         }
