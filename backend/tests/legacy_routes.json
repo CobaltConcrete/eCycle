@@ -1,0 +1,166 @@
+[
+  {
+    "path": "/checklist-options",
+    "method": "get"
+  },
+  {
+    "path": "/user-checklist",
+    "method": "post"
+  },
+  {
+    "path": "/comments/{forumid}",
+    "method": "get"
+  },
+  {
+    "path": "/comments/add",
+    "method": "post"
+  },
+  {
+    "path": "/comments/reply/{commentid}",
+    "method": "post"
+  },
+  {
+    "path": "/comments/edit/{commentid}",
+    "method": "put"
+  },
+  {
+    "path": "/comments/delete/{commentid}",
+    "method": "put"
+  },
+  {
+    "path": "/get-shopid-from-forumid/{forumid}",
+    "method": "get"
+  },
+  {
+    "path": "/forums/{shopid}",
+    "method": "get"
+  },
+  {
+    "path": "/forums/details/{forumid}",
+    "method": "get"
+  },
+  {
+    "path": "/forums/add",
+    "method": "post"
+  },
+  {
+    "path": "/forums/edit/{forumid}",
+    "method": "put"
+  },
+  {
+    "path": "/forums/delete/{forumid}",
+    "method": "delete"
+  },
+  {
+    "path": "/get-actiontype-from-shopid/{shopid}",
+    "method": "get"
+  },
+  {
+    "path": "/add-history",
+    "method": "post"
+  },
+  {
+    "path": "/get-history",
+    "method": "get"
+  },
+  {
+    "path": "/nearby-locations",
+    "method": "post"
+  },
+  {
+    "path": "/get-current-coordinates",
+    "method": "post"
+  },
+  {
+    "path": "/get-coordinates",
+    "method": "post"
+  },
+  {
+    "path": "/get-location-name",
+    "method": "post"
+  },
+  {
+    "path": "/get-directions",
+    "method": "post"
+  },
+  {
+    "path": "/comments/report/{commentid}",
+    "method": "post"
+  },
+  {
+    "path": "/comments/reported",
+    "method": "get"
+  },
+  {
+    "path": "/verify-admin",
+    "method": "post"
+  },
+  {
+    "path": "/classify-comment-GPT",
+    "method": "post"
+  },
+  {
+    "path": "/classify-comment-AZURE",
+    "method": "post"
+  },
+  {
+    "path": "/comments/report-gpt/{commentid}",
+    "method": "post"
+  },
+  {
+    "path": "/comments/report-azure/{commentid}",
+    "method": "post"
+  },
+  {
+    "path": "/verify-shop",
+    "method": "post"
+  },
+  {
+    "path": "/get-shop-details/{shopid}",
+    "method": "get"
+  },
+  {
+    "path": "/add-shop",
+    "method": "post"
+  },
+  {
+    "path": "/remove-shop",
+    "method": "post"
+  },
+  {
+    "path": "/verify",
+    "method": "post"
+  },
+  {
+    "path": "/register",
+    "method": "post"
+  },
+  {
+    "path": "/check-username",
+    "method": "post"
+  },
+  {
+    "path": "/login",
+    "method": "post"
+  },
+  {
+    "path": "/get-username/{userid}",
+    "method": "get"
+  },
+  {
+    "path": "/get-usertype/{userid}",
+    "method": "get"
+  },
+  {
+    "path": "/user-checklist/{userid}",
+    "method": "get"
+  },
+  {
+    "path": "/update-single-user-points/{userid}",
+    "method": "post"
+  },
+  {
+    "path": "/update-all-user-points",
+    "method": "post"
+  }
+]

@@ -1,100 +1,156 @@
-from flask_sqlalchemy import SQLAlchemy
-from flask_bcrypt import Bcrypt
+import bcrypt
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import backref, relationship
 
-db = SQLAlchemy()
-bcrypt = Bcrypt()
+from database import Base
 
-class UserTable(db.Model):
-    __tablename__ = 'usertable'
 
-    userid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    username = db.Column(db.String(100), unique=True, nullable=False)
-    password = db.Column(db.String(255), nullable=False)
-    points = db.Column(db.BigInteger, default=0)
-    usertype = db.Column(db.String(50), nullable=False)
+class AuthIdentity(Base):
+    __tablename__ = "authidentity"
+
+    auth_user_id = Column(String(36), primary_key=True)
+    userid = Column(
+        Integer, ForeignKey("usertable.userid"), unique=True, nullable=False
+    )
+    disabled = Column(Boolean, nullable=False, default=False, server_default="false")
+
+
+class UserTable(Base):
+    __tablename__ = "usertable"
+
+    userid = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(100), unique=True, nullable=False)
+    password = Column(String(255), nullable=False)
+    points = Column(BigInteger, default=0)
+    usertype = Column(String(50), nullable=False)
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)
+        try:
+            return bcrypt.checkpw(
+                password.encode("utf-8"), self.password.encode("utf-8")
+            )
+        except ValueError:
+            return False
 
     @classmethod
     def create_user(cls, username, password, usertype):
-        hashed_password = bcrypt.generate_password_hash(password).decode('utf-8')
+        hashed_password = bcrypt.hashpw(
+            password.encode("utf-8"), bcrypt.gensalt(rounds=12)
+        ).decode("utf-8")
         return cls(username=username, password=hashed_password, usertype=usertype)
-    
-class ShopTable(db.Model):
-    __tablename__ = 'shoptable'
 
-    shopid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), primary_key=True, nullable=False)
-    shopname = db.Column(db.String(255), nullable=False)
-    latitude = db.Column(db.Float, nullable=False)
-    longtitude = db.Column(db.Float, nullable=False)
-    addressname = db.Column(db.String(255), nullable=False)
-    website = db.Column(db.String(255))
-    actiontype = db.Column(db.String(255), nullable=False)
 
-    user = db.relationship('UserTable', backref=db.backref('shop', uselist=False))
+class ShopTable(Base):
+    __tablename__ = "shoptable"
 
-class ChecklistOptionTable(db.Model):
-    __tablename__ = 'checklistoptiontable'
+    shopid = Column(
+        Integer, ForeignKey("usertable.userid"), primary_key=True, nullable=False
+    )
+    shopname = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longtitude = Column(Float, nullable=False)
+    addressname = Column(String(255), nullable=False)
+    website = Column(String(255))
+    actiontype = Column(String(255), nullable=False)
 
-    checklistoptionid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    checklistoptiontype = db.Column(db.String(100), nullable=False)
+    user = relationship("UserTable", backref=backref("shop", uselist=False))
 
-class UserChecklistTable(db.Model):
-    __tablename__ = 'userchecklisttable'
 
-    userid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), primary_key=True)
-    checklistoptionid = db.Column(db.Integer, db.ForeignKey('checklistoptiontable.checklistoptionid'), primary_key=True)
+class ChecklistOptionTable(Base):
+    __tablename__ = "checklistoptiontable"
 
-    user = db.relationship('UserTable', backref=db.backref('checklist_options', lazy=True))
-    option = db.relationship('ChecklistOptionTable', backref=db.backref('users', lazy=True))
+    checklistoptionid = Column(Integer, primary_key=True, autoincrement=True)
+    checklistoptiontype = Column(String(100), nullable=False)
 
-class ForumTable(db.Model):
-    __tablename__ = 'forumtable'
 
-    forumid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    forumtext = db.Column(db.String(255), nullable=False)
-    shopid = db.Column(db.Integer, db.ForeignKey('shoptable.shopid'), nullable=False)
-    posterid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), nullable=False)
-    time = db.Column(db.String(50), nullable=False)
+class UserChecklistTable(Base):
+    __tablename__ = "userchecklisttable"
 
-    shop = db.relationship('ShopTable', backref=db.backref('forums', lazy=True))
-    poster = db.relationship('UserTable', backref=db.backref('posts', lazy=True))
+    userid = Column(Integer, ForeignKey("usertable.userid"), primary_key=True)
+    checklistoptionid = Column(
+        Integer, ForeignKey("checklistoptiontable.checklistoptionid"), primary_key=True
+    )
 
-class CommentTable(db.Model):
-    __tablename__ = 'commenttable'
+    user = relationship("UserTable", backref=backref("checklist_options", lazy=True))
+    option = relationship("ChecklistOptionTable", backref=backref("users", lazy=True))
 
-    commentid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    commenttext = db.Column(db.String(255), nullable=False)
-    forumid = db.Column(db.Integer, db.ForeignKey('forumtable.forumid'), nullable=False)
-    posterid = db.Column(db.Integer, db.ForeignKey('usertable.userid'), nullable=False)
-    replyid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid'), nullable=True)
-    encodedimage = db.Column(db.Text, nullable=True)
-    time = db.Column(db.String(50), nullable=False)
-    deleted = db.Column(db.Boolean, nullable=False, default=False)
 
-    forum = db.relationship('ForumTable', backref=db.backref('comments', lazy=True))
-    poster = db.relationship('UserTable', backref=db.backref('comments', lazy=True))
-    reply = db.relationship('CommentTable', remote_side=[commentid], backref='replies')
+class ForumTable(Base):
+    __tablename__ = "forumtable"
 
-class UserHistoryTable(db.Model):
-    __tablename__ = 'userhistorytable'
+    forumid = Column(Integer, primary_key=True, autoincrement=True)
+    forumtext = Column(String(255), nullable=False)
+    shopid = Column(Integer, ForeignKey("shoptable.shopid"), nullable=False)
+    posterid = Column(Integer, ForeignKey("usertable.userid"), nullable=False)
+    time = Column(String(50), nullable=False)
 
-    userid = db.Column(db.Integer, db.ForeignKey('usertable.userid', ondelete="CASCADE"), primary_key=True, nullable=False)
-    shopid = db.Column(db.Integer, db.ForeignKey('shoptable.shopid', ondelete="CASCADE"), primary_key=True, nullable=False)
-    time = db.Column(db.String(50), nullable=False)
+    shop = relationship("ShopTable", backref=backref("forums", lazy=True))
+    poster = relationship("UserTable", backref=backref("posts", lazy=True))
 
-    user = db.relationship('UserTable', backref=db.backref('history', lazy=True))
-    shop = db.relationship('ShopTable', backref=db.backref('history', lazy=True))
 
-class ReportTable(db.Model):
-    __tablename__ = 'reporttable'
+class CommentTable(Base):
+    __tablename__ = "commenttable"
 
-    reportid = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    commentid = db.Column(db.Integer, db.ForeignKey('commenttable.commentid', ondelete="CASCADE"), nullable=False)
-    reporterid = db.Column(db.Integer, db.ForeignKey('usertable.userid', ondelete="CASCADE"), nullable=False)
-    time = db.Column(db.String(50), nullable=False)
-    dangerscore = db.Column(db.Integer, nullable=False, default=1)  # Added danger score column
+    commentid = Column(Integer, primary_key=True, autoincrement=True)
+    commenttext = Column(String(255), nullable=False)
+    forumid = Column(Integer, ForeignKey("forumtable.forumid"), nullable=False)
+    posterid = Column(Integer, ForeignKey("usertable.userid"), nullable=False)
+    replyid = Column(Integer, ForeignKey("commenttable.commentid"), nullable=True)
+    encodedimage = Column(Text, nullable=True)
+    time = Column(String(50), nullable=False)
+    deleted = Column(Boolean, nullable=False, default=False)
 
-    comment = db.relationship('CommentTable', backref=db.backref('reports', lazy=True))
-    reporter = db.relationship('UserTable', backref=db.backref('reports', lazy=True))
+    forum = relationship("ForumTable", backref=backref("comments", lazy=True))
+    poster = relationship("UserTable", backref=backref("comments", lazy=True))
+    reply = relationship("CommentTable", remote_side=[commentid], backref="replies")
+
+
+class UserHistoryTable(Base):
+    __tablename__ = "userhistorytable"
+
+    userid = Column(
+        Integer,
+        ForeignKey("usertable.userid", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+    shopid = Column(
+        Integer,
+        ForeignKey("shoptable.shopid", ondelete="CASCADE"),
+        primary_key=True,
+        nullable=False,
+    )
+    time = Column(String(50), nullable=False)
+
+    user = relationship("UserTable", backref=backref("history", lazy=True))
+    shop = relationship("ShopTable", backref=backref("history", lazy=True))
+
+
+class ReportTable(Base):
+    __tablename__ = "reporttable"
+
+    reportid = Column(Integer, primary_key=True, autoincrement=True)
+    commentid = Column(
+        Integer,
+        ForeignKey("commenttable.commentid", ondelete="CASCADE"),
+        nullable=False,
+    )
+    reporterid = Column(
+        Integer, ForeignKey("usertable.userid", ondelete="CASCADE"), nullable=False
+    )
+    time = Column(String(50), nullable=False)
+    dangerscore = Column(
+        Integer, nullable=False, default=1
+    )  # Added danger score column
+
+    comment = relationship("CommentTable", backref=backref("reports", lazy=True))
+    reporter = relationship("UserTable", backref=backref("reports", lazy=True))

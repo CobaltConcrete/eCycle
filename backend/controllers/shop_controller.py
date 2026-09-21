@@ -1,62 +1,57 @@
-from flask import Blueprint, request, jsonify
-from models import db, UserTable, ShopTable, ForumTable, CommentTable, UserHistoryTable
+from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 
-shop_bp = Blueprint('shop', __name__)
+from auth import CurrentUser, profile, require_owner, require_role
+from database import Database
+from models import CommentTable, ForumTable, ReportTable, ShopTable, UserHistoryTable
+from points import refresh_points
+from schemas import ID, ShopIdInput, ShopInput
 
-@shop_bp.route('/verify-shop', methods=['POST'])
-def verify_shop():
-    data = request.get_json()
-    userid = data['userid']
-    username = data['username']
-    usertype = data['usertype']
-    userhashedpassword = data['userhashedpassword']
+router = APIRouter()
 
-    user = UserTable.query.filter_by(
-        userid=userid,
-        username=username,
-        usertype=usertype,
-        password=userhashedpassword
-    ).first()
-    
-    if user:
-        if user.usertype == "shop":
-            return jsonify({'isValid': True, 'usertype': user.usertype}), 200
-        else:
-            return jsonify({'isValid': False, 'message': 'User is not a shop.'}), 403
-        
-    return jsonify({'isValid': False, 'message': 'Invalid credentials.'}), 401
 
-@shop_bp.route('/get-shop-details/<int:shopid>', methods=['GET'])
-def get_shop_details(shopid):
-    shop = ShopTable.query.get(shopid)
+@router.post("/verify-shop")
+def verify_shop(user: CurrentUser):
+    require_role(user, "shop")
+    return {"isValid": True, **profile(user)}
+
+
+@router.get("/get-shop-details/{shopid:int}")
+def get_shop_details(shopid: ID, session: Database):
+    shop = session.get(ShopTable, shopid)
     if shop:
-        return jsonify({
-            'shopid': shop.shopid,
-            'shopname': shop.shopname,
-            'latitude': shop.latitude,
-            'longtitude': shop.longtitude,
-            'addressname': shop.addressname,
-            'website': shop.website,
-            'actiontype': shop.actiontype
-        }), 200
-    return jsonify({'message': 'Shop not found'}), 404
+        return JSONResponse(
+            {
+                "shopid": shop.shopid,
+                "shopname": shop.shopname,
+                "latitude": shop.latitude,
+                "longtitude": shop.longtitude,
+                "addressname": shop.addressname,
+                "website": shop.website,
+                "actiontype": shop.actiontype,
+            },
+            status_code=200,
+        )
+    return JSONResponse({"message": "Shop not found"}, status_code=404)
 
-@shop_bp.route('/add-shop', methods=['POST'])
-def signup_shop():
-    data = request.get_json()
-    shopid = data.get('userid')
-    shopname = data['shopname']
-    addressname = data['addressname']
-    website = data.get('website')
-    actiontype = data['actiontype']
-    latitude = data.get('latitude')
-    longtitude = data.get('longtitude')
 
+@router.post("/add-shop")
+def signup_shop(user: CurrentUser, payload: ShopInput, session: Database):
+    require_role(user, "shop")
+    require_owner(user, payload.userid)
+    data = payload.model_dump()
+    shopid = data.get("userid")
+    shopname = data["shopname"]
+    addressname = data["addressname"]
+    website = data.get("website")
+    actiontype = data["actiontype"]
+    latitude = data.get("latitude")
+    longtitude = data.get("longtitude")
     if latitude is None or longtitude is None:
-        return jsonify({'error': 'Invalid address; unable to get coordinates.'}), 400
-
-    existing_shop = ShopTable.query.filter_by(shopid=shopid).first()
-
+        return JSONResponse(
+            {"error": "Invalid address; unable to get coordinates."}, status_code=400
+        )
+    existing_shop = session.query(ShopTable).filter_by(shopid=shopid).first()
     if existing_shop:
         existing_shop.shopname = shopname
         existing_shop.addressname = addressname
@@ -64,9 +59,10 @@ def signup_shop():
         existing_shop.actiontype = actiontype
         existing_shop.latitude = latitude
         existing_shop.longtitude = longtitude
-
-        db.session.commit()
-        return jsonify({'message': 'Shop information updated successfully!'}), 200
+        session.commit()
+        return JSONResponse(
+            {"message": "Shop information updated successfully!"}, status_code=200
+        )
     else:
         new_shop = ShopTable(
             shopid=shopid,
@@ -75,38 +71,51 @@ def signup_shop():
             website=website,
             actiontype=actiontype,
             latitude=latitude,
-            longtitude=longtitude
+            longtitude=longtitude,
         )
-        
-        db.session.add(new_shop)
-        db.session.commit()
-        return jsonify({'message': 'Shop registered successfully!'}), 201
+        session.add(new_shop)
+        session.commit()
+        return JSONResponse(
+            {"message": "Shop registered successfully!"}, status_code=201
+        )
 
-@shop_bp.route('/remove-shop', methods=['POST'])
-def remove_shop():
-    data = request.get_json()
-    shopid = data.get('shopid')
 
+@router.post("/remove-shop")
+def remove_shop(user: CurrentUser, payload: ShopIdInput, session: Database):
+    require_role(user, "shop", "admin")
+    require_owner(user, payload.shopid, admin=True)
+    data = payload.model_dump()
+    shopid = data.get("shopid")
     if not shopid:
-        return jsonify({'error': 'Shop ID is required.'}), 400
-
-    shop_to_delete = ShopTable.query.filter_by(shopid=shopid).first()
-
+        return JSONResponse({"error": "Shop ID is required."}, status_code=400)
+    shop_to_delete = session.query(ShopTable).filter_by(shopid=shopid).first()
     if not shop_to_delete:
-        return jsonify({'error': 'Shop not found.'}), 404
-
-    # Delete associated forums and comments
-    forums_to_delete = ForumTable.query.filter_by(shopid=shopid).all()
+        return JSONResponse({"error": "Shop not found."}, status_code=404)
+    forums_to_delete = session.query(ForumTable).filter_by(shopid=shopid).all()
+    affected_authors = set()
     for forum in forums_to_delete:
-        CommentTable.query.filter_by(forumid=forum.forumid).delete()
-        db.session.delete(forum)
-
-    # Delete associated user history entries
-    UserHistoryTable.query.filter_by(shopid=shopid).delete()
-
-    # Delete the shop itself
-    db.session.delete(shop_to_delete)
-
-    db.session.commit()
-
-    return jsonify({'message': 'Shop, its associated forums, and user history entries removed successfully!'}), 200
+        affected_authors.add(forum.posterid)
+        affected_authors.update(
+            row[0]
+            for row in session.query(CommentTable.posterid).filter_by(
+                forumid=forum.forumid
+            )
+        )
+        comment_ids = session.query(CommentTable.commentid).filter_by(
+            forumid=forum.forumid
+        )
+        session.query(ReportTable).filter(
+            ReportTable.commentid.in_(comment_ids)
+        ).delete(synchronize_session=False)
+        session.query(CommentTable).filter_by(forumid=forum.forumid).delete()
+        session.delete(forum)
+    session.query(UserHistoryTable).filter_by(shopid=shopid).delete()
+    session.delete(shop_to_delete)
+    refresh_points(session, affected_authors)
+    session.commit()
+    return JSONResponse(
+        {
+            "message": "Shop, its associated forums, and user history entries removed successfully!"
+        },
+        status_code=200,
+    )

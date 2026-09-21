@@ -1,5 +1,8 @@
-Create .env file in this same folder with the following information below:
-
-REACT_APP_GOOGLE_MAPS_API_KEY=ABCdefGHIjkl
-REACT_APP_OPENAI_KEY=ABCdefGHIjkl
-REACT_APP_AZURE_KEY=ABCdefGHIjkl
+# Copy to backend/.env. Use the exact URI from Supabase > Connect.
+DATABASE_URL=postgresql://postgres:password@localhost:5432/ecycle
+SUPABASE_URL=https://YOUR_PROJECT_REF.supabase.co
+SUPABASE_PUBLISHABLE_KEY=
+CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+PORT=5000
+# Server key: allow Geocoding API and Routes API; separate from browser key.
+GOOGLE_MAPS_API_KEY=

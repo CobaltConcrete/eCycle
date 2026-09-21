@@ -1,0 +1,2 @@
+# Optional CSV preprocessing scripts only; archived Flask-based importers need a separate rewrite.
+pandas>=2,<4

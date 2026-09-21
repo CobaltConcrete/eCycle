@@ -1,3 +1,16 @@
+.map-page { width: min(100%, 1100px); margin: 0 auto; padding: 16px; box-sizing: border-box; }
+.map-page fieldset { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 16px; }
+.map-page label { display: block; }
+.map-page .location-input { display: block; width: 100%; box-sizing: border-box; margin: 8px 0 16px; }
+.map-page summary { cursor: pointer; font-weight: 700; padding: 16px 0; }
+.map-page select { margin-left: 12px; padding: 10px; }
+.map-place-list { list-style: none; padding: 0; }
+.map-place-list li { padding: 12px; border-bottom: 1px solid #ccc; }
+.map-place-list button[aria-pressed="true"] { outline: 3px solid #176b45; outline-offset: 3px; }
+.map-page [role="alert"] { color: #8c1d18; }
+.map-page .instructions-container { background: #f4f8f4; color: #17291e; padding: 16px; }
+.map-page .transport-mode-container { flex-wrap: wrap; gap: 8px; }
+
 .user-info {
     top: 20px;
     right: 20px;

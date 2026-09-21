@@ -1,65 +1,30 @@
-.login-container {
-    border: 1px solid #4caf50;
-    border-radius: 5px;
-    padding: 50px;
-    margin: 20px auto;
-    background-color: #f9f9f9;
-    width: 100%;
-    max-width: 500px;
-    height: auto;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
-}
-
-.login-container h2 {
-    text-align: center;
-    color: #4caf50;
-}
-
-.login-container input {
-    width: 90%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin: 10px 0;
-    transition: border-color 0.3s;
-}
-
-.login-container input:focus {
-    border-color: #4caf50;
-    outline: none;
-}
-
-.login-container button[type="submit"] {
-    width: 90%;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4caf50;
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.login-container button[type="submit"]:hover {
-    background-color: #388e3c;
-}
-
-.signup-prompt {
-    font-size: 0.9rem;
-    color: #555;
-    text-align: center;
-}
-
-.signup-prompt button {
-    margin-left: 5px;
-    background-color: transparent;
-    color: #007bff;
-    border: none;
-    cursor: pointer;
-    text-decoration: underline;
-}
-
-.signup-prompt button:hover {
-    color: #0056b3;
+.welcome-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: center; gap: clamp(36px, 6vw, 90px); padding: 16px 0 28px; }
+.welcome-story h1 { font-size: clamp(36px, 4.4vw, 62px); line-height: 1.1; letter-spacing: -2.7px; font-weight: 550; margin: 24px 0; color: var(--ink); text-align: left; }
+.welcome-story h1 em { font-family: Georgia, serif; font-weight: 400; color: var(--green); }
+.welcome-description { max-width: 460px; font-size: 16px; line-height: 1.8; color: var(--muted); }
+.journey-steps { display: flex; flex-wrap: wrap; gap: 12px 24px; margin: 20px 0; }
+.journey-steps p { font-size: 12px; font-weight: 600; }
+.journey-steps span { display: block; margin-bottom: 8px; color: var(--green); font-family: monospace; }
+.welcome-photo { min-height: 185px; border-radius: var(--radius); background: linear-gradient(90deg, rgba(14,41,31,.85), rgba(14,41,31,.12)), url('../../images/repairewaste.jpg') center / cover; display: flex; align-items: end; padding: 24px; }
+.welcome-photo span { color: white; font-size: 24px; line-height: 1.25; letter-spacing: -.5px; }
+.login-container { border: 1px solid var(--line); border-radius: 24px; padding: clamp(24px, 4vw, 44px); background: white; box-shadow: 0 16px 50px #173c3408; width: 100%; }
+.login-container h2 { margin: 18px 0 10px; color: var(--ink); font-size: 30px; font-weight: 600; letter-spacing: -1px; }
+.login-description { font-size: 14px; line-height: 1.7; color: var(--muted); margin-bottom: 30px; }
+.login-container form { display: flex; flex-direction: column; text-align: left; }
+.login-container label { font-size: 13px; font-weight: 650; margin-bottom: 8px; }
+.login-container input { width: 100%; border: 1px solid #b8c6bd; border-radius: 9px; padding: 14px; margin-bottom: 20px; background: #fafbf8; color: var(--ink); }
+.login-container button[type="submit"] { width: 100%; border: none; border-radius: 9px; padding: 15px; background: var(--green); color: white; font-weight: 650; margin-top: 4px; }
+.login-container button[type="submit"]:hover { background: #173e30; }
+.login-container button:disabled { opacity: .65; cursor: wait; }
+.signup-prompt { font-size: 13px; color: var(--muted); margin: 22px 0; text-align: center; }
+.signup-prompt button { background: none; border: 0; color: var(--green); text-decoration: underline; font-weight: 600; }
+.login-footnote { border-top: 1px solid var(--line); padding-top: 22px; font-size: 12px; color: var(--muted); line-height: 1.7; }
+.login-error { background: #fff2ee; border: 1px solid #dba797; border-radius: 8px; padding: 12px; color: #8d2516; font-size: 14px; line-height: 1.5; }
+@media (max-width: 760px) {
+ .welcome-layout { grid-template-columns: 1fr; gap: 28px; padding: 0; }
+ .welcome-story h1 { letter-spacing: -1.5px; }
+ .welcome-description { font-size: 14px; }
+ .welcome-photo { display: none; }
+ .journey-steps { margin-bottom: 0; }
+ .login-container { padding: 24px; }
 }

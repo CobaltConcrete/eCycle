@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../components/api';
 import './Comments.css';
 
 const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onReport }) => {
@@ -60,10 +60,10 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
                 </p>
                 {isEditing ? (
                     <div>
-                        <textarea 
-                            value={editText} 
-                            onChange={(e) => setEditText(e.target.value)} 
-                            placeholder="Edit your comment... (10 chars)" 
+                        <textarea maxLength={255}
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                            placeholder="Edit your comment... (10 chars)"
                             className="edit-input"
                         />
                         <button onClick={handleEdit} className="btn save-button">Save Edit</button>
@@ -89,30 +89,30 @@ const Comment = ({ comment, replies, depth = 0, onEdit, onDelete, onReply, onRep
                     {(usertype === 'admin' || parseInt(userid) === comment.posterid) && (
                         <button onClick={() => onDelete(comment.commentid)} className="btn delete-button">Delete</button>
                     )}
-                    
+
                     <button onClick={() => setIsReplying(!isReplying)} className="btn reply-button">Reply</button>
                     <button onClick={() => onReport(comment.commentid)} className="btn report-button">Report</button>
                 </div>
 
                 {isReplying && (
                     <div className="reply-container">
-                        <textarea
+                        <textarea maxLength={255}
                             value={replyText}
                             onChange={(e) => setReplyText(e.target.value)}
                             placeholder="Write a reply... (10 chars)"
                             className="reply-input"
                         />
-                        <input 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={(e) => setImageFile(e.target.files[0])} 
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setImageFile(e.target.files[0])}
                         />
                         {imageFile && (
                             <div>
-                                <img 
-                                    src={URL.createObjectURL(imageFile)} 
-                                    alt="Preview" 
-                                    style={{ width: '100px', height: 'auto' }} 
+                                <img
+                                    src={URL.createObjectURL(imageFile)}
+                                    alt="Preview"
+                                    style={{ width: '100px', height: 'auto' }}
                                 />
                                 <button onClick={() => setImageFile(null)} className="btn cancel-button">Remove Image</button>
                             </div>
@@ -162,19 +162,18 @@ const Comments = () => {
             const userid = localStorage.getItem('userid');
             const username = localStorage.getItem('username');
             const usertype = localStorage.getItem('usertype');
-            const userhashedpassword = localStorage.getItem('userhashedpassword');
 
-            if (!userid || !username || !usertype || !userhashedpassword) {
+
+            if (!userid || !username || !usertype) {
                 navigate('/');
                 return;
             }
 
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+                const response = await axios.post(`/verify`, {
                     userid,
                     username,
                     usertype,
-                    userhashedpassword,
                 });
 
                 if (response.data.isValid) {
@@ -201,7 +200,7 @@ const Comments = () => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/${forumid}`);
+            const response = await axios.get(`/comments/${forumid}`);
             setComments(response.data);
         } catch (error) {
             console.error('Error fetching comments:', error);
@@ -211,7 +210,7 @@ const Comments = () => {
 
     const fetchForumDetails = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/forums/details/${forumid}`);
+            const response = await axios.get(`/forums/details/${forumid}`);
             setForumDetails(response.data);
         } catch (error) {
             console.error('Error fetching forum details:', error);
@@ -223,14 +222,13 @@ const Comments = () => {
         const userid = localStorage.getItem('userid');
         const username = localStorage.getItem('username');
         const usertype = localStorage.getItem('usertype');
-        const userhashedpassword = localStorage.getItem('userhashedpassword');
+
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+            const response = await axios.post(`/verify`, {
                 userid,
                 username,
                 usertype,
-                userhashedpassword,
             });
 
             if (response.data.isValid) {
@@ -245,14 +243,6 @@ const Comments = () => {
         }
     };
 
-    const updateAllUserPoints = async () => {
-        try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/update-all-user-points`, {});
-        } catch (error) {
-            console.error('Error updating user points:', error);
-            window.alert('Error updating user points. Please try again later.');
-        }
-    };
 
     const compressImage = async (file, maxWidth = 320, maxHeight = 320) => {
         return new Promise((resolve, reject) => {
@@ -323,7 +313,7 @@ const Comments = () => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`${process.env.REACT_APP_API_URL}/comments/add`, {
+                    await axios.post(`/comments/add`, {
                         forumid,
                         commenttext: newComment,
                         posterid: userid,
@@ -332,7 +322,7 @@ const Comments = () => {
                     setNewComment('');
                     setImageFile(null);
                     window.alert('Comment posted successfully.');
-                    await updateAllUserPoints();
+
                     await fetchComments();
                 } catch (error) {
                     console.error('Error adding comment:', error);
@@ -357,10 +347,10 @@ const Comments = () => {
 
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`${process.env.REACT_APP_API_URL}/comments/edit/${commentid}`, { commenttext: newText });
+                await axios.put(`/comments/edit/${commentid}`, { commenttext: newText });
                 fetchComments();
                 window.alert('Comment edited successfully.');
-                await updateAllUserPoints();
+
                 await fetchComments();
             } catch (error) {
                 console.error('Error editing comment:', error);
@@ -372,10 +362,10 @@ const Comments = () => {
     const handleDeleteComment = async (commentid) => {
         await verifyAndExecute(async () => {
             try {
-                await axios.put(`${process.env.REACT_APP_API_URL}/comments/delete/${commentid}`);
+                await axios.put(`/comments/delete/${commentid}`);
                 fetchComments();
                 window.alert('Comment deleted successfully.');
-                await updateAllUserPoints();
+
                 await fetchComments();
             } catch (error) {
                 console.error('Error deleting comment:', error);
@@ -412,14 +402,14 @@ const Comments = () => {
             await verifyAndExecute(async () => {
                 try {
                     const userid = localStorage.getItem('userid');
-                    await axios.post(`${process.env.REACT_APP_API_URL}/comments/reply/${commentid}`, {
+                    await axios.post(`/comments/reply/${commentid}`, {
                         forumid,
                         commenttext: replyText,
                         posterid: userid,
                         encodedimage: encodedImage,
                     });
                     window.alert('Reply posted successfully.');
-                    await updateAllUserPoints();
+
                     await fetchComments();
                 } catch (error) {
                     console.error('Error replying to comment:', error);
@@ -435,7 +425,7 @@ const Comments = () => {
         await verifyAndExecute(async () => {
             try {
                 const userid = localStorage.getItem('userid');
-                await axios.post(`${process.env.REACT_APP_API_URL}/comments/report-azure/${commentid}`, {
+                await axios.post(`/comments/report/${commentid}`, {
                     reporterid: userid
                 });
                 window.alert('Comment reported successfully.');
@@ -472,7 +462,7 @@ const Comments = () => {
 
     const handleBackClick = async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-shopid-from-forumid/${forumid}`);
+            const response = await axios.get(`/get-shopid-from-forumid/${forumid}`);
             const shopid = response.data.shopid;
             navigate(`/forums/${shopid}`);
         } catch (error) {
@@ -493,47 +483,47 @@ const Comments = () => {
                     <p className="forum-meta">Posted by {forumDetails.postername} at {forumDetails.time}</p>
                 </div>
             )}
-            
+
             <div className="new-comment">
-                <textarea
+                <textarea maxLength={255}
                     value={newComment}
                     onChange={(e) => setNewComment(e.target.value)}
                     placeholder="Write a comment... (min 10 chars)"
                     className="comment-input"
-                    maxLength={2000}
+
                 />
-                <input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={(e) => setImageFile(e.target.files[0])} 
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setImageFile(e.target.files[0])}
                 />
                 {imageFile && (
                     <div>
-                        <img 
-                            src={URL.createObjectURL(imageFile)} 
-                            alt="Preview" 
-                            style={{ width: '100px', height: 'auto' }} 
+                        <img
+                            src={URL.createObjectURL(imageFile)}
+                            alt="Preview"
+                            style={{ width: '100px', height: 'auto' }}
                         />
                         <button onClick={() => setImageFile(null)}>Remove Image</button>
                     </div>
                 )}
                 <button onClick={handleAddComment} className="btn add-comment-button">Add Comment</button>
             </div>
-            
+
             {error && <p className="error-message">{error}</p>}
-            
+
             <div className={`comments-scrollable ${organizedComments.length === 0 ? 'no-comments-bg' : ''}`}>
                 <div className={`comments-list ${organizedComments.length === 0 ? 'no-comments-bg' : ''}`}>
                     {organizedComments.length > 0 ? (
                         organizedComments.map((comment) => (
-                            <Comment 
-                                key={comment.commentid} 
-                                comment={comment} 
-                                replies={comment.replies} 
-                                onEdit={handleEditComment} 
-                                onDelete={handleDeleteComment} 
+                            <Comment
+                                key={comment.commentid}
+                                comment={comment}
+                                replies={comment.replies}
+                                onEdit={handleEditComment}
+                                onDelete={handleDeleteComment}
                                 onReply={handleReplyComment}
-                                onReport={handleReportComment} 
+                                onReport={handleReportComment}
                             />
                         ))
                     ) : (
@@ -541,19 +531,19 @@ const Comments = () => {
                     )}
                 </div>
             </div>
-            
+
             <div className="button-container">
                 <button onClick={handleBackClick} className="button back-button">
                     Back to Forum
                 </button>
 
                 {usertype === 'admin' && (
-                    <button 
-                        type="button" 
-                        onClick={() => navigate('/report')} 
+                    <button
+                        type="button"
+                        onClick={() => navigate('/report')}
                         className="button reportpage-button"
                     >
-                        Go to Report Page 
+                        Go to Report Page
                     </button>
                 )}
             </div>

@@ -1,76 +1,41 @@
-.App {
-  text-align: center;
-  height: 100%;
-  background-repeat: repeat;
-  background-size: auto;
-  background-color: rgba(255, 255, 255, 0.6);
-  background-blend-mode: overlay;
+ :root {
+  --ink: #173c34; --muted: #596b63; --paper: #f6f7f2; --line: #dce3db;
+  --green: #215c45; --lime: #dcebb5; --radius: 20px;
 }
-
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); }
+button, input, select, textarea { font: inherit; }
+button, a, input, select, textarea, summary { -webkit-tap-highlight-color: transparent; }
+button, summary { cursor: pointer; }
+button, input:not([type="checkbox"]), select { min-height: 44px; }
+:focus-visible { outline: 3px solid #ad6016 !important; outline-offset: 4px; }
+a { color: var(--green); }
+.App { min-height: 100vh; display: flex; flex-direction: column; }
+.site-header { width: min(1240px, 100%); margin: 0 auto; padding: 24px 40px; display: flex; align-items: center; gap: 32px; border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 9px; font-size: 27px; font-weight: 750; letter-spacing: -1px; text-decoration: none; }
+.brand > span { border-radius: 50%; background: var(--green); color: white; width: 35px; height: 35px; display: grid; place-items: center; }
+.brand-note { color: var(--muted); font-size: 13px; }
+.site-header nav { margin-left: auto; font-size: 14px; }
+.site-header nav a { text-decoration: none; font-weight: 600; }
+.site-header nav button { border: 1px solid var(--line); border-radius: 24px; padding: 8px 20px; background: white; color: var(--green); }
+.App-header { width: min(1240px, 100%); margin: 0 auto; padding: 48px 40px; flex: 1; font-size: 16px; }
+.site-footer { width: min(1240px, 100%); margin: auto auto 0; padding: 24px 40px; display: flex; justify-content: space-between; gap: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+.eyebrow { color: var(--green); font-size: 11px; font-weight: 750; letter-spacing: 2px; }
+.skip-link { position: absolute; left: 16px; top: -100px; padding: 12px; background: white; z-index: 2000; }
+.skip-link:focus { top: 10px; }
+.App-header > .map-container, .App-header > .report-container { max-width: 100%; }
+.App-header .instructions-container, .App-header .location-details, .App-header .history-details { width: 100%; max-width: 800px; }
+.App-header .nav-pills, .App-header .transport-mode-container { flex-wrap: wrap; gap: 8px; }
+.App-header .report-container { overflow-x: auto; }
+.App-header .user-info { overflow-wrap: anywhere; color: var(--muted); }
+@media (max-width: 700px) {
+  .site-header { padding: 18px 20px; gap: 12px; }
+  .brand-note { display: none; }
+  .site-header nav { font-size: 12px; }
+  .App-header { padding: 28px 20px; }
+  .site-footer { padding: 20px; flex-direction: column; gap: 6px; }
+  .App-header .scrollable-content { padding: 12px; }
 }
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  min-height: 60vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: #115d33;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 2rem 0;
-}
-
-.title-container {
-  background-color: #e0f7e0;
-  padding: 1rem 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  max-width: 100%;
-}
-
-h1 {
-  font-size: 3rem;
-  margin: 0.5rem 0;
-  color: #2E7D32;
-  text-align: center;
-  width: 100%;
-}
-
-@media (max-width: 600px) {
-  .App-header {
-    font-size: calc(8px + 2vmin);
-    padding: 1rem;
-  }
-
-  h1 {
-    font-size: 2.5rem;
-  }
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }

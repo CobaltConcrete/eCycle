@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import axios from 'axios';
+import axios from '../../components/api';
 import { useParams, useNavigate } from 'react-router-dom';
 import './Map.css';
 
@@ -53,19 +53,18 @@ const Map = () => {
             const userid = localStorage.getItem('userid');
             const username = localStorage.getItem('username');
             const usertype = localStorage.getItem('usertype');
-            const userhashedpassword = localStorage.getItem('userhashedpassword');
 
-            if (!userid || !username || !usertype || !userhashedpassword) {
+
+            if (!userid || !username || !usertype) {
                 navigate('/');
                 return;
             }
 
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+                const response = await axios.post(`/verify`, {
                     userid,
                     username,
                     usertype,
-                    userhashedpassword,
                 });
 
                 if (response.data.isValid) {
@@ -84,7 +83,7 @@ const Map = () => {
 
     const fetchNearbyLocations = useCallback(async (lat, lng) => {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/nearby-locations`, {
+            const response = await axios.post(`/nearby-locations`, {
                 lat,
                 lon: lng,
                 actiontype: type,
@@ -164,7 +163,7 @@ const Map = () => {
     useEffect(() => {
         const fetchHistory = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-history`, {
+                const response = await axios.get(`/get-history`, {
                     params: { userid }
                 });
                 setHistory(response.data.history);
@@ -230,7 +229,7 @@ const Map = () => {
                 loc = location;
 
                 try {
-                    const response = await axios.post(`${process.env.REACT_APP_API_URL}/add-history`, {
+                    const response = await axios.post(`/add-history`, {
                         userid: localStorage.getItem('userid'),
                         shopid: location.shopid
                     });
@@ -298,7 +297,7 @@ const Map = () => {
 
     const fetchCoordinatesFromAddress = async (address) => {
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/get-coordinates`, { address });
+            const response = await axios.post(`/get-coordinates`, { address });
             const { lat, lon } = response.data;
             setManualLocation({ lat, lng: lon });
             loadMap(lat, lon);

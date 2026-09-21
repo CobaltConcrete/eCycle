@@ -1,97 +1,33 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { Link, Navigate } from 'react-router-dom';
+import { requireSupabase } from '../../components/supabase';
 import { useAuth } from '../../components/AuthContext';
-import './Signup.css';
 
-const Signup = () => {
-    const [username, setUsername] = useState('');
+export default function Signup() {
+    const { session, loading } = useAuth();
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    const navigate = useNavigate();
-    const { login } = useAuth();
-
-    const registerUser = async (usertype) => {
-        if (!username.trim()) {
-            alert('Username cannot be empty.');
-            return;
-        }
-
-        if (!password.trim()) {
-            alert('Password cannot be empty.');
-            return;
-        }
-
+    const [busy, setBusy] = useState(false);
+    if (!loading && session) return <Navigate to="/" replace />;
+    async function submit(event) {
+        event.preventDefault(); setBusy(true); setError(''); setMessage('');
         try {
-            const usernameExists = await axios.post(`${process.env.REACT_APP_API_URL}/check-username`, { username });
-
-            if (usernameExists.data.exists) {
-                alert('Username is already taken. Please choose a different one.');
-                return;
-            }
-
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/register`, {
-                username,
-                password,
-                usertype,
-            });
-
-            if (response.status === 200 || response.status === 201) {
-                const { userid } = response.data;
-                localStorage.setItem('userid', userid);
-                localStorage.setItem('username', username);
-                localStorage.setItem('usertype', usertype);
-                login();
-                
-                alert('Registration successful! Redirecting to login page.');
-                
-                navigate('/');
-            } else {
-                alert('Registration failed! Please try again.');
-            }
-        } catch (err) {
-            setError('An error occurred. Please try again later.');
-            alert('An error occurred. Please try again later.');
-        }
-    };
-
-    const handleBackToLogin = () => {
-        navigate('/');
-    };
-
-    return (
-        <div className="signup-container">
-            <h2>Sign Up</h2>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-            <form>
-                <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
-                    required
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    required
-                />
-                <div className="user-type-container">
-                    <button type="button" onClick={() => registerUser('user')} className="user-button">
-                        Register as User
-                    </button>
-                    <button type="button" onClick={() => registerUser('shop')} className="shop-button">
-                        Register as Shop
-                    </button>
-                </div>
-            </form>
-            <button onClick={handleBackToLogin} className="back-to-login-button">
-                Back to Login
-            </button>
-        </div>
-    );
-};
-
-export default Signup;
+            const { error } = await requireSupabase().auth.signUp({ email: email.trim(), password,
+                options: { emailRedirectTo: window.location.origin + '/' } });
+            if (error) throw error;
+            setPassword('');
+            setMessage('Check your email to confirm your account, then sign in. You will choose your username and account type next.');
+        } catch (err) { setError(err.message); } finally { setBusy(false); }
+    }
+    return <section className="login-container"><h1>Create your account</h1>
+        <p>First confirm your email. Then choose a resident or shop profile.</p>
+        {error && <p role="alert">{error}</p>}{message && <p role="status">{message}</p>}
+        <form onSubmit={submit}>
+            <label htmlFor="signup-email">Email</label><input id="signup-email" type="email" autoComplete="email" required value={email} onChange={e => setEmail(e.target.value)} />
+            <label htmlFor="signup-password">Password (at least 12 characters)</label><input id="signup-password" type="password" autoComplete="new-password" required minLength={12} value={password} onChange={e => setPassword(e.target.value)} />
+            <button disabled={busy}>{busy ? 'Creating account...' : 'Create account'}</button>
+        </form><Link to="/">Back to sign in</Link>
+    </section>;
+}

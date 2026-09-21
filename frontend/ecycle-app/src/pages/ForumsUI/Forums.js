@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../components/api';
 import './Forums.css';
 
 const Forums = () => {
@@ -23,10 +23,10 @@ const Forums = () => {
 
     const fetchShopDetails = useCallback(async () => {
         try {
-            const shopResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get-shop-details/${shopid}`);
+            const shopResponse = await axios.get(`/get-shop-details/${shopid}`);
             setShopDetails(shopResponse.data);
 
-            const userResponse = await axios.get(`${process.env.REACT_APP_API_URL}/get-username/${shopid}`);
+            const userResponse = await axios.get(`/get-username/${shopid}`);
             setUsername(userResponse.data.username);
         } catch (error) {
             console.error('Error fetching shop or user data:', error);
@@ -36,7 +36,7 @@ const Forums = () => {
 
     const fetchActionType = useCallback(async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/get-actiontype/${shopid}`);
+            const response = await axios.get(`/get-actiontype-from-shopid/${shopid}`);
             setActionType(response.data.actiontype);
         } catch (error) {
             console.error('Error fetching action type:', error);
@@ -46,7 +46,7 @@ const Forums = () => {
 
     const fetchForums = useCallback(async () => {
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/forums/${shopid}`);
+            const response = await axios.get(`/forums/${shopid}`);
             setForums(response.data);
         } catch (error) {
             console.error('Error fetching forum data:', error);
@@ -57,19 +57,18 @@ const Forums = () => {
     useEffect(() => {
         const verifyUser = async () => {
             const username = localStorage.getItem('username');
-            const userhashedpassword = localStorage.getItem('userhashedpassword');
 
-            if (!userid || !username || !usertype || !userhashedpassword) {
+
+            if (!userid || !username || !usertype) {
                 navigate('/');
                 return;
             }
 
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+                const response = await axios.post(`/verify`, {
                     userid,
                     username,
                     usertype,
-                    userhashedpassword,
                 });
 
                 if (response.data.isValid) {
@@ -95,14 +94,13 @@ const Forums = () => {
 
     const verifyAndExecute = async (action) => {
         const username = localStorage.getItem('username');
-        const userhashedpassword = localStorage.getItem('userhashedpassword');
+
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+            const response = await axios.post(`/verify`, {
                 userid,
                 username,
                 usertype,
-                userhashedpassword,
             });
 
             if (response.data.isValid) {
@@ -117,14 +115,6 @@ const Forums = () => {
         }
     };
 
-    const updateAllUserPoints = async () => {
-        try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/update-all-user-points`, {});
-        } catch (error) {
-            console.error('Error updating user points:', error);
-            window.alert('Error updating user points. Please try again later.');
-        }
-    };
 
     const handleAddForum = async () => {
         if (!newForumText.trim()) {
@@ -140,7 +130,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.post(`${process.env.REACT_APP_API_URL}/forums/add`, {
+                const response = await axios.post(`/forums/add`, {
                     forumtext: newForumText,
                     shopid,
                     posterid: userid,
@@ -153,7 +143,7 @@ const Forums = () => {
                 setNewForumText('');
                 window.alert('Forum posted successfully.');
                 fetchForums();
-                await updateAllUserPoints();
+
             } catch (error) {
                 console.error('Error adding new forum:', error);
                 window.alert('Error adding new forum. Please try again later.');
@@ -177,7 +167,7 @@ const Forums = () => {
         setLoading(true);
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.put(`${process.env.REACT_APP_API_URL}/forums/edit/${forumid}`, {
+                const response = await axios.put(`/forums/edit/${forumid}`, {
                     forumtext: editMode.forumtext,
                 });
 
@@ -185,7 +175,7 @@ const Forums = () => {
                 setEditMode({ status: false, forumid: null, forumtext: '' });
                 window.alert('Forum edited successfully.');
                 fetchForums();
-                await updateAllUserPoints();
+
             } catch (error) {
                 console.error('Error editing forum:', error);
                 window.alert('Error editing forum. Please try again later.');
@@ -198,12 +188,12 @@ const Forums = () => {
     const handleDeleteForum = async (forumid) => {
         await verifyAndExecute(async () => {
             try {
-                const response = await axios.delete(`${process.env.REACT_APP_API_URL}/forums/delete/${forumid}`);
+                const response = await axios.delete(`/forums/delete/${forumid}`);
 
                 if (response.status !== 200) throw new Error('Error deleting forum.');
                 window.alert('Forum deleted successfully.');
                 fetchForums();
-                await updateAllUserPoints();
+
             } catch (error) {
                 console.error('Error deleting forum:', error);
                 window.alert('Error deleting forum. Please try again later.');
@@ -216,11 +206,11 @@ const Forums = () => {
         if (!confirmRemoval) return;
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/remove-shop`, { shopid });
+            const response = await axios.post(`/remove-shop`, { shopid });
             if (response.data.message) {
                 alert('Shop removed successfully!');
                 navigate('/');
-                await updateAllUserPoints();
+
             }
         } catch (error) {
             console.error('Error removing shop:', error);
@@ -272,7 +262,7 @@ const Forums = () => {
             {error && <p className="error-message">{error}</p>}
 
             <div className="add-forum">
-                <textarea
+                <textarea maxLength={255}
                 value={newForumText}
                 onChange={(e) => setNewForumText(e.target.value)}
                 placeholder="Write a forum... (min 10 chars)"
@@ -289,7 +279,7 @@ const Forums = () => {
                     <li key={forum.forumid} className="forum-item">
                     {editMode.status && editMode.forumid === forum.forumid ? (
                         <>
-                            <textarea
+                            <textarea maxLength={255}
                                 value={editMode.forumtext}
                                 onChange={(e) => setEditMode({ ...editMode, forumtext: e.target.value })}
                                 placeholder="Edit your forum... (min 10 chars)"

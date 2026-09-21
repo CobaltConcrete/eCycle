@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../../components/api';
 import './Report.css';
 
 const Report = () => {
@@ -14,19 +14,18 @@ const Report = () => {
         const userid = localStorage.getItem('userid');
         const username = localStorage.getItem('username');
         const usertype = localStorage.getItem('usertype');
-        const userhashedpassword = localStorage.getItem('userhashedpassword');
 
-        if (!userid || !username || !usertype || !userhashedpassword || usertype !== 'admin') {
+
+        if (!userid || !username || !usertype || usertype !== 'admin') {
             navigate('/');
             return;
         }
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify-admin`, {
+            const response = await axios.post(`/verify-admin`, {
                 userid,
                 username,
                 usertype,
-                userhashedpassword,
             });
 
             if (!response.data.isValid) {
@@ -45,13 +44,13 @@ const Report = () => {
     useEffect(() => {
         const fetchReports = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/comments/reported`);
+                const response = await axios.get(`/comments/reported`);
                 const reports = response.data;
 
                 const analyzedReports = await Promise.all(
                     reports.map(async (report) => {
                         const analysisResponse = await axios.post(
-                            `${process.env.REACT_APP_API_URL}/classify-comment-AZURE`,
+                            `/classify-comment-AZURE`,
                             { commenttext: report.commenttext }
                         );
                         return {

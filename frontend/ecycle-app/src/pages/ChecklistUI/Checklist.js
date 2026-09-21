@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState, useCallback } from 'react';
+import axios from '../../components/api';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../components/AuthContext';
 import './Checklist.css';
 
 const Checklist = () => {
@@ -9,29 +8,27 @@ const Checklist = () => {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const { login } = useAuth();
     const [usertype, setUsertype] = useState(localStorage.getItem('usertype'));
     const current_role = localStorage.getItem('usertype');
     const current_username = localStorage.getItem('username');
     const current_points = localStorage.getItem('points');
 
-    const verifyUser = async () => {
+    const verifyUser = useCallback(async () => {
         const userid = localStorage.getItem('userid');
         const username = localStorage.getItem('username');
         const usertype = localStorage.getItem('usertype');
-        const userhashedpassword = localStorage.getItem('userhashedpassword');
 
-        if (!userid || !username || !usertype || !userhashedpassword) {
+
+        if (!userid || !username || !usertype) {
             navigate('/');
             return;
         }
 
         try {
-            const response = await axios.post(`${process.env.REACT_APP_API_URL}/verify`, {
+            const response = await axios.post(`/verify`, {
                 userid,
                 username,
                 usertype,
-                userhashedpassword,
             });
 
             if (response.data.isValid) {
@@ -43,12 +40,12 @@ const Checklist = () => {
             console.error('Verification failed:', error);
             navigate('/');
         }
-    };
+    }, [navigate]);
 
     const fetchUserChecklist = async () => {
         const userid = localStorage.getItem('userid');
         try {
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-checklist/${userid}`);
+            const response = await axios.get(`/user-checklist/${userid}`);
             setSelectedOptions(response.data); // Set saved checklist options as selected
         } catch (err) {
             setError('Error loading user checklist. Please try again later.');
@@ -62,7 +59,7 @@ const Checklist = () => {
     useEffect(() => {
         const fetchChecklistOptions = async () => {
             try {
-                const response = await axios.get(`${process.env.REACT_APP_API_URL}/checklist-options`);
+                const response = await axios.get(`/checklist-options`);
                 setChecklistOptions(response.data);
             } catch (err) {
                 setError('Error fetching checklist options. Please try again later.');
@@ -95,7 +92,7 @@ const Checklist = () => {
         const userid = localStorage.getItem('userid');
 
         try {
-            await axios.post(`${process.env.REACT_APP_API_URL}/user-checklist`, {
+            await axios.post(`/user-checklist`, {
                 userid,
                 checklistoptionids: selectedOptions,
             });
