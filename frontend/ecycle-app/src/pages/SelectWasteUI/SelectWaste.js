@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../components/api';
@@ -72,9 +73,7 @@ const SelectWaste = () => {
 
     return (
         <>
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
             <div className="select-waste-container">
                 <p className="eyebrow">A BETTER NEXT CHAPTER</p><h2>What will you do today?</h2>
                 <p>Choose a service. We'll find nearby places that accept the items on your checklist.</p>

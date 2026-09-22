@@ -1,0 +1,60 @@
+:root { --ink:#203c32; --muted:#64746b; --paper:#f5f5ef; --line:#dce4d9; --green:#285b46; --lime:#e0ebc7; --radius:22px; --shadow:0 12px 40px #203c3209; }
+body { font-family:'Segoe UI',system-ui,sans-serif; line-height:1.6; background:var(--paper); }
+.App h1,.App h2,.App h3 { color:var(--ink); line-height:1.2; }
+.App button { font-weight:600; transition:background .18s,border-color .18s,box-shadow .18s,transform .18s; }
+.App button:disabled { opacity:.55; cursor:not-allowed; }
+.App :where(button:not(.waste-box):not(#map button)) { border:1px solid var(--line); border-radius:12px; padding:11px 20px; background:#edf1e7; color:var(--green); }
+.App :where(button:not(.waste-box):not(#map button)):hover:not(:disabled) { background:#e0e8d7; }
+.App input:not([type=checkbox]):not([type=radio]),.App textarea,.App select { border:1px solid #c8d4c5; border-radius:12px; padding:13px 16px; background:#fcfdf9; color:var(--ink); font-size:16px; max-width:100%; }
+.App input[type=radio],.App input[type=checkbox] { accent-color:var(--green); }
+.App-header { padding-top:40px; padding-bottom:56px; }
+.App .site-header nav button { border-radius:999px; background:transparent; }
+.App .text-button { background:transparent; border:0; color:var(--green); padding:8px 4px; text-underline-offset:5px; }
+.App .text-button:hover { background:transparent; text-decoration:underline; }
+.App .login-container { max-width:520px; margin-inline:auto; border-radius:28px; box-shadow:var(--shadow); border-color:var(--line); }
+.App .login-container form button { background:var(--green); color:white; border:0; width:100%; padding:15px 22px; border-radius:12px; margin-top:12px; box-shadow:0 5px 12px #285b4615; }
+.App .login-container form button:hover { background:#1f4938; }
+.App .login-container form { gap:3px; }
+.App .login-container > button:not(.text-button) { margin-top:18px; width:100%; }
+.App .login-container > a { display:inline-block; margin-top:22px; }
+.App .login-container select { margin-bottom:14px; }
+.App .forgot-password { display:block; margin:12px 0 0 auto; font-size:13px; }
+.App .signup-prompt { display:flex; justify-content:center; align-items:center; flex-wrap:wrap; gap:0 8px; margin:20px 0; padding-top:18px; border-top:1px solid var(--line); }
+.App .login-footnote { border:0; padding:0; text-align:center; margin-bottom:0; }
+.welcome-story .eyebrow { display:inline-block; background:#e6ecdc; border-radius:999px; padding:8px 13px; font-size:10px; letter-spacing:1.5px; }
+.account-summary { display:flex; align-items:center; gap:12px; padding:14px 18px; margin:0 0 30px; background:#ffffffb8; border:1px solid var(--line); border-radius:18px; text-align:left; }
+.account-avatar { width:42px; height:42px; flex-shrink:0; border-radius:50%; display:grid; place-items:center; background:#dfe9ce; color:var(--green); font-weight:700; font-size:14px; }
+.account-name { display:flex; flex-direction:column; min-width:0; }
+.account-name strong { font-size:14px; font-weight:650; overflow-wrap:anywhere; }
+.account-name span,.account-points span { font-size:11px; color:var(--muted); }
+.account-points { margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; flex-shrink:0; border-left:1px solid var(--line); padding-left:18px; }
+.account-points strong { font-size:20px; line-height:1.2; color:var(--green); }
+.App :is(.signup-container,.signup-shop-container) { border:1px solid var(--line); background:white; border-radius:24px; padding:clamp(24px,4vw,40px); box-shadow:var(--shadow); }
+.App :is(.signup-container,.signup-shop-container) input { width:100%; }
+.App :is(.forums-container,.comments-container,.report-container) { max-height:none; border-radius:22px; }
+.App :is(.forums-list,.comments-list,.shop-details,.report-container table) { background:#f0f3e9; border-color:var(--line); border-radius:16px; }
+.App :is(.forum-item,.comment-item) { background:white; border:1px solid var(--line); border-radius:14px; margin:12px 0; padding:20px; }
+.App :is(.forum-item,.comment-item):hover { background:#f8faf3; border-color:#adc4aa; }
+.App :is(.forum-text,.comment-text) { color:var(--ink); }
+.App :is(.forum-meta,.comment-meta,.no-forums) { color:var(--muted); font-size:13px; }
+.App :is(.back-button,.checklist-button,.submit-button,.post-button,.forum-button,.user-type-container button) { background:var(--green); color:white; border:0; border-radius:12px; padding:12px 22px; }
+.App :is(.back-button,.checklist-button,.submit-button,.post-button,.forum-button):hover { background:#1e4736; }
+.App .button-container { display:flex; flex-direction:row; flex-wrap:wrap; gap:12px; margin-top:24px; }
+@media(max-width:700px) { .App-header { padding:24px 16px 36px; } .account-summary { padding:12px; gap:10px; } .account-points { padding-left:12px; } .account-points span { font-size:10px; } .welcome-layout { gap:28px; } }
+.App .comment-box.even,.App .comment-box.odd { background:#fcfdf8; color:var(--ink); border:1px solid var(--line); border-radius:16px; }
+.App .comment-box .comment-text.deleted { color:var(--muted); opacity:1; }
+.App .no-comments { color:var(--muted); }
+.App :is(.add-comment-button,.save-button,.selectwaste-button,.link-button) { background:var(--green); color:white; border-radius:12px; border:0; padding:12px 18px; }
+.App :is(.reply-button,.edit-button) { background:#e5edd9; color:var(--green); border-radius:10px; }
+.App :is(.delete-button,.report-button,.reportpage-button) { background:#f7e8df; color:#87442e; border-radius:10px; }
+.App .sorting-controls { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.App .report-table th { background:#e4ecd8; color:var(--ink); }
+.App .report-table :is(th,td) { border-color:var(--line); padding:14px; }
+.App .signup-shop-container { width:min(100%,600px); }
+@media(max-width:700px) {
+  .welcome-layout > .login-container { order:0; }
+  .welcome-layout > .welcome-story { order:1; padding:8px 6px; }
+  .welcome-story h1 { font-size:32px; }
+  .welcome-story .journey-steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+  .journey-steps p { font-size:11px; }
+}

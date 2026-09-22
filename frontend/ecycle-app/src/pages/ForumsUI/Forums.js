@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from '../../components/api';
@@ -220,9 +221,7 @@ const Forums = () => {
 
     return (
         <div className="forums-container">
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
         {isVerified ? (
             <>
             <h2 className="forums-title">

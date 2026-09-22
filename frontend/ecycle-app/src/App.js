@@ -14,6 +14,7 @@ import Comments from './pages/CommentsUI/Comments';
 import Report from './pages/ReportUI/Report';
 import { CompleteProfile, ResetPassword, UpdatePassword } from './pages/AccountUI/Account';
 
+import './refinements.css';
 
 const App = () => {
     const { isAuthenticated, logout, error, user } = useAuth();

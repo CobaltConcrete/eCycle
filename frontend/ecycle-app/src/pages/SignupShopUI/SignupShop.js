@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from '../../components/api';
 import { useNavigate } from 'react-router-dom';
@@ -77,9 +78,7 @@ const SignupShop = () => {
 
     return (
         <div className="signup-shop-container">
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
             <h2>Sign Up Your Shop</h2>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>

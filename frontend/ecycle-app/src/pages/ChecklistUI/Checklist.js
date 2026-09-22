@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useEffect, useState, useCallback } from 'react';
 import axios from '../../components/api';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +9,7 @@ const Checklist = () => {
     const [selectedOptions, setSelectedOptions] = useState([]);
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const [usertype, setUsertype] = useState(localStorage.getItem('usertype'));
+    const [usertype] = useState(localStorage.getItem('usertype'));
     const current_role = localStorage.getItem('usertype');
     const current_username = localStorage.getItem('username');
     const current_points = localStorage.getItem('points');
@@ -109,15 +110,15 @@ const Checklist = () => {
 
     return (
         <div className="checklist-container">
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
+            <p className="eyebrow">MAKE ROOM FOR SOMETHING BETTER</p>
             <h2>
-                {usertype === 'shop' ? 'Select Waste Type You Accept:' : 'Select Waste Type You Have:'}
+                {usertype === 'shop' ? 'What items do you accept?' : 'What are you making space for?'}
             </h2>
+            <p className="checklist-intro">{usertype === 'shop' ? 'Choose the categories your location accepts.' : "Select your items. We'll find places that accept your selection."}</p>
             {error && <p style={{ color: 'red' }}>{error}</p>}
             <form onSubmit={handleSubmit}>
-                {checklistOptions.map(option => (
+                <div className="checklist-grid">{checklistOptions.map(option => (
                     <div key={option.checklistoptionid} className="switch-container">
                         <input
                             type="checkbox"
@@ -130,11 +131,12 @@ const Checklist = () => {
                             {option.checklistoptiontype}
                         </label>
                     </div>
-                ))}
+                ))}</div>
+                <div className="checklist-actions"><span aria-live="polite">{selectedOptions.length} selected</span>
                 <button type="button" onClick={handleSelectAll} className="btn select-all-btn">
                     {selectedOptions.length === checklistOptions.length ? 'Deselect All' : 'Select All'}
                 </button>
-                <button type="submit" className="btn submit-btn">Submit</button>
+                <button type="submit" className="btn submit-btn">{usertype === 'shop' ? 'Save accepted items' : 'Continue'} <span aria-hidden="true">&rarr;</span></button></div>
             </form>
         </div>
     );

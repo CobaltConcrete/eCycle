@@ -93,10 +93,10 @@ const Login = () => {
                 </button>
             </form>
             {session && authError && <button onClick={refreshProfile}>Retry loading your account</button>}
-            <button onClick={() => navigate('/reset-password')}>Forgot password?</button>
+            <button className="text-button forgot-password" onClick={() => navigate('/reset-password')}>Forgot password?</button>
             <p className="signup-prompt">
                 Don't have an account? 
-                <button onClick={handleSignUp} style={{ marginLeft: '5px' }}>
+                <button onClick={handleSignUp} className="text-button">
                     Create an account
                 </button>
             </p>

@@ -4,6 +4,7 @@ import api from '../../components/api';
 import { useAuth } from '../../components/AuthContext';
 import { locationPopup } from '../../components/locationPopup';
 import { loadMaps, locateDevice, normalizeLocation, apiMessage } from '../../components/mapServices';
+import TransportIcon from '../../components/TransportIcon';
 import './Map.css';
 
 export default function MapPage() {
@@ -18,6 +19,8 @@ export default function MapPage() {
     const [history, setHistory] = useState([]);
     const [selected, setSelected] = useState(null);
     const [mode, setMode] = useState('DRIVING');
+    const [placeView, setPlaceView] = useState('nearby');
+    const modes = [['DRIVING', 'Driving'], ['WALKING', 'Walking'], ['BICYCLING', 'Bicycling'], ['TRANSIT', 'Transit']];
     const [route, setRoute] = useState(null);
     const [busy, setBusy] = useState(false);
     const [searching, setSearching] = useState(false);
@@ -177,7 +180,7 @@ export default function MapPage() {
     }, [maps, route]);
 
     const locationList = (items, prefix) => <ul className="map-place-list">{items.map(place => <li key={place.shopid}>
-        <button type="button" aria-pressed={selected?.shopid === place.shopid} onClick={() => selectLocation(place)}>
+        <button className="place-title" type="button" aria-pressed={selected?.shopid === place.shopid} onClick={() => selectLocation(place)}>
             {prefix} {place.shopname}
         </button>
         <p>{place.addressname}</p><p>{place.distance} km straight-line distance</p>
@@ -185,8 +188,10 @@ export default function MapPage() {
     </li>)}</ul>;
 
     return <section className="map-page">
+        <p className="eyebrow">A GOOD PLACE TO START</p>
         <h1>Find nearby {type === 'repair' ? 'repair shops' : type === 'dispose' ? 'disposal locations' : 'recycling locations'}</h1>
-        <form onSubmit={search}>
+        <p className="map-intro">A new life for your items could be just around the corner.</p>
+        <form className="map-search" onSubmit={search}>
             <fieldset><legend>Where are you starting from?</legend>
                 <label><input type="radio" name="location-source" checked={source === 'device'} onChange={() => { clearOrigin(); setSource('device'); }} /> My current location</label>
                 <label><input type="radio" name="location-source" checked={source === 'address'} onChange={() => { clearOrigin(); setSource('address'); }} /> Enter an address</label>
@@ -196,11 +201,18 @@ export default function MapPage() {
         </form>
         {error && <p role="alert">{error}</p>}
         {origin && <p>Search origin: {origin.lat.toFixed(5)}, {origin.lng.toFixed(5)}{Number.isFinite(origin.accuracy) ? ` (reported accuracy: ${Math.round(origin.accuracy)} m)` : ''}</p>}
-        <label className="transport-mode-container">Transport mode <select value={mode} onChange={event => setMode(event.target.value)}>
-            <option value="DRIVING">Driving</option><option value="WALKING">Walking</option><option value="BICYCLING">Bicycling</option><option value="TRANSIT">Transit</option>
-        </select></label>
+        <fieldset className="transport-picker">
+            <legend>How would you like to get there?</legend>
+            <div className="transport-track" style={{ '--mode-index': modes.findIndex(([value]) => value === mode) }}>
+                <span className="transport-indicator" aria-hidden="true" />
+                {modes.map(([value, label]) => <label key={value} className={mode === value ? 'transport-pill selected' : 'transport-pill'}>
+                    <input type="radio" name="transport-mode" value={value} checked={mode === value} onChange={() => setMode(value)} />
+                    <TransportIcon mode={value} /><span>{label}</span>
+                </label>)}
+            </div>
+        </fieldset>
         {mapError && <div role="alert"><p>{mapError}</p><button onClick={() => { setMaps(null); setMapAttempt(value => value + 1); }}>Retry map</button></div>}
-        <div ref={node} id="map" aria-label="Nearby places and route map" style={{ height: 400, width: '100%' }} />
+        <div ref={node} id="map" aria-label="Nearby places and route map" className="map-canvas" />
         {selected && <h2>Directions to {selected.shopname}</h2>}
         {routing && <p role="status">Loading directions...</p>}
         {routeError && <div role="alert"><p>{routeError}</p><button onClick={() => setRouteAttempt(value => value + 1)}>Retry directions</button></div>}
@@ -213,13 +225,18 @@ export default function MapPage() {
                 {!route.directions.length && <p>No detailed instructions were supplied for this route.</p>}
             </details>
         </div>}
-        <details open className="location-details"><summary>Nearby places</summary>
+        <div className="place-browser">
+        <div className="place-tabs" role="group" aria-label="Places to explore">
+            <button type="button" aria-pressed={placeView === 'nearby'} onClick={() => setPlaceView('nearby')}>Nearby places <span aria-hidden="true">{locations.length}</span></button>
+            <button type="button" aria-pressed={placeView === 'recent'} onClick={() => setPlaceView('recent')}>Recently viewed places <span aria-hidden="true">{history.length}</span></button>
+        </div>
+        <section className="location-details" aria-label="Nearby places" hidden={placeView !== 'nearby'}>
             {!origin ? <p>Choose a starting point to find places.</p> : searching ? <p role="status">Finding matching places...</p> : !locations.length ? <p>No matching places found for this search.</p> : locationList(locations, 'Directions to')}
-        </details>
-        <details className="history-details"><summary>Recently viewed places</summary>
+        </section>
+        <section className="history-details" aria-label="Recently viewed places" hidden={placeView !== 'recent'}>
             {historyError && <p role="alert">{historyError}</p>}
             {history.length ? locationList(history, 'Revisit') : <p>No recent places for this account.</p>}
-        </details>
+        </section></div>
         <div className="button-container"><button onClick={() => navigate(user?.usertype === 'shop' ? `/forums/${userid}` : '/select-waste')}>Back</button>
             {user?.usertype === 'admin' && <button onClick={() => navigate('/report')}>Review reports</button>}
         </div>

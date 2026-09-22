@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../components/api';
@@ -84,9 +85,7 @@ const Report = () => {
 
     return (
         <div className="report-container">
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
             <h2>Reported Comments</h2>
             <p>Reports await moderator review. A report is not a finding of harmful content.</p>
             {error && <p className="error-message">{error}</p>}

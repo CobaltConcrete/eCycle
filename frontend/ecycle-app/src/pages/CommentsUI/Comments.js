@@ -1,3 +1,4 @@
+import AccountSummary from '../../components/AccountSummary';
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../components/api';
@@ -474,9 +475,7 @@ const Comments = () => {
 
     return (
         <div className="comments-container">
-            <div className="user-info">
-                <p>Role: <u>{current_role}</u> | Username: <u>{current_username}</u> | Points: <u>{current_points}</u></p>
-            </div>
+            <AccountSummary username={current_username} role={current_role} points={current_points} />
             {forumDetails && (
                 <div className="forum-details">
                     <h2 className="forum-title">{forumDetails.forumtext}</h2>

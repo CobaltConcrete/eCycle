@@ -69,7 +69,8 @@ test('manual origin drives nearby search, history routes and mode changes', asyn
     fireEvent.click(screen.getByText('Recently viewed places'));
     fireEvent.click(await screen.findByRole('button', { name: 'Revisit Previous shop' }));
     await screen.findByText('Turn left');
-    fireEvent.change(screen.getByLabelText('Transport mode'), { target: { value: 'TRANSIT' } });
+    fireEvent.click(screen.getByRole('radio', { name: 'Transit' }));
+    expect(screen.getByRole('radio', { name: 'Transit' })).toBeChecked();
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/get-directions', {
         user_location: { lat: 1.2, lon: 103.7 }, destination: { lat: 1.4, lon: 103.9 }, mode: 'TRANSIT',
     }, expect.anything()));
@@ -105,7 +106,7 @@ test('late route responses cannot overwrite a newer mode and old polylines are r
         ? new Promise(resolve => { oldResponse = resolve; }) : original(path, body, options));
     page(); fireEvent.click(await searchDevice());
     await waitFor(() => expect(oldResponse).toBeDefined());
-    fireEvent.change(screen.getByLabelText('Transport mode'), { target: { value: 'WALKING' } });
+    fireEvent.click(screen.getByRole('radio', { name: 'Walking' }));
     await screen.findByText('Turn left');
     await act(async () => oldResponse({ data: { ...route, directions: ['Obsolete driving directions'] } }));
     expect(screen.queryByText('Obsolete driving directions')).not.toBeInTheDocument();
