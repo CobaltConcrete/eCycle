@@ -57,6 +57,26 @@ test('requests location only on demand, accepts zero coordinates and keeps one m
     expect(screen.getByText('Route warning')).toBeInTheDocument();
     await waitFor(() => expect(sdk.geometry.encoding.decodePath).toHaveBeenCalledWith('test-line'));
     expect(sdk.Map).toHaveBeenCalledTimes(1);
+    expect(sdk.Marker).toHaveBeenCalledWith(expect.objectContaining({
+        title: 'Your starting point', icon: expect.objectContaining({ fillColor: '#2563eb' }),
+    }));
+});
+
+test('radius starts at ten matches and expands/shrinks without another search request', async () => {
+    const original = api.post.getMockImplementation();
+    api.post.mockImplementation((path, body, options) => path === '/nearby-locations'
+        ? Promise.resolve({ data: Array.from({ length: 15 }, (_, i) => ({ ...place, shopid: i + 1, shopname: `Place ${i + 1}`, distance: i + 1 })) })
+        : original(path, body, options));
+    page();
+    fireEvent.click(screen.getByRole('button', { name: 'Use my location' }));
+    await screen.findByText('10 matching places within 10.0 km');
+    const slider = screen.getByRole('slider', { name: /Search radius/ });
+    expect(slider).toHaveValue('10');
+    fireEvent.change(slider, { target: { value: '15' } });
+    expect(screen.getByText('15 matching places within 15.0 km')).toBeInTheDocument();
+    fireEvent.change(slider, { target: { value: '0.1' } });
+    expect(screen.getByText('0 matching places within 0.1 km')).toBeInTheDocument();
+    expect(api.post.mock.calls.filter(([path]) => path === '/nearby-locations')).toHaveLength(1);
 });
 
 test('manual origin drives nearby search, history routes and mode changes', async () => {
@@ -69,8 +89,8 @@ test('manual origin drives nearby search, history routes and mode changes', asyn
     fireEvent.click(screen.getByText('Recently viewed places'));
     fireEvent.click(await screen.findByRole('button', { name: 'Revisit Previous shop' }));
     await screen.findByText('Turn left');
-    fireEvent.click(screen.getByRole('radio', { name: 'Transit' }));
-    expect(screen.getByRole('radio', { name: 'Transit' })).toBeChecked();
+    fireEvent.click(screen.getByRole('radio', { name: 'Train' }));
+    expect(screen.getByRole('radio', { name: 'Train' })).toBeChecked();
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/get-directions', {
         user_location: { lat: 1.2, lon: 103.7 }, destination: { lat: 1.4, lon: 103.9 }, mode: 'TRANSIT',
     }, expect.anything()));
@@ -110,6 +130,7 @@ test('late route responses cannot overwrite a newer mode and old polylines are r
     await screen.findByText('Turn left');
     await act(async () => oldResponse({ data: { ...route, directions: ['Obsolete driving directions'] } }));
     expect(screen.queryByText('Obsolete driving directions')).not.toBeInTheDocument();
+    await waitFor(() => expect(sdk.Polyline).toHaveBeenCalled());
     const line = sdk.Polyline.mock.results[0].value;
     fireEvent.click(screen.getByLabelText('Enter an address'));
     await waitFor(() => expect(line.setMap).toHaveBeenCalledWith(null));

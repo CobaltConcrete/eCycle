@@ -48,6 +48,8 @@ def compute_route(payload: DirectionsInput) -> DirectionsResponse:
         "languageCode": "en",
         "units": "METRIC",
     }
+    if payload.mode.upper() == "TRANSIT":
+        body["transitPreferences"] = {"allowedTravelModes": ["RAIL"]}
     try:
         response = requests.post(
             ROUTES_URL,

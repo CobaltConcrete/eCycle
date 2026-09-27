@@ -29,18 +29,18 @@ def test_all_selected_items_and_constant_query_count(app, db):
     finally:
         event.remove(db.engine, "before_cursor_execute", record)
     assert response.status_code == 200
-    assert [row["shopid"] for row in response.json()] == [4, 6, 8, 10, 12]
+    assert [row["shopid"] for row in response.json()] == list(range(4, 32, 2))
     assert len(statements) == 3  # One identity/role lookup + two search queries.
 
 
-def test_empty_checklist_keeps_all_items_and_limits_results(app, db):
-    assert [r["shopid"] for r in search(app).json()] == [3, 4, 5, 6, 7]
+def test_empty_checklist_returns_all_matching_places_without_a_cap(app, db):
+    assert [r["shopid"] for r in search(app).json()] == list(range(3, 32))
 
 
 def test_ties_are_resolved_by_shop_id(app, db):
     db.session.query(ShopTable).update({"latitude": 0})
     db.session.commit()
-    assert [r["shopid"] for r in search(app).json()] == [3, 4, 5, 6, 7]
+    assert [r["shopid"] for r in search(app).json()] == list(range(3, 32))
 
 
 def test_sort_uses_unrounded_distance(app, db):
@@ -49,7 +49,8 @@ def test_sort_uses_unrounded_distance(app, db):
     db.session.commit()
     rows = search(app).json()
     assert rows[0]["shopid"] == 4
-    assert rows[0]["distance"] == rows[1]["distance"]
+    assert rows[0]["distance"] < rows[1]["distance"]
+    assert round(rows[0]["distance"], 2) == round(rows[1]["distance"], 2)
 
 
 def test_no_matching_shop(app, db):

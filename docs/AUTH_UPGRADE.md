@@ -63,6 +63,9 @@ original application tables or shop/category data. Configure the credentials
 below first, then prepare the base schema and reviewed seed data (or restore a
 reviewed backup into this empty development database) before running
 `001_auth_identity.sql`. That migration alone is not a fresh-database installer.
+For the reviewed historical baseline, use the [setup and recovery runbook](SETUP_AND_RECOVERY.md#6-populate-a-new-empty-database-from-the-reviewed-baseline):
+`populate_database.py` creates the base schema and applies the identity/RLS
+migration in one transaction, so do not apply that migration separately first.
 The Gmail used to own the Supabase account is separate from the database password
 and from eCycle application accounts; its Gmail password never belongs in `.env`.
 

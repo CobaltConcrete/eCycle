@@ -62,7 +62,10 @@ def test_route_contract_mode_mapping_and_key_boundary(app, provider, mode, expec
         "longitude": 0,
     }
     assert "routingPreference" not in kwargs["json"]
-    assert "transitPreferences" not in kwargs["json"]
+    if expected == "TRANSIT":
+        assert kwargs["json"]["transitPreferences"] == {"allowedTravelModes": ["RAIL"]}
+    else:
+        assert "transitPreferences" not in kwargs["json"]
     assert kwargs["headers"]["X-Goog-Api-Key"] == "fixture-server-key"
     assert "*" not in kwargs["headers"]["X-Goog-FieldMask"]
     assert kwargs["allow_redirects"] is False

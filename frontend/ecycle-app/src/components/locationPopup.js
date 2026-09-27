@@ -16,7 +16,7 @@ export function locationPopup(location, onOpenForum) {
     if (Number.isFinite(location.distance)) {
         const distance = document.createElement('p');
         distance.className = 'popup-distance';
-        distance.textContent = `${location.distance} km away · straight-line distance`;
+        distance.textContent = `${location.distance.toFixed(2)} km away · straight-line distance`;
         container.appendChild(distance);
     }
     const actions = document.createElement('div');

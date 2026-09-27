@@ -2,6 +2,12 @@
 
 React + FastAPI + PostgreSQL application for repair and recycling discovery in Singapore.
 
+Interview preparation: [codebase study guide, API inventory and system-design questions](docs/eCycle_SWE_INTERVIEW_GUIDE.md).
+
+Start here: [complete setup, Render deployment and database recovery](docs/SETUP_AND_RECOVERY.md).
+Includes creating a replacement Supabase project, repopulating an empty database,
+and updating both local and Render environment variables.
+
 Read [the architecture, upgrade plan, Supabase setup, and implementation log](docs/UPGRADE_PLAN.md).
 Original requirements: [SRS](docs/SRS_Template.docx).
 

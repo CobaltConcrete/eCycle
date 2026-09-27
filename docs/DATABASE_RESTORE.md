@@ -1,5 +1,10 @@
 # Database population — 22 September 2026
 
+For first setup or a replacement Supabase project, follow the ordered
+[setup and recovery runbook](SETUP_AND_RECOVERY.md), including Render environment
+changes. The counts below record the September 22 baseline import, not current
+live counts. Resume a paused project before considering a baseline rebuild.
+
 ## Learning questions, before implementation
 
 1. **Why was the previous solution insufficient?** The configured Supabase PostgreSQL database is reachable, but its public schema has no tables. Files in the repository are backups, not a populated database. Historical creation scripts also disagree with the current models: history lacks its composite key and forum references the user table instead of the shop table.

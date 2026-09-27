@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../components/api';
 import { useAuth } from '../../components/AuthContext';
@@ -15,12 +15,15 @@ export default function MapPage() {
     const [source, setSource] = useState('device');
     const [address, setAddress] = useState('');
     const [origin, setOrigin] = useState(null);
-    const [locations, setLocations] = useState([]);
+    const [candidates, setLocations] = useState([]);
+    const [radius, setRadius] = useState(5);
+    const locations = useMemo(() => candidates.filter(place => place.distance <= radius), [candidates, radius]);
+    const maxRadius = Math.max(10, Math.ceil(candidates[candidates.length - 1]?.distance || 10));
     const [history, setHistory] = useState([]);
     const [selected, setSelected] = useState(null);
     const [mode, setMode] = useState('DRIVING');
     const [placeView, setPlaceView] = useState('nearby');
-    const modes = [['DRIVING', 'Driving'], ['WALKING', 'Walking'], ['BICYCLING', 'Bicycling'], ['TRANSIT', 'Transit']];
+    const modes = [['DRIVING', 'Driving'], ['WALKING', 'Walking'], ['BICYCLING', 'Bicycling'], ['TRANSIT', 'Train']];
     const [route, setRoute] = useState(null);
     const [busy, setBusy] = useState(false);
     const [searching, setSearching] = useState(false);
@@ -102,7 +105,13 @@ export default function MapPage() {
         const controller = new AbortController();
         setSearching(true);
         api.post('/nearby-locations', { userid, lat: origin.lat, lon: origin.lng, actiontype: type }, { signal: controller.signal })
-            .then(({ data }) => { if (!cancelled) setLocations(data.map(normalizeLocation)); })
+            .then(({ data }) => {
+                if (cancelled) return;
+                const matches = data.map(normalizeLocation).sort((a, b) => a.distance - b.distance || a.shopid - b.shopid);
+                setLocations(matches);
+                const target = matches[Math.min(9, matches.length - 1)];
+                setRadius(target ? Math.max(0.1, Math.ceil(target.distance * 10) / 10) : 5);
+            })
             .catch(err => { if (!cancelled) setError(apiMessage(err, 'Unable to load nearby locations. Please search again.')); })
             .finally(() => { if (!cancelled) setSearching(false); });
         return () => { cancelled = true; controller.abort(); };
@@ -131,7 +140,11 @@ export default function MapPage() {
         if (!origin) return;
         const markers = [];
         const bounds = new maps.LatLngBounds();
-        markers.push(new maps.Marker({ map: mapRef.current, position: origin, title: 'Search origin' }));
+        markers.push(new maps.Marker({
+            map: mapRef.current, position: origin, title: 'Your starting point', zIndex: 1000,
+            icon: { path: 'M 0,-10 A 10,10 0 1,1 0,10 A 10,10 0 1,1 0,-10 Z',
+                fillColor: '#2563eb', fillOpacity: 1, strokeColor: '#ffffff', strokeWeight: 3, scale: 1 },
+        }));
         bounds.extend(origin);
         const visible = [...locations];
         if (selected && !visible.some(place => place.shopid === selected.shopid)) visible.push(selected);
@@ -183,7 +196,7 @@ export default function MapPage() {
         <button className="place-title" type="button" aria-pressed={selected?.shopid === place.shopid} onClick={() => selectLocation(place)}>
             {prefix} {place.shopname}
         </button>
-        <p>{place.addressname}</p><p>{place.distance} km straight-line distance</p>
+        <p>{place.addressname}</p><p>{place.distance.toFixed(2)} km straight-line distance</p>
         {place.time && <p>Last viewed: {place.time}</p>}
     </li>)}</ul>;
 
@@ -201,6 +214,15 @@ export default function MapPage() {
         </form>
         {error && <p role="alert">{error}</p>}
         {origin && <p>Search origin: {origin.lat.toFixed(5)}, {origin.lng.toFixed(5)}{Number.isFinite(origin.accuracy) ? ` (reported accuracy: ${Math.round(origin.accuracy)} m)` : ''}</p>}
+        <div className="radius-control">
+            <label htmlFor="search-radius">Search radius <strong>{radius.toFixed(1)} km</strong></label>
+            <input id="search-radius" type="range" min="0.1" max={maxRadius} step="0.1" value={radius}
+                disabled={!origin || searching || busy} aria-describedby="radius-help"
+                aria-valuetext={radius.toFixed(1) + ' kilometres'}
+                onChange={event => { setRadius(Number(event.target.value)); setSelected(null); }} />
+            <p id="radius-help">Straight-line distance. Travel routes may be longer. The starting radius aims for 10 matching places.</p>
+            {origin && !searching && <p role="status">{locations.length} matching places within {radius.toFixed(1)} km</p>}
+        </div>
         <fieldset className="transport-picker">
             <legend>How would you like to get there?</legend>
             <div className="transport-track" style={{ '--mode-index': modes.findIndex(([value]) => value === mode) }}>
@@ -211,6 +233,8 @@ export default function MapPage() {
                 </label>)}
             </div>
         </fieldset>
+        {mode === 'TRANSIT' && <p>Train routes prefer MRT, LRT and rail. Google may include other transport where needed.</p>}
+        <p className="map-legend"><span className="origin-dot" aria-hidden="true" /> Your starting point <span aria-hidden="true"> | </span> Pins: matching places</p>
         {mapError && <div role="alert"><p>{mapError}</p><button onClick={() => { setMaps(null); setMapAttempt(value => value + 1); }}>Retry map</button></div>}
         <div ref={node} id="map" aria-label="Nearby places and route map" className="map-canvas" />
         {selected && <h2>Directions to {selected.shopname}</h2>}

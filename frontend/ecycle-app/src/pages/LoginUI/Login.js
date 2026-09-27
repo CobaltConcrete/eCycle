@@ -3,17 +3,20 @@ import { Navigate, useNavigate } from 'react-router-dom';
 import { requireSupabase } from '../../components/supabase';
 import { useAuth } from '../../components/AuthContext';
 import './Login.css';
+import SocialSignIn from '../../components/SocialSignIn';
 
 const Login = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [socialBusy, setSocialBusy] = useState(false);
     const navigate = useNavigate();
     const { user, session, needsProfile, loading: authLoading, error: authError, refreshProfile, recovery } = useAuth();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (loading || socialBusy) return;
         setError('');
 
         if (!username.trim()) {
@@ -65,6 +68,7 @@ const Login = () => {
             <h2 id="login-heading">Welcome back.</h2>
             <p className="login-description">Sign in to find the right place for your items.</p>
             {(error || authError) && <p className="login-error" id="login-error" role="alert">{error || authError}</p>}
+            <SocialSignIn disabled={loading} onBusyChange={setSocialBusy} />
             <form onSubmit={handleSubmit} aria-busy={loading}>
                 <label htmlFor="login-username">Email</label>
                 <input
@@ -88,7 +92,7 @@ const Login = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Password"
                 />
-                <button type="submit" disabled={loading}>
+                <button type="submit" disabled={loading || socialBusy}>
                     {loading ? 'Signing in...' : 'Sign in →'}
                 </button>
             </form>

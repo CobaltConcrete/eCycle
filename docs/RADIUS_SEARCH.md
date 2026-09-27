@@ -1,0 +1,16 @@
+# Radius search and Train control
+
+## Four learning questions before implementation
+
+1. The five-result cap hides other nearby matches and prevents the user expressing a distance preference.
+2. Return the matching directory ordered by distance once per origin/service; filter it immediately with a native distance slider. Initialize to the tenth match's distance rounded upward to 0.1 km (minimum 0.1 km); fewer matches use the furthest available, no matches use 5 km. Equal-distance matches are included, so the initial count can exceed ten. This avoids an Auth/database round trip for each slider movement.
+3. Radius means straight-line distance, not route distance or journey time. Fetching all matches is reasonable for the current 718-location baseline but scales in payload and browser memory with directory size. No latency improvement is claimed; SQL-side spatial filtering and paginated results should replace this approach as the directory grows.
+4. A fixed 5 km default cannot reliably produce ten matches across locations/categories. Server queries on every slider movement add latency/load; debounced PostGIS radius queries are a better future large-directory solution but require a schema/index migration. A ten-result cap would repeat the original problem.
+
+The Train label retains the compatible TRANSIT API value but requests Google's RAIL preference (subway/train/light rail). Provider preferences are not a guarantee of train-only journeys; explain this beside the control. [Google transit preferences](https://developers.google.com/maps/documentation/routes/reference/rest/v2/TransitPreferences)
+
+Implemented full-precision sorted API results, a native labelled range control, tenth-match initialization and local filtering. The slider runs from 0.1 km to at least 10 km, extending to the furthest matching location rounded up to a whole kilometre. It is disabled before an origin exists/during search. New origins reset the default; manual adjustments clear the selected route. No matching records leaves an explicit empty result and a 5 km initial radius. The map marker list follows filtered results; recently viewed selections remain independently usable.
+
+Origin-marker learning addition: identical origin/destination markers were ambiguous. A blue circular marker, white border, accessible title and visible legend distinguish the origin by both shape and color. Custom SVG-path marker styling uses the existing Google SDK; no icon package or external image download is needed. Provider rendering still requires live verification.
+
+No database migration or credential changes are needed. Deploy the backend and frontend together: an old backend still returns only five places. Validation: 85 backend tests and 30 frontend tests passed; Ruff lint and formatting checks passed. The production frontend build succeeded with existing Comments/Forums lint warnings and an outdated Browserslist notice. Frontend tests verify initial ten-match selection, expanding/reducing the radius without another nearby request, and the distinct origin marker configuration. Tests mock the map provider; live marker rendering and rail journeys remain unverified in this iteration. No provider calls or live database writes were performed for these tests.

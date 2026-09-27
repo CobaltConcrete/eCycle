@@ -1,5 +1,4 @@
 import os
-from heapq import nsmallest
 
 import requests
 from fastapi import APIRouter, HTTPException
@@ -60,10 +59,8 @@ def get_nearby_locations(user: CurrentUser, payload: NearbyInput, session: Datab
                 "distance": distance,
             }
         )
-    nearby_shops = nsmallest(5, shop_list, key=lambda x: (x["distance"], x["shopid"]))
-    for shop in nearby_shops:
-        shop["distance"] = round(shop["distance"], 2)
-    return nearby_shops
+    # Return full-precision distances for client radius filtering. Round for display only.
+    return sorted(shop_list, key=lambda x: (x["distance"], x["shopid"]))
 
 
 @router.post("/get-current-coordinates", deprecated=True)

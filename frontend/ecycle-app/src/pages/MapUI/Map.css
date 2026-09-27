@@ -47,3 +47,10 @@
 .location-info a:hover { text-decoration:underline; }
 .App .location-info .forum-button { width:100%; border-radius:10px; background:var(--green); color:white; margin-top:4px; }
 @media(max-width:600px) { .map-search { padding:18px; } .transport-pill { flex-direction:column; gap:3px; padding:8px 2px; font-size:11px; } .map-canvas { height:350px; } .place-browser { padding:12px; } .place-tabs { gap:2px; } .App .place-tabs button { font-size:12px; padding:10px 6px; } .map-place-list { grid-template-columns:1fr; } }
+.radius-control { margin:24px 0; border:1px solid var(--line); border-radius:18px; padding:20px; background:white; }
+.radius-control label { display:flex; justify-content:space-between; gap:12px; font-size:14px; font-weight:600; }
+.radius-control strong { color:var(--green); font-variant-numeric:tabular-nums; }
+.App .radius-control input[type=range] { width:100%; padding:0; margin:10px 0; border:0; accent-color:var(--green); background:transparent; cursor:pointer; }
+.radius-control p { color:var(--muted); font-size:12px; margin:4px 0; }
+.map-legend { display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.origin-dot { width:14px; height:14px; border:2px solid white; box-shadow:0 0 0 1px #2563eb; border-radius:50%; background:#2563eb; }
