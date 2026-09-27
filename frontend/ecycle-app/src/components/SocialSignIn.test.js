@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 test.each([
-    ['Google', 'google', {}], ['GitHub', 'github', {}], ['Microsoft', 'azure', { scopes: 'email' }],
+    ['Google', 'google', {}],
 ])('%s requests OAuth with a same-origin return URL', async (label, provider, extra) => {
     const signInWithOAuth = jest.fn().mockResolvedValue({ data: {}, error: null });
     requireSupabase.mockReturnValue({ auth: { signInWithOAuth } });
@@ -32,6 +32,7 @@ test.each([Login, Signup])('account screen supports OAuth without requiring emai
     const signInWithOAuth = jest.fn().mockResolvedValue({ error: null });
     requireSupabase.mockReturnValue({ auth: { signInWithOAuth } });
     render(<MemoryRouter><Page /></MemoryRouter>);
+    expect(screen.queryByRole('button', { name: /GitHub|Microsoft/ })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
     await waitFor(() => expect(signInWithOAuth).toHaveBeenCalledTimes(1));
     expect(screen.getByRole('button', { name: /^(Sign in|Create account)/ })).toBeDisabled();
@@ -42,19 +43,19 @@ test('provider errors release controls for retry without displaying provider det
     const onBusyChange = jest.fn();
     requireSupabase.mockReturnValue({ auth: { signInWithOAuth } });
     render(<SocialSignIn onBusyChange={onBusyChange} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Continue with GitHub' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to start GitHub sign-in');
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to start Google sign-in');
     expect(screen.getByRole('alert')).not.toHaveTextContent('sensitive-provider-details');
-    expect(screen.getByRole('button', { name: 'Continue with GitHub' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeEnabled();
     expect(onBusyChange).toHaveBeenLastCalledWith(false);
 });
 
 test('handles missing configuration and thrown network errors', async () => {
     requireSupabase.mockImplementation(() => { throw new Error('not configured'); });
     render(<SocialSignIn />);
-    fireEvent.click(screen.getByRole('button', { name: 'Continue with Microsoft' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to start Microsoft sign-in');
-    expect(screen.getByRole('button', { name: 'Continue with Microsoft' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Continue with Google' }));
+    expect(await screen.findByRole('alert')).toHaveTextContent('Unable to start Google sign-in');
+    expect(screen.getByRole('button', { name: 'Continue with Google' })).toBeEnabled();
 });
 
 test('cancelled callback shows a safe explanation without echoing URL error details', () => {

@@ -3,8 +3,6 @@ import { requireSupabase } from './supabase';
 
 const providers = [
     { id: 'google', label: 'Google' },
-    { id: 'github', label: 'GitHub' },
-    { id: 'azure', label: 'Microsoft', scopes: 'email' },
 ];
 
 function callbackError() {
@@ -30,7 +28,6 @@ export default function SocialSignIn({ disabled = false, onBusyChange }) {
                 provider: provider.id,
                 options: {
                     redirectTo: window.location.origin + '/',
-                    ...(provider.scopes ? { scopes: provider.scopes } : {}),
                 },
             });
             if (authError) throw authError;

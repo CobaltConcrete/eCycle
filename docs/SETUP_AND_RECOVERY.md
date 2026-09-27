@@ -206,7 +206,7 @@ Do not put the restore/import command in Render's startup or pre-deploy command.
 
 ## 7. Configure authentication and Google Maps
 
-For Google, GitHub and Microsoft login, follow [OAuth provider setup](OAUTH_SETUP.md) as well. These options avoid eCycle confirmation-email delivery for social sign-in, but each provider must be configured in Supabase. Their client secrets do not belong in either app's `.env`.
+For Google login, follow [OAuth provider setup](OAUTH_SETUP.md) as well. Google login avoids eCycle confirmation-email delivery, but must be configured in Supabase. Its operational client secret belongs in Supabase provider settings; any ignored local copy is only an operator reference.
 
 ### Troubleshooting: missing confirmation email or reset opens localhost
 
